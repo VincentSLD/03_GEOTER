@@ -188,12 +188,12 @@
   #scan3d-modal.open{display:flex}
   #scan3d-header{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:var(--black);border-bottom:2px solid var(--yellow);flex-shrink:0;z-index:2}
   #scan3d-header span{font-weight:800;font-size:14px;color:var(--yellow);display:flex;align-items:center;gap:6px}
-  #scan3d-header .scan3d-actions{display:flex;gap:8px;align-items:center;margin-right:44px}
+  #scan3d-header .scan3d-actions{display:flex;gap:8px;align-items:center}
   .btn-scan3d{border:none;border-radius:8px;padding:8px 14px;font-size:11px;font-weight:700;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:5px}
   .btn-scan3d-import{background:var(--yellow);color:var(--black);font-weight:800}
   .btn-scan3d-import:hover{background:var(--yellow-light)}
   .btn-scan3d-reset{background:var(--black-mid);color:#fff;border:1px solid rgba(255,255,255,0.15)}.btn-scan3d-reset:hover{background:var(--gray-700)}
-  .btn-scan3d-close{background:var(--red);color:#fff;border-radius:50%;width:36px;height:36px;padding:0;font-size:16px}
+  .btn-scan3d-close{background:transparent;color:var(--gray-300);border:none;padding:8px;font-size:18px;font-weight:800;line-height:1}
   #scan3d-canvas{flex:1;width:100%;cursor:grab}
   #scan3d-canvas:active{cursor:grabbing}
   #scan3d-info{position:absolute;bottom:12px;left:12px;background:rgba(0,0,0,0.7);color:var(--yellow);padding:6px 12px;border-radius:6px;font-size:11px;font-weight:700;z-index:2;backdrop-filter:blur(4px)}
@@ -317,6 +317,7 @@
         <input type="file" id="scan3dInput" accept=".ply,.obj" style="display:none" onchange="loadScanFile(event)">
         <button class="btn-scan3d btn-scan3d-measure" id="btn-measure" onclick="toggleMeasureMode()">📏 Mesurer</button>
         <button class="btn-scan3d btn-scan3d-clear" onclick="clearMeasurements()">🗑️ Effacer</button>
+        <button class="btn-scan3d btn-scan3d-reset" onclick="captureScan3D()">📸 Capture</button>
         <button class="btn-scan3d btn-scan3d-reset" onclick="resetScan3DView()">🔄 Recentrer</button>
         <button class="btn-scan3d btn-scan3d-close" onclick="closeScan3D()">✕</button>
       </div>
@@ -862,7 +863,7 @@ function initScan3D(){
   scan3dScene.background=new THREE.Color(0x1a1a1a);
   scan3dCamera=new THREE.PerspectiveCamera(60,w/h,0.01,1000);
   scan3dCamera.position.set(0,2,5);
-  scan3dRenderer=new THREE.WebGLRenderer({canvas,antialias:true});
+  scan3dRenderer=new THREE.WebGLRenderer({canvas,antialias:true,preserveDrawingBuffer:true});
   scan3dRenderer.setSize(w,h);
   scan3dRenderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
   scan3dControls=new OrbitControls(scan3dCamera,canvas);
@@ -1106,6 +1107,15 @@ window.clearMeasurements=function(){
   measureObjects.forEach(o=>{scan3dScene.remove(o);if(o.geometry)o.geometry.dispose();if(o.material){if(o.material.map)o.material.map.dispose();o.material.dispose();}});
   measureObjects=[];
   measurePending=[];
+};
+
+window.captureScan3D=function(){
+  if(!scan3dRenderer)return;
+  scan3dRenderer.render(scan3dScene,scan3dCamera);
+  const url=scan3dRenderer.domElement.toDataURL('image/png');
+  document.getElementById('snapshot-img').src=url;
+  document.getElementById('snapshot-download').href=url;
+  document.getElementById('snapshot-modal').classList.add('open');
 };
 </script>
 </body>
