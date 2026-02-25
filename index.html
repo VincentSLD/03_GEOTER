@@ -320,7 +320,7 @@
       <span>📡 Scan 3D</span>
       <div class="scan3d-actions">
         <button class="btn-scan3d btn-scan3d-import" onclick="document.getElementById('scan3dInput').click()">📂 Importer</button>
-        <input type="file" id="scan3dInput" accept=".ply,.obj" style="display:none" onchange="loadScanFile(event)">
+        <input type="file" id="scan3dInput" accept=".ply,.obj,.mtl,.jpg,.jpeg,.png,.tga,.bmp" multiple style="display:none" onchange="loadScanFile(event)">
         <button class="btn-scan3d btn-scan3d-measure" id="btn-distance" onclick="toggleDistanceMode()">📏 Distance</button>
         <button class="btn-scan3d btn-scan3d-measure" id="btn-alti" onclick="toggleAltiMode()">📐 Altimétrie</button>
         <button class="btn-scan3d btn-scan3d-measure" id="btn-ngf" onclick="toggleNgfMode()">📌 Réf. NGF</button>
@@ -875,12 +875,13 @@ import * as THREE from 'three';
 import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
 import {PLYLoader} from 'three/addons/loaders/PLYLoader.js';
 import {OBJLoader} from 'three/addons/loaders/OBJLoader.js';
+import {MTLLoader} from 'three/addons/loaders/MTLLoader.js';
 
 let scan3dScene,scan3dCamera,scan3dRenderer,scan3dControls,scan3dAnimId=null,scan3dMesh=null;
 let scan3dRaycaster,scan3dMouse=new THREE.Vector2();
 let measureMode=false,altiMode=false,eraseMode=false,measurePending=[],measureObjects=[],measureGroups=[],scanScaleFactor=1,scanOrigCenter=new THREE.Vector3();
 let ngfMode=false,ngfOffset=null,ngfPendingRawY=0,ngfPendingPt=null;
-let scanRawData=null,scanFileName='',scanFileType='';
+let scanRawData=null,scanFileName='',scanFileType='',scanMtlData=null,scanTexturesData={};
 
 function arrayBufferToBase64(buf){const bytes=new Uint8Array(buf);let bin='';for(let i=0;i<bytes.length;i++)bin+=String.fromCharCode(bytes[i]);return btoa(bin);}
 function base64ToArrayBuffer(b64){const bin=atob(b64);const bytes=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)bytes[i]=bin.charCodeAt(i);return bytes.buffer;}
@@ -950,44 +951,88 @@ window.resetScan3DView=function(){
   scan3dControls.update();
 };
 
+function addObjToScene(objText,mtlText,textureBlobUrls,name){
+  if(scan3dMesh){scan3dScene.remove(scan3dMesh);}
+  const objLoader=new OBJLoader();
+  if(mtlText){
+    const mtlLoader=new MTLLoader();
+    // Replace texture filenames with blob URLs in MTL text
+    let patchedMtl=mtlText;
+    for(const [fname,url] of Object.entries(textureBlobUrls)){
+      patchedMtl=patchedMtl.replaceAll(fname,url);
+    }
+    const materials=mtlLoader.parse(patchedMtl,'');
+    materials.preload();
+    objLoader.setMaterials(materials);
+  }
+  const group=objLoader.parse(objText);
+  scan3dMesh=group;
+  const box=new THREE.Box3().setFromObject(group);
+  const center=box.getCenter(new THREE.Vector3());
+  const size=box.getSize(new THREE.Vector3());
+  scanOrigCenter.copy(center);
+  group.position.sub(center);
+  const maxDim=Math.max(size.x,size.y,size.z);
+  const s=5/maxDim;group.scale.set(s,s,s);
+  scanScaleFactor=s;
+  scan3dScene.add(group);
+  scan3dControls.target.set(0,0,0);
+  scan3dCamera.position.set(0,size.y*s,maxDim*s*1.5);
+  scan3dControls.update();
+  document.getElementById('scan3d-empty').style.display='none';
+  document.getElementById('scan3d-info').style.display='block';
+  document.getElementById('scan3d-info').textContent=`${name} — mesh${scanMtlData?' + textures':''}`;
+}
+
 window.loadScanFile=function(e){
-  const file=e.target.files[0];if(!file)return;
-  const ext=file.name.split('.').pop().toLowerCase();
-  scanFileName=file.name;scanFileType=ext;
-  const reader=new FileReader();
-  if(ext==='ply'){
+  const files=Array.from(e.target.files);if(!files.length)return;
+  // Sort files by type
+  let objFile=null,mtlFile=null,plyFile=null;
+  const imgFiles=[];
+  const imgExts=['jpg','jpeg','png','bmp','tga'];
+  files.forEach(f=>{
+    const ext=f.name.split('.').pop().toLowerCase();
+    if(ext==='ply')plyFile=f;
+    else if(ext==='obj')objFile=f;
+    else if(ext==='mtl')mtlFile=f;
+    else if(imgExts.includes(ext))imgFiles.push(f);
+  });
+  // PLY
+  if(plyFile){
+    scanFileName=plyFile.name;scanFileType='ply';scanMtlData=null;scanTexturesData={};
+    const reader=new FileReader();
     reader.onload=function(ev){
       scanRawData=ev.target.result;
       const loader=new PLYLoader();
       const geometry=loader.parse(ev.target.result);
-      addScanToScene(geometry,file.name);
+      addScanToScene(geometry,plyFile.name);
     };
-    reader.readAsArrayBuffer(file);
-  }else if(ext==='obj'){
-    reader.onload=function(ev){
-      scanRawData=ev.target.result;
-      const loader=new OBJLoader();
-      const group=loader.parse(ev.target.result);
-      if(scan3dMesh){scan3dScene.remove(scan3dMesh);}
-      scan3dMesh=group;
-      // Center
-      const box=new THREE.Box3().setFromObject(group);
-      const center=box.getCenter(new THREE.Vector3());
-      const size=box.getSize(new THREE.Vector3());
-      scanOrigCenter.copy(center);
-      group.position.sub(center);
-      const maxDim=Math.max(size.x,size.y,size.z);
-      const s=5/maxDim;group.scale.set(s,s,s);
-      scanScaleFactor=s;
-      scan3dScene.add(group);
-      scan3dControls.target.set(0,0,0);
-      scan3dCamera.position.set(0,size.y*s,maxDim*s*1.5);
-      scan3dControls.update();
-      document.getElementById('scan3d-empty').style.display='none';
-      document.getElementById('scan3d-info').style.display='block';
-      document.getElementById('scan3d-info').textContent=`${file.name} — mesh`;
-    };
-    reader.readAsText(file);
+    reader.readAsArrayBuffer(plyFile);
+  // OBJ
+  }else if(objFile){
+    scanFileName=objFile.name;scanFileType='obj';scanMtlData=null;scanTexturesData={};
+    // Read all files in parallel
+    const promises=[];
+    // Read OBJ
+    const pObj=new Promise(r=>{const rd=new FileReader();rd.onload=ev=>r(ev.target.result);rd.readAsText(objFile);});
+    promises.push(pObj);
+    // Read MTL
+    const pMtl=mtlFile?new Promise(r=>{const rd=new FileReader();rd.onload=ev=>r(ev.target.result);rd.readAsText(mtlFile);}):Promise.resolve(null);
+    promises.push(pMtl);
+    // Read images as dataURL
+    const imgPromises=imgFiles.map(f=>new Promise(r=>{const rd=new FileReader();rd.onload=ev=>r({name:f.name,dataUrl:ev.target.result});rd.readAsDataURL(f);}));
+    promises.push(Promise.all(imgPromises));
+    Promise.all(promises).then(([objText,mtlText,imgs])=>{
+      scanRawData=objText;
+      scanMtlData=mtlText;
+      // Build texture blob URLs map
+      const textureBlobUrls={};
+      imgs.forEach(img=>{
+        scanTexturesData[img.name]=img.dataUrl;
+        textureBlobUrls[img.name]=img.dataUrl;
+      });
+      addObjToScene(objText,mtlText,textureBlobUrls,objFile.name);
+    });
   }
   e.target.value='';
 };
@@ -1289,6 +1334,9 @@ window.exportScan3DProject=function(){
   // Scan data
   if(scanFileType==='ply') project.scanData=arrayBufferToBase64(scanRawData);
   else project.scanData=btoa(unescape(encodeURIComponent(scanRawData)));
+  // MTL + textures
+  if(scanMtlData) project.scanMtlData=btoa(unescape(encodeURIComponent(scanMtlData)));
+  if(Object.keys(scanTexturesData).length>0) project.scanTextures=scanTexturesData;
   // Scale & origin
   project.scanScaleFactor=scanScaleFactor;
   project.scanOrigCenter={x:scanOrigCenter.x,y:scanOrigCenter.y,z:scanOrigCenter.z};
@@ -1344,22 +1392,9 @@ window.importScan3DProject=function(e){
       addScanToScene(geometry,scanFileName);
     }else{
       scanRawData=decodeURIComponent(escape(atob(project.scanData)));
-      const loader=new OBJLoader();
-      const group=loader.parse(scanRawData);
-      if(scan3dMesh){scan3dScene.remove(scan3dMesh);}
-      scan3dMesh=group;
-      const box=new THREE.Box3().setFromObject(group);
-      const center=box.getCenter(new THREE.Vector3());
-      const size=box.getSize(new THREE.Vector3());
-      scanOrigCenter.copy(center);
-      group.position.sub(center);
-      const maxDim=Math.max(size.x,size.y,size.z);
-      const s=5/maxDim;group.scale.set(s,s,s);
-      scanScaleFactor=s;
-      scan3dScene.add(group);
-      document.getElementById('scan3d-empty').style.display='none';
-      document.getElementById('scan3d-info').style.display='block';
-      document.getElementById('scan3d-info').textContent=`${scanFileName} — mesh`;
+      scanMtlData=project.scanMtlData?decodeURIComponent(escape(atob(project.scanMtlData))):null;
+      scanTexturesData=project.scanTextures||{};
+      addObjToScene(scanRawData,scanMtlData,scanTexturesData,scanFileName);
     }
     // Restore NGF
     if(project.ngfOffset!=null){
