@@ -320,7 +320,7 @@
       <span>📡 Scan 3D</span>
       <div class="scan3d-actions">
         <button class="btn-scan3d btn-scan3d-import" onclick="document.getElementById('scan3dInput').click()">📂 Importer</button>
-        <input type="file" id="scan3dInput" accept=".ply,.obj,.mtl,.jpg,.jpeg,.png,.tga,.bmp" multiple style="display:none" onchange="loadScanFile(event)">
+        <input type="file" id="scan3dInput" webkitdirectory style="display:none" onchange="loadScanFile(event)">
         <button class="btn-scan3d btn-scan3d-measure" id="btn-distance" onclick="toggleDistanceMode()">📏 Distance</button>
         <button class="btn-scan3d btn-scan3d-measure" id="btn-alti" onclick="toggleAltiMode()">📐 Altimétrie</button>
         <button class="btn-scan3d btn-scan3d-measure" id="btn-ngf" onclick="toggleNgfMode()">📌 Réf. NGF</button>
@@ -986,6 +986,11 @@ function addObjToScene(objText,mtlText,textureBlobUrls,name){
 
 window.loadScanFile=function(e){
   const files=Array.from(e.target.files);if(!files.length)return;
+  // Find root dir from webkitRelativePath (first segment)
+  let rootDir='';
+  if(files[0].webkitRelativePath){
+    rootDir=files[0].webkitRelativePath.split('/')[0]+'/';
+  }
   // Sort files by type
   let objFile=null,mtlFile=null,plyFile=null;
   const imgFiles=[];
@@ -1011,24 +1016,31 @@ window.loadScanFile=function(e){
   // OBJ
   }else if(objFile){
     scanFileName=objFile.name;scanFileType='obj';scanMtlData=null;scanTexturesData={};
-    // Read all files in parallel
     const promises=[];
-    // Read OBJ
     const pObj=new Promise(r=>{const rd=new FileReader();rd.onload=ev=>r(ev.target.result);rd.readAsText(objFile);});
     promises.push(pObj);
-    // Read MTL
     const pMtl=mtlFile?new Promise(r=>{const rd=new FileReader();rd.onload=ev=>r(ev.target.result);rd.readAsText(mtlFile);}):Promise.resolve(null);
     promises.push(pMtl);
-    // Read images as dataURL
-    const imgPromises=imgFiles.map(f=>new Promise(r=>{const rd=new FileReader();rd.onload=ev=>r({name:f.name,dataUrl:ev.target.result});rd.readAsDataURL(f);}));
+    // Read images — store with relative path from OBJ folder (e.g. "textures/img.jpg")
+    const imgPromises=imgFiles.map(f=>new Promise(r=>{
+      const rd=new FileReader();
+      rd.onload=ev=>{
+        // Build relative path: remove root dir prefix
+        let relPath=f.webkitRelativePath||f.name;
+        if(rootDir&&relPath.startsWith(rootDir))relPath=relPath.substring(rootDir.length);
+        r({relPath,name:f.name,dataUrl:ev.target.result});
+      };
+      rd.readAsDataURL(f);
+    }));
     promises.push(Promise.all(imgPromises));
     Promise.all(promises).then(([objText,mtlText,imgs])=>{
       scanRawData=objText;
       scanMtlData=mtlText;
-      // Build texture blob URLs map
       const textureBlobUrls={};
       imgs.forEach(img=>{
-        scanTexturesData[img.name]=img.dataUrl;
+        // Store both relative path and filename as keys for matching
+        scanTexturesData[img.relPath]=img.dataUrl;
+        textureBlobUrls[img.relPath]=img.dataUrl;
         textureBlobUrls[img.name]=img.dataUrl;
       });
       addObjToScene(objText,mtlText,textureBlobUrls,objFile.name);
