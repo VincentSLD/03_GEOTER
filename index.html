@@ -648,16 +648,19 @@ function renderElements(){
         return;
       }
       e.stopPropagation();selectedId=el.id;renderElements();
-      const nd=$elemLayer.querySelector(`.plan-element:nth-child(${elements.indexOf(el)+1})`);if(!nd)return;
+      const idx=elements.indexOf(el);
+      const nd=$elemLayer.querySelector(`.plan-element:nth-child(${idx+1})`);if(!nd)return;
       let dr=true;const r2=$area.getBoundingClientRect();
-      const dsx=e.clientX-(el.x*scale+offX+r2.left),dsy=e.clientY-(el.y*scale+offY+r2.top);
+      const startX=e.clientX,startY=e.clientY;
+      const origX=el.x,origY=el.y,origX2=el.x2||0,origY2=el.y2||0;
       nd.setPointerCapture(e.pointerId);nd.classList.add('dragging');
-      const mH=ev=>{if(!dr)return;const r3=$area.getBoundingClientRect();
-        const nx=(ev.clientX-dsx-r3.left-offX)/scale,ny=(ev.clientY-dsy-r3.top-offY)/scale;
-        if(el.type==='arrow'){const ddx=nx-el.x,ddy=ny-el.y;el.x2+=ddx;el.y2+=ddy;}
-        el.x=nx;el.y=ny;renderElements();
+      const mH=ev=>{if(!dr)return;
+        const dx=(ev.clientX-startX)/scale,dy=(ev.clientY-startY)/scale;
+        el.x=origX+dx;el.y=origY+dy;
+        if(el.type==='arrow'){el.x2=origX2+dx;el.y2=origY2+dy;}
+        nd.style.left=(el.x*scale+offX)+'px';nd.style.top=(el.y*scale+offY)+'px';
       };
-      const uH=()=>{dr=false;nd.classList.remove('dragging');nd.removeEventListener('pointermove',mH);nd.removeEventListener('pointerup',uH);};
+      const uH=()=>{dr=false;nd.classList.remove('dragging');nd.removeEventListener('pointermove',mH);nd.removeEventListener('pointerup',uH);renderElements();};
       nd.addEventListener('pointermove',mH);nd.addEventListener('pointerup',uH);
     });
     $elemLayer.appendChild(div);
