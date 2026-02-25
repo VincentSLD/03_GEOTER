@@ -65,7 +65,7 @@
   .btn-load-center:hover{background:var(--yellow-light);transform:translateY(-1px);box-shadow:0 6px 20px var(--yellow-glow)}
   #empty-state .hint{font-size:10px;color:var(--gray-500);font-weight:600;margin-top:-4px}
 
-  .plan-element{position:absolute;user-select:none;touch-action:none;z-index:10}
+  .plan-element{position:absolute;user-select:none;touch-action:none;z-index:10;transform:translate(-50%,-50%)}
   .plan-element.dragging{z-index:1000}
   .sticker-wrap{display:flex;flex-direction:column;align-items:center}
   .sticker-icon{line-height:1;background:rgba(255,255,255,0.95);border-radius:var(--radius);padding:4px;border:2px solid transparent;box-shadow:var(--shadow-sm);transition:all .15s;display:flex;align-items:center;justify-content:center}
@@ -232,6 +232,7 @@
     <button class="tool-btn active" data-tool="select" onclick="selectTool('select')"><span class="icon">👆</span><span class="label">Sélection</span></button>
     <button class="tool-btn" data-tool="sticker" onclick="selectTool('sticker')"><span class="icon">🏷️</span><span class="label">Vignette</span></button>
     <button class="tool-btn" data-tool="text" onclick="selectTool('text')"><span class="icon">✏️</span><span class="label">Texte</span></button>
+    <button class="tool-btn" data-tool="arrow" onclick="selectTool('arrow')"><span class="icon">↗️</span><span class="label">Flèche</span></button>
     <button class="tool-btn" data-tool="draw" onclick="selectTool('draw')"><span class="icon">🖌️</span><span class="label">Dessin</span></button>
     <button class="tool-btn" data-tool="erase" onclick="selectTool('erase')"><span class="icon">🧹</span><span class="label">Gomme</span></button>
     <div class="tool-sep"></div>
@@ -441,6 +442,7 @@ let elements=[],selectedId=null,selectedStickerId=null;
 let drawColor='#D94040',brushSize=4,textColor='#1A1A1A';
 let drawPaths=[],currentPathPts=[],isDrawing=false,photos=[],cameraStream=null;
 let teEditingId=null,teOriginX=0,teOriginY=0;
+let arrowStartPt=null,arrowPreviewEnd=null,arrowDoubleHead=false;
 const COLORS=['#1A1A1A','#D94040','#3D7AB5','#F2B705','#4CAF50','#E88D00','#9B59B6','#FFFFFF'];
 const BRUSHES=[2,4,8,12];
 
@@ -455,9 +457,9 @@ function resizeDrawCanvas(){const r=$area.getBoundingClientRect();$drawCanvas.wi
 
 function selectTool(t){
   currentTool=t;selectedId=null;
-  document.querySelectorAll('.tool-btn[data-tool]').forEach(b=>{b.className='tool-btn';if(b.dataset.tool===t){const c={select:'active',sticker:'active-yellow',text:'active-dark',draw:'active-red',erase:'active-orange'};b.classList.add(c[t]||'active');}});
-  $area.style.cursor={select:'grab',draw:'crosshair',erase:'cell',sticker:'crosshair',text:'text'}[t]||'crosshair';
-  document.getElementById('color-options').style.display=(t==='draw'||t==='text')?'flex':'none';
+  document.querySelectorAll('.tool-btn[data-tool]').forEach(b=>{b.className='tool-btn';if(b.dataset.tool===t){const c={select:'active',sticker:'active-yellow',text:'active-dark',draw:'active-red',erase:'active-orange',arrow:'active-red'};b.classList.add(c[t]||'active');}});
+  $area.style.cursor={select:'grab',draw:'crosshair',erase:'cell',sticker:'crosshair',text:'text',arrow:'crosshair'}[t]||'crosshair';
+  document.getElementById('color-options').style.display=(t==='draw'||t==='text'||t==='arrow')?'flex':'none';
   document.getElementById('brush-options').style.display=t==='draw'?'flex':'none';
   if(t==='sticker')openCatalog();else closeCatalog();renderElements();
 }
@@ -554,10 +556,26 @@ function onPD(e){
   if(currentTool==='select'){selectedId=null;renderElements();isPanning=true;panStartX=e.clientX;panStartY=e.clientY;panOX=offX;panOY=offY;$area.style.cursor='grabbing';$area.setPointerCapture(e.pointerId);return;}
   if(currentTool==='sticker'&&selectedStickerId){const s=ALL_STICKERS.find(x=>x.id===selectedStickerId);elements.push({id:Date.now(),type:'sticker',x:pt.px,y:pt.py,svgKey:s.svg,label:s.label,color:s.color,sScale:1});renderElements();return;}
   if(currentTool==='text'){openTextEditor(pt.px,pt.py);return;}
+  if(currentTool==='arrow'){arrowStartPt={x:pt.px,y:pt.py};arrowPreviewEnd=null;$area.setPointerCapture(e.pointerId);return;}
   if(currentTool==='draw'||currentTool==='erase'){isDrawing=true;currentPathPts=[{x:pt.px,y:pt.py}];$area.setPointerCapture(e.pointerId);}
 }
-function onPM(e){if(isPanning){offX=panOX+(e.clientX-panStartX);offY=panOY+(e.clientY-panStartY);updatePlanTransform();redrawCanvas();renderElements();return;}if(isDrawing){const pt=gP(e);currentPathPts.push({x:pt.px,y:pt.py});redrawCanvas();}}
-function onPU(){if(isPanning){isPanning=false;$area.style.cursor='grab';return;}if(isDrawing){isDrawing=false;if(currentPathPts.length>1)drawPaths.push({points:[...currentPathPts],color:currentTool==='erase'?'eraser':drawColor,size:brushSize});currentPathPts=[];redrawCanvas();}}
+function onPM(e){
+  if(isPanning){offX=panOX+(e.clientX-panStartX);offY=panOY+(e.clientY-panStartY);updatePlanTransform();redrawCanvas();renderElements();return;}
+  if(arrowStartPt){const pt=gP(e);arrowPreviewEnd={x:pt.px,y:pt.py};renderElements();return;}
+  if(isDrawing){const pt=gP(e);currentPathPts.push({x:pt.px,y:pt.py});redrawCanvas();}
+}
+function onPU(){
+  if(isPanning){isPanning=false;$area.style.cursor='grab';return;}
+  if(arrowStartPt&&arrowPreviewEnd){
+    const dx=arrowPreviewEnd.x-arrowStartPt.x,dy=arrowPreviewEnd.y-arrowStartPt.y;
+    if(Math.sqrt(dx*dx+dy*dy)>5){
+      elements.push({id:Date.now(),type:'arrow',x:arrowStartPt.x,y:arrowStartPt.y,x2:arrowPreviewEnd.x,y2:arrowPreviewEnd.y,color:drawColor,doubleHead:arrowDoubleHead});
+    }
+    arrowStartPt=null;arrowPreviewEnd=null;renderElements();return;
+  }
+  arrowStartPt=null;arrowPreviewEnd=null;
+  if(isDrawing){isDrawing=false;if(currentPathPts.length>1)drawPaths.push({points:[...currentPathPts],color:currentTool==='erase'?'eraser':drawColor,size:brushSize});currentPathPts=[];redrawCanvas();}
+}
 function onW(e){e.preventDefault();const d=e.deltaY>0?0.92:1.08;const ns=Math.max(0.08,Math.min(6,scale*d));const r=$area.getBoundingClientRect();const mx=e.clientX-r.left,my=e.clientY-r.top;offX=mx-(mx-offX)*(ns/scale);offY=my-(my-offY)*(ns/scale);scale=ns;updatePlanTransform();redrawCanvas();renderElements();updateZoomBadge();}
 
 function redrawCanvas(){
@@ -571,25 +589,40 @@ function renderElements(){
   $elemLayer.innerHTML='';
   elements.forEach(el=>{
     const div=document.createElement('div');div.className='plan-element'+(selectedId===el.id?' selected':'');
-    div.style.left=(el.x*scale+offX)+'px';div.style.top=(el.y*scale+offY)+'px';div.style.transform='translate(-50%,-50%)';
+    div.style.left=(el.x*scale+offX)+'px';div.style.top=(el.y*scale+offY)+'px';
     if(el.type==='sticker'){
       const ss=el.sScale||1;const sz=Math.round(28*ss);
-      div.innerHTML=`<div class="sticker-wrap"><div class="sticker-icon ${selectedId===el.id?'selected':''}" style="padding:${Math.round(4*ss)}px"><svg viewBox="0 0 32 32" width="${sz}" height="${sz}" xmlns="http://www.w3.org/2000/svg">${SVG[el.svgKey]?.replace(/<svg[^>]*>|<\/svg>/g,'')||'?'}</svg></div><span class="sticker-label" style="background:${el.color};font-size:${Math.max(6,Math.round(7*ss))}px">${el.label}</span></div><button class="del-btn" data-action="del" data-eid="${el.id}">×</button><div class="resize-controls"><button class="resize-btn minus" data-action="shrink" data-eid="${el.id}">−</button><button class="resize-btn plus" data-action="grow" data-eid="${el.id}">+</button></div>`;
+      div.innerHTML=`<div class="sticker-wrap"><div class="sticker-icon ${selectedId===el.id?'selected':''}" style="padding:${Math.round(4*ss)}px"><svg viewBox="0 0 32 32" width="${sz}" height="${sz}" xmlns="http://www.w3.org/2000/svg">${SVG[el.svgKey]?.replace(/<svg[^>]*>|<\/svg>/g,'')||'?'}</svg></div></div><button class="del-btn" data-action="del" data-eid="${el.id}">×</button><div class="resize-controls"><button class="resize-btn minus" data-action="shrink" data-eid="${el.id}">−</button><button class="resize-btn plus" data-action="grow" data-eid="${el.id}">+</button></div>`;
     }else if(el.type==='text'){
       div.innerHTML=`<div class="text-box ${selectedId===el.id?'selected':''}" style="color:${el.color}">${el.html||el.text||''}</div><button class="del-btn" data-action="del" data-eid="${el.id}">×</button><button class="edit-btn" data-action="edit" data-eid="${el.id}">✏️</button>`;
+    }else if(el.type==='arrow'){
+      const sx1=el.x*scale+offX,sy1=el.y*scale+offY,sx2=el.x2*scale+offX,sy2=el.y2*scale+offY;
+      const mx=(sx1+sx2)/2,my=(sy1+sy2)/2;
+      div.style.left=mx+'px';div.style.top=my+'px';
+      const w=Math.abs(sx2-sx1)+40,h=Math.abs(sy2-sy1)+40;
+      const ox=Math.min(sx1,sx2)-mx+20,oy=Math.min(sy1,sy2)-my+20;
+      const lx1=sx1-mx-ox+20,ly1=sy1-my-oy+20,lx2=sx2-mx-ox+20,ly2=sy2-my-oy+20;
+      const sel=selectedId===el.id;
+      div.innerHTML=`<svg width="${w}" height="${h}" style="position:absolute;left:${ox}px;top:${oy}px;overflow:visible;pointer-events:none" xmlns="http://www.w3.org/2000/svg">
+        <defs><marker id="ah-${el.id}" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><polygon points="0 0,10 3.5,0 7" fill="${el.color}"/></marker>
+        ${el.doubleHead?`<marker id="ah2-${el.id}" markerWidth="10" markerHeight="7" refX="1" refY="3.5" orient="auto"><polygon points="10 0,0 3.5,10 7" fill="${el.color}"/></marker>`:''}</defs>
+        <line x1="${lx1}" y1="${ly1}" x2="${lx2}" y2="${ly2}" stroke="${el.color}" stroke-width="${sel?3:2}" marker-end="url(#ah-${el.id})" ${el.doubleHead?`marker-start="url(#ah2-${el.id})"`:''} style="pointer-events:stroke;cursor:move" stroke-linecap="round"/>
+        ${sel?`<circle cx="${lx1}" cy="${ly1}" r="5" fill="${el.color}" opacity="0.5"/><circle cx="${lx2}" cy="${ly2}" r="5" fill="${el.color}" opacity="0.5"/>`:''}
+      </svg>
+      <button class="del-btn" data-action="del" data-eid="${el.id}" style="left:${ox+lx2+6}px;top:${oy+ly2-10}px">×</button>
+      <button class="edit-btn" data-action="togglehead" data-eid="${el.id}" style="left:${ox+lx1-20}px;top:${oy+ly1-10}px">⇄</button>`;
     }
     div.addEventListener('pointerdown',e=>{
-      // Handle action buttons first
       const actionBtn = e.target.closest('[data-action]');
       if(actionBtn){
-        e.stopPropagation();
-        e.preventDefault();
+        e.stopPropagation();e.preventDefault();
         const eid = Number(actionBtn.dataset.eid);
         const action = actionBtn.dataset.action;
         if(action==='del') deleteElement(eid);
         else if(action==='edit') editText(eid);
         else if(action==='shrink') resizeElement(eid, -0.25);
         else if(action==='grow') resizeElement(eid, 0.25);
+        else if(action==='togglehead'){const ae=elements.find(x=>x.id===eid);if(ae)ae.doubleHead=!ae.doubleHead;renderElements();}
         return;
       }
       e.stopPropagation();selectedId=el.id;renderElements();
@@ -597,12 +630,26 @@ function renderElements(){
       let dr=true;const r2=$area.getBoundingClientRect();
       const dsx=e.clientX-(el.x*scale+offX+r2.left),dsy=e.clientY-(el.y*scale+offY+r2.top);
       nd.setPointerCapture(e.pointerId);nd.classList.add('dragging');
-      const mH=ev=>{if(!dr)return;const r3=$area.getBoundingClientRect();el.x=(ev.clientX-dsx-r3.left-offX)/scale;el.y=(ev.clientY-dsy-r3.top-offY)/scale;nd.style.left=(el.x*scale+offX)+'px';nd.style.top=(el.y*scale+offY)+'px';};
+      const mH=ev=>{if(!dr)return;const r3=$area.getBoundingClientRect();
+        const nx=(ev.clientX-dsx-r3.left-offX)/scale,ny=(ev.clientY-dsy-r3.top-offY)/scale;
+        if(el.type==='arrow'){const ddx=nx-el.x,ddy=ny-el.y;el.x2+=ddx;el.y2+=ddy;}
+        el.x=nx;el.y=ny;renderElements();
+      };
       const uH=()=>{dr=false;nd.classList.remove('dragging');nd.removeEventListener('pointermove',mH);nd.removeEventListener('pointerup',uH);};
       nd.addEventListener('pointermove',mH);nd.addEventListener('pointerup',uH);
     });
     $elemLayer.appendChild(div);
   });
+  // Arrow preview during drawing
+  if(arrowStartPt&&arrowPreviewEnd){
+    const div=document.createElement('div');div.className='plan-element';div.style.left='0px';div.style.top='0px';div.style.transform='none';div.style.pointerEvents='none';
+    const sx1=arrowStartPt.x*scale+offX,sy1=arrowStartPt.y*scale+offY,sx2=arrowPreviewEnd.x*scale+offX,sy2=arrowPreviewEnd.y*scale+offY;
+    div.innerHTML=`<svg width="100%" height="100%" style="position:fixed;inset:0;overflow:visible;pointer-events:none" xmlns="http://www.w3.org/2000/svg">
+      <defs><marker id="ah-preview" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><polygon points="0 0,10 3.5,0 7" fill="${drawColor}"/></marker></defs>
+      <line x1="${sx1}" y1="${sy1}" x2="${sx2}" y2="${sy2}" stroke="${drawColor}" stroke-width="2" marker-end="url(#ah-preview)" stroke-dasharray="6,4" stroke-linecap="round"/>
+    </svg>`;
+    $elemLayer.appendChild(div);
+  }
 }
 function deleteElement(id){elements=elements.filter(e=>e.id!==id);selectedId=null;renderElements();}
 function resizeElement(id,delta){const el=elements.find(e=>e.id===id);if(!el)return;el.sScale=Math.max(0.4,Math.min(4,(el.sScale||1)+delta));renderElements();}
@@ -656,6 +703,29 @@ function captureSnapshot(){
     // Draw paths at screen coords
     for(const p of drawPaths){ctx.beginPath();ctx.lineCap='round';ctx.lineJoin='round';if(p.color==='eraser'){ctx.globalCompositeOperation='destination-out';ctx.lineWidth=p.size*scale*3;}else{ctx.globalCompositeOperation='source-over';ctx.strokeStyle=p.color;ctx.lineWidth=p.size*scale;}for(let i=0;i<p.points.length;i++){if(i===0)ctx.moveTo(toX(p.points[i].x),toY(p.points[i].y));else ctx.lineTo(toX(p.points[i].x),toY(p.points[i].y));}ctx.stroke();}
     ctx.globalCompositeOperation='source-over';
+    // Render arrows
+    elements.filter(e=>e.type==='arrow').forEach(el=>{
+      const ax1=toX(el.x),ay1=toY(el.y),ax2=toX(el.x2),ay2=toY(el.y2);
+      const angle=Math.atan2(ay2-ay1,ax2-ax1);
+      const headLen=12;
+      ctx.strokeStyle=el.color;ctx.fillStyle=el.color;ctx.lineWidth=2;ctx.lineCap='round';
+      ctx.beginPath();ctx.moveTo(ax1,ay1);ctx.lineTo(ax2,ay2);ctx.stroke();
+      // End arrowhead
+      ctx.beginPath();
+      ctx.moveTo(ax2,ay2);
+      ctx.lineTo(ax2-headLen*Math.cos(angle-Math.PI/6),ay2-headLen*Math.sin(angle-Math.PI/6));
+      ctx.lineTo(ax2-headLen*Math.cos(angle+Math.PI/6),ay2-headLen*Math.sin(angle+Math.PI/6));
+      ctx.closePath();ctx.fill();
+      // Start arrowhead (double)
+      if(el.doubleHead){
+        const a2=angle+Math.PI;
+        ctx.beginPath();
+        ctx.moveTo(ax1,ay1);
+        ctx.lineTo(ax1-headLen*Math.cos(a2-Math.PI/6),ay1-headLen*Math.sin(a2-Math.PI/6));
+        ctx.lineTo(ax1-headLen*Math.cos(a2+Math.PI/6),ay1-headLen*Math.sin(a2+Math.PI/6));
+        ctx.closePath();ctx.fill();
+      }
+    });
     const done=()=>{const url=c.toDataURL('image/png');document.getElementById('snapshot-img').src=url;document.getElementById('snapshot-download').href=url;document.getElementById('snapshot-modal').classList.add('open');};
     // Render rich text at screen coords
     const textEls=elements.filter(e=>e.type==='text');
@@ -720,7 +790,7 @@ function captureSnapshot(){
       const blob=new Blob([svgStr],{type:'image/svg+xml'});
       const url=URL.createObjectURL(blob);
       const img=new Image();
-      img.onload=()=>{ctx.drawImage(img,toX(el.x)-sz/2,toY(el.y)-sz/2,sz,sz);ctx.font=`bold ${Math.round(9*ss)}px sans-serif`;ctx.fillStyle=el.color;ctx.textAlign='center';ctx.fillText(el.label,toX(el.x),toY(el.y)+sz/2+Math.round(10*ss));URL.revokeObjectURL(url);check();};
+      img.onload=()=>{ctx.drawImage(img,toX(el.x)-sz/2,toY(el.y)-sz/2,sz,sz);URL.revokeObjectURL(url);check();};
       img.src=url;
     });
   };
