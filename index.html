@@ -319,7 +319,8 @@
       <div class="scan3d-actions">
         <button class="btn-scan3d btn-scan3d-import" onclick="document.getElementById('scan3dInput').click()">📂 Importer</button>
         <input type="file" id="scan3dInput" accept=".ply,.obj" style="display:none" onchange="loadScanFile(event)">
-        <button class="btn-scan3d btn-scan3d-measure" id="btn-measure" onclick="toggleMeasureMode()">📏 Mesurer</button>
+        <button class="btn-scan3d btn-scan3d-measure" id="btn-distance" onclick="toggleDistanceMode()">📏 Distance</button>
+        <button class="btn-scan3d btn-scan3d-measure" id="btn-alti" onclick="toggleAltiMode()">📐 Altimétrie</button>
         <button class="btn-scan3d btn-scan3d-measure" id="btn-ngf" onclick="toggleNgfMode()">📌 Réf. NGF</button>
         <button class="btn-scan3d btn-scan3d-clear" onclick="clearMeasurements()">🗑️ Effacer</button>
         <button class="btn-scan3d btn-scan3d-reset" onclick="captureScan3D()">📸 Capture</button>
@@ -331,7 +332,7 @@
       <canvas id="scan3d-canvas"></canvas>
       <div id="scan3d-empty"><div class="big-icon">📡</div><p>Importez un fichier de scan 3D<br>(PLY ou OBJ)</p></div>
       <div id="scan3d-info" style="display:none"></div>
-      <div id="scan3d-altitude">Alt NGF: <span>—</span></div>
+      <div id="scan3d-altitude">Altitude : <span>—</span></div>
       <div id="scan3d-ngf-ref" style="display:none"></div>
       <div id="ngf-input-modal">
         <div id="ngf-input-inner" onclick="event.stopPropagation()">
@@ -871,8 +872,8 @@ import {OBJLoader} from 'three/addons/loaders/OBJLoader.js';
 
 let scan3dScene,scan3dCamera,scan3dRenderer,scan3dControls,scan3dAnimId=null,scan3dMesh=null;
 let scan3dRaycaster,scan3dMouse=new THREE.Vector2();
-let measureMode=false,measurePending=[],measureObjects=[],scanScaleFactor=1,scanOrigCenter=new THREE.Vector3();
-let ngfMode=false,ngfOffset=null,ngfPendingRawY=0;
+let measureMode=false,altiMode=false,measurePending=[],measureObjects=[],scanScaleFactor=1,scanOrigCenter=new THREE.Vector3();
+let ngfMode=false,ngfOffset=null,ngfPendingRawY=0,ngfPendingPt=null;
 
 function initScan3D(){
   const canvas=document.getElementById('scan3d-canvas');
@@ -1052,6 +1053,16 @@ window.applyNgfRef=function(){
   if(isNaN(val)){alert('Veuillez saisir une altitude valide.');return;}
   ngfOffset=val-ngfPendingRawY;
   document.getElementById('ngf-input-modal').classList.remove('open');
+  // Place red marker on reference point
+  if(ngfPendingPt){
+    const refMarker=new THREE.Mesh(new THREE.SphereGeometry(0.05,16,16),new THREE.MeshBasicMaterial({color:0xE53935}));
+    refMarker.position.copy(ngfPendingPt);
+    scan3dScene.add(refMarker);
+    const refLabel=createTextSprite(`${val.toFixed(2)} m`,0xE53935);
+    refLabel.position.copy(ngfPendingPt).add(new THREE.Vector3(0,0.14,0));
+    scan3dScene.add(refLabel);
+    measureObjects.push(refMarker,refLabel);
+  }
   // Show NGF ref badge
   const refDiv=document.getElementById('scan3d-ngf-ref');
   refDiv.style.display='block';
@@ -1064,14 +1075,32 @@ window.applyNgfRef=function(){
   scan3dControls.enablePan=true;
 };
 
-window.toggleMeasureMode=function(){
+window.toggleDistanceMode=function(){
+  if(altiMode){altiMode=false;document.getElementById('btn-alti').classList.remove('active');document.getElementById('scan3d-altitude').style.display='none';}
   measureMode=!measureMode;
-  const btn=document.getElementById('btn-measure');
+  const btn=document.getElementById('btn-distance');
   const canvas=document.getElementById('scan3d-canvas');
-  const altDiv=document.getElementById('scan3d-altitude');
   btn.classList.toggle('active',measureMode);
   canvas.classList.toggle('measure-mode',measureMode);
   if(measureMode){
+    scan3dControls.enableRotate=false;
+    scan3dControls.enablePan=false;
+  }else{
+    scan3dControls.enableRotate=true;
+    scan3dControls.enablePan=true;
+    measurePending=[];
+  }
+};
+
+window.toggleAltiMode=function(){
+  if(measureMode){measureMode=false;document.getElementById('btn-distance').classList.remove('active');measurePending=[];}
+  altiMode=!altiMode;
+  const btn=document.getElementById('btn-alti');
+  const canvas=document.getElementById('scan3d-canvas');
+  const altDiv=document.getElementById('scan3d-altitude');
+  btn.classList.toggle('active',altiMode);
+  canvas.classList.toggle('measure-mode',altiMode);
+  if(altiMode){
     scan3dControls.enableRotate=false;
     scan3dControls.enablePan=false;
     altDiv.style.display='block';
@@ -1079,12 +1108,11 @@ window.toggleMeasureMode=function(){
     scan3dControls.enableRotate=true;
     scan3dControls.enablePan=true;
     altDiv.style.display='none';
-    measurePending=[];
   }
 };
 
 function onScan3DClick(e){
-  if((!measureMode&&!ngfMode)||!scan3dMesh)return;
+  if((!measureMode&&!altiMode&&!ngfMode)||!scan3dMesh)return;
   const canvas=document.getElementById('scan3d-canvas');
   const rect=canvas.getBoundingClientRect();
   scan3dMouse.x=((e.clientX-rect.left)/rect.width)*2-1;
@@ -1097,23 +1125,31 @@ function onScan3DClick(e){
   // NGF reference mode
   if(ngfMode){
     ngfPendingRawY=realPt.y;
+    ngfPendingPt=pt.clone();
     document.getElementById('ngf-raw-alt').textContent=`${realPt.y.toFixed(2)} m`;
     document.getElementById('ngf-alt-input').value='';
     document.getElementById('ngf-input-modal').classList.add('open');
     setTimeout(()=>document.getElementById('ngf-alt-input').focus(),100);
     return;
   }
-  // Measure mode
-  const marker=new THREE.Mesh(
-    new THREE.SphereGeometry(0.04,16,16),
-    new THREE.MeshBasicMaterial({color:0xF2B705})
-  );
+  // Altimétrie mode — single click shows altitude
+  if(altiMode){
+    const marker=new THREE.Mesh(new THREE.SphereGeometry(0.04,16,16),new THREE.MeshBasicMaterial({color:0xF2B705}));
+    marker.position.copy(pt);
+    scan3dScene.add(marker);
+    const rawY=realPt.y;
+    const altText=ngfOffset!==null?`${toNgfAlt(rawY).toFixed(2)} m`:`${rawY.toFixed(2)} m`;
+    const aLabel=createTextSprite(altText,0xFFFFFF);
+    aLabel.position.copy(pt).add(new THREE.Vector3(0,0.12,0));
+    scan3dScene.add(aLabel);
+    measureObjects.push(marker,aLabel);
+    return;
+  }
+  // Distance mode — two clicks for distance line
+  const marker=new THREE.Mesh(new THREE.SphereGeometry(0.04,16,16),new THREE.MeshBasicMaterial({color:0xF2B705}));
   marker.position.copy(pt);
   scan3dScene.add(marker);
-  const aLabel=createTextSprite(altLabel(realPt.y),0xFFFFFF);
-  aLabel.position.copy(pt).add(new THREE.Vector3(0,0.12,0));
-  scan3dScene.add(aLabel);
-  measureObjects.push(marker,aLabel);
+  measureObjects.push(marker);
   measurePending.push(pt);
   if(measurePending.length===2){
     addMeasureLine(measurePending[0],measurePending[1]);
@@ -1122,7 +1158,7 @@ function onScan3DClick(e){
 }
 
 function onScan3DPointerMove(e){
-  if(!measureMode||!scan3dMesh)return;
+  if(!altiMode||!scan3dMesh)return;
   const canvas=document.getElementById('scan3d-canvas');
   const rect=canvas.getBoundingClientRect();
   scan3dMouse.x=((e.clientX-rect.left)/rect.width)*2-1;
