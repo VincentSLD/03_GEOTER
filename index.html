@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>GéoTer' — Annotateur de plans terrain</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,opsz,wght@0,6..12,400;0,6..12,600;0,6..12,700;0,6..12,800;0,6..12,900;1,6..12,400&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<style>
+  :root {
+    --yellow: #F2B705; --yellow-light: #F5C842; --yellow-dark: #D9A004;
+    --yellow-pale: #FFF8E1; --yellow-glow: rgba(242,183,5,0.25);
+    --black: #1A1A1A; --black-soft: #2D2D2D; --black-mid: #3A3A3A;
+    --gray-700: #4A4A4A; --gray-500: #7A7A7A; --gray-300: #B0B0B0;
+    --gray-200: #D4D4D4; --gray-100: #ECECEC; --gray-50: #F5F5F5;
+    --white: #FFFFFF; --red: #D94040; --green: #4CAF50; --blue: #3D7AB5;
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.1); --shadow-md: 0 4px 12px rgba(0,0,0,0.15);
+    --shadow-lg: 0 8px 32px rgba(0,0,0,0.2);
+    --radius: 10px; --radius-lg: 16px;
+  }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  html,body{width:100%;height:100%;overflow:hidden;font-family:'Nunito Sans',sans-serif;background:var(--gray-50);color:var(--black)}
+  ::-webkit-scrollbar{width:5px;height:5px}::-webkit-scrollbar-thumb{background:var(--gray-300);border-radius:3px}
+  button{font-family:inherit;cursor:pointer}
+  #app{display:flex;flex-direction:column;height:100dvh;width:100vw;overflow:hidden}
+
+  #header{background:var(--black);padding:10px 14px;display:flex;align-items:center;justify-content:space-between;z-index:100;flex-shrink:0;border-bottom:3px solid var(--yellow)}
+  #header .logo{display:flex;align-items:center;gap:10px}
+  #header .logo-icon{width:36px;height:36px;border-radius:8px;background:var(--yellow);display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--black);font-weight:900;box-shadow:0 2px 10px var(--yellow-glow)}
+  #header .logo-text{font-size:18px;font-weight:900;color:var(--yellow);letter-spacing:-0.02em}
+  #header .logo-sub{font-size:9px;color:rgba(255,255,255,0.5);font-weight:600;letter-spacing:0.06em;text-transform:uppercase;margin-top:-2px}
+  #header .actions{display:flex;gap:6px}
+  .btn-header{border:none;border-radius:8px;padding:8px 14px;font-size:11px;font-weight:700;display:flex;align-items:center;gap:5px;transition:all .2s}
+  .btn-load{background:var(--black-mid);color:#fff;border:1px solid rgba(255,255,255,0.15)}.btn-load:hover{background:var(--gray-700)}
+  .btn-capture{background:var(--yellow);color:var(--black);font-weight:800;box-shadow:0 2px 10px var(--yellow-glow)}.btn-capture:hover{background:var(--yellow-light)}
+
+  #toolbar{background:var(--white);border-bottom:1px solid var(--gray-200);padding:5px 8px;display:flex;align-items:center;gap:3px;overflow-x:auto;flex-shrink:0;z-index:100;box-shadow:var(--shadow-sm)}
+  .tool-btn{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;padding:6px 10px;border:none;border-radius:var(--radius);background:transparent;color:var(--gray-500);font-size:11px;font-weight:700;min-width:50px;transition:all .2s}
+  .tool-btn .icon{font-size:17px}.tool-btn .label{font-size:8px;letter-spacing:.02em;white-space:nowrap}
+  .tool-btn:hover{background:var(--gray-100);color:var(--black)}
+  .tool-btn.active{background:var(--black);color:var(--yellow)}
+  .tool-btn.active-yellow{background:var(--yellow);color:var(--black)}
+  .tool-btn.active-dark{background:var(--black-soft);color:var(--yellow)}
+  .tool-btn.active-red{background:var(--red);color:#fff}
+  .tool-btn.active-orange{background:#E88D00;color:#fff}
+  .tool-sep{width:1px;height:30px;background:var(--gray-200);margin:0 4px;flex-shrink:0}
+  .color-dot{width:22px;height:22px;border-radius:50%;border:2px solid var(--gray-200);cursor:pointer;flex-shrink:0;transition:all .15s}
+  .color-dot:hover{transform:scale(1.15)}.color-dot.active{border:3px solid var(--black);box-shadow:0 0 0 2px var(--yellow-glow)}
+  .brush-btn{width:28px;height:28px;border-radius:6px;background:var(--gray-100);border:none;font-size:10px;font-weight:700;color:var(--gray-500);transition:all .15s}
+  .brush-btn:hover{background:var(--gray-200)}.brush-btn.active{background:var(--black);color:var(--yellow)}
+  .sub-options{display:flex;gap:3px;align-items:center;margin-left:6px}
+
+  #canvas-area{flex:1;position:relative;overflow:hidden;touch-action:none;background:radial-gradient(ellipse at 15% 25%,rgba(242,183,5,0.03),transparent 50%),radial-gradient(ellipse at 85% 75%,rgba(26,26,26,0.03),transparent 50%),var(--gray-50)}
+  #grid-svg{position:absolute;inset:0;width:100%;height:100%;opacity:.18;pointer-events:none}
+  #plan-img{position:absolute;pointer-events:none;box-shadow:var(--shadow-lg);border-radius:3px;display:none}
+  #draw-canvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+  #elements-layer{position:absolute;inset:0}
+  #zoom-badge{position:absolute;bottom:12px;right:12px;background:var(--black);color:var(--yellow);padding:4px 12px;border-radius:6px;font-size:11px;font-weight:800;z-index:50;pointer-events:none;border:1px solid rgba(242,183,5,0.3)}
+  #empty-state{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;pointer-events:none}
+  #empty-state .big-icon{font-size:56px;opacity:.18}
+  #empty-state p{font-size:14px;color:var(--gray-300);font-weight:700;text-align:center;line-height:1.6}
+  #empty-state .hint{font-size:11px;color:var(--gray-500);font-weight:600;background:var(--white);border:2px dashed var(--yellow);border-radius:var(--radius);padding:10px 18px;margin-top:4px}
+
+  .plan-element{position:absolute;user-select:none;touch-action:none;z-index:10}
+  .plan-element.dragging{z-index:1000}
+  .sticker-wrap{display:flex;flex-direction:column;align-items:center}
+  .sticker-icon{line-height:1;background:rgba(255,255,255,0.95);border-radius:var(--radius);padding:4px;border:2px solid transparent;box-shadow:var(--shadow-sm);transition:all .15s;display:flex;align-items:center;justify-content:center}
+  .sticker-icon svg{display:block}
+  .sticker-icon.selected{border-color:var(--yellow);box-shadow:0 0 0 3px var(--yellow-glow),var(--shadow-md)}
+  .sticker-label{font-size:7px;font-weight:800;color:#fff;padding:2px 5px;border-radius:3px;margin-top:2px;white-space:nowrap;letter-spacing:.03em;text-transform:uppercase}
+  .text-box{background:rgba(255,255,255,0.95);border:1px solid var(--gray-200);border-radius:8px;padding:6px 10px;font-size:13px;font-weight:600;max-width:240px;word-break:break-word;box-shadow:var(--shadow-sm);transition:all .15s}
+  .text-box.selected{border:2px solid var(--yellow);box-shadow:0 0 0 3px var(--yellow-glow),var(--shadow-md)}
+  .del-btn{position:absolute;top:-9px;right:-9px;background:var(--red);color:#fff;border:none;border-radius:50%;width:20px;height:20px;font-size:12px;line-height:20px;text-align:center;font-weight:800;display:none;box-shadow:0 2px 6px rgba(217,64,64,0.4)}
+  .plan-element.selected .del-btn{display:block}
+  .resize-controls{display:none;position:absolute;bottom:-12px;left:50%;transform:translateX(-50%);flex-direction:row;gap:3px;z-index:20}
+  .plan-element.selected .resize-controls{display:flex}
+  .resize-btn{width:22px;height:22px;border-radius:50%;border:none;font-size:14px;font-weight:900;line-height:22px;text-align:center;cursor:pointer;box-shadow:var(--shadow-sm);transition:all .15s}
+  .resize-btn.minus{background:var(--gray-100);color:var(--black)}
+  .resize-btn.plus{background:var(--yellow);color:var(--black)}
+  .resize-btn:hover{transform:scale(1.15)}
+
+  #catalog-overlay{position:fixed;top:0;left:0;right:0;background:var(--white);border-radius:0 0 20px 20px;box-shadow:0 6px 32px rgba(0,0,0,0.2);padding:14px 16px 20px;z-index:150;max-height:60vh;overflow-y:auto;transform:translateY(-100%);transition:transform .3s cubic-bezier(.4,0,.2,1)}
+  #catalog-overlay.open{transform:translateY(0)}
+  #catalog-overlay::after{content:'';display:block;width:36px;height:4px;background:var(--yellow);border-radius:2px;margin:12px auto 0}
+  #catalog-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+  #catalog-header span{font-weight:800;font-size:14px;color:var(--black)}
+  .catalog-close{background:var(--gray-100);border:none;border-radius:8px;width:32px;height:32px;font-size:15px;color:var(--gray-500);transition:all .15s}
+  .catalog-close:hover{background:var(--gray-200)}
+  .cat-section-title{font-size:10px;font-weight:800;color:var(--gray-500);text-transform:uppercase;letter-spacing:.06em;margin:10px 0 6px;padding-left:2px}
+  #catalog-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:7px}
+  .catalog-item{display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 4px;border:2px solid var(--gray-100);border-radius:12px;background:var(--gray-50);transition:all .2s}
+  .catalog-item:hover{border-color:var(--yellow);background:var(--yellow-pale)}
+  .catalog-item.active{border-color:var(--yellow);background:var(--yellow-pale);box-shadow:0 0 0 2px var(--yellow-glow)}
+  .catalog-item .cat-icon{width:32px;height:32px;display:flex;align-items:center;justify-content:center}
+  .catalog-item .cat-icon svg{width:28px;height:28px}
+  .catalog-item .name{font-size:8px;font-weight:700;text-align:center;line-height:1.2}
+
+  #snapshot-modal{position:fixed;inset:0;background:rgba(0,0,0,0.8);display:none;flex-direction:column;align-items:center;justify-content:center;z-index:500;padding:16px;backdrop-filter:blur(4px)}
+  #snapshot-modal.open{display:flex}
+  #snapshot-inner{background:var(--white);border-radius:var(--radius-lg);padding:16px;max-width:92vw;max-height:82vh;overflow:auto;box-shadow:var(--shadow-lg);border-top:4px solid var(--yellow)}
+  #snapshot-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+  #snapshot-header span{font-weight:800;font-size:14px;color:var(--black)}
+  #snapshot-img{width:100%;border-radius:var(--radius);border:1px solid var(--gray-200)}
+  .btn-download{background:var(--yellow);color:var(--black);border:none;border-radius:8px;padding:8px 14px;font-size:11px;font-weight:800;text-decoration:none;display:inline-flex;align-items:center;gap:4px;box-shadow:0 2px 8px var(--yellow-glow)}
+
+  #photo-section{background:var(--white);border-top:3px solid var(--yellow);max-height:35vh;overflow-y:auto;flex-shrink:0;padding:14px 16px}
+  #photo-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+  #photo-header h3{font-size:13px;font-weight:800;color:var(--black);display:flex;align-items:center;gap:6px}
+  .btn-photo{background:var(--black);color:var(--yellow);border:none;border-radius:var(--radius);padding:8px 14px;font-size:11px;font-weight:800;box-shadow:0 2px 8px rgba(0,0,0,0.2);transition:all .2s}
+  .btn-photo:hover{background:var(--black-soft)}
+  #photo-empty{background:var(--yellow-pale);border:2px dashed var(--yellow);border-radius:12px;padding:24px 14px;text-align:center;color:var(--gray-500);font-size:12px;line-height:1.6;font-weight:600}
+  #photo-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px}
+  .photo-card{position:relative;border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow-md);aspect-ratio:4/3}
+  .photo-card img{width:100%;height:100%;object-fit:cover}
+  .photo-card .photo-time{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,0.85));padding:16px 8px 6px;color:var(--yellow);font-size:9px;font-weight:700}
+  .photo-card .photo-del{position:absolute;top:4px;right:4px;background:rgba(0,0,0,0.6);color:#fff;border:none;border-radius:50%;width:22px;height:22px;font-size:11px;line-height:22px;backdrop-filter:blur(4px);transition:all .15s}
+  .photo-card .photo-del:hover{background:var(--red)}
+
+  #camera-overlay{position:fixed;inset:0;background:#000;z-index:9999;display:none;flex-direction:column;align-items:center;justify-content:center}
+  #camera-overlay.open{display:flex}
+  #camera-video{width:100%;max-height:80vh;object-fit:contain}
+  #camera-controls{display:flex;gap:24px;margin-top:20px;align-items:center}
+  .cam-btn-close{background:var(--red);color:#fff;border:none;border-radius:50%;width:52px;height:52px;font-size:20px;box-shadow:0 4px 16px rgba(217,64,64,0.4)}
+  .cam-btn-snap{background:var(--yellow);color:var(--black);border:4px solid var(--white);border-radius:50%;width:72px;height:72px;font-size:26px;box-shadow:0 4px 20px var(--yellow-glow);transition:all .2s}
+  .cam-btn-snap:active{transform:scale(0.92)}
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="header">
+    <div class="logo">
+      <div class="logo-icon">G</div>
+      <div><div class="logo-text">GéoTer'</div><div class="logo-sub">Annotation terrain</div></div>
+    </div>
+    <div class="actions">
+      <button class="btn-header btn-load" onclick="document.getElementById('fileInput').click()">📄 Charger plan</button>
+      <input type="file" id="fileInput" accept=".pdf,image/*" style="display:none" onchange="loadPlan(event)">
+      <button class="btn-header btn-capture" onclick="captureSnapshot()">📸 Capture</button>
+    </div>
+  </div>
+  <div id="toolbar">
+    <button class="tool-btn active" data-tool="select" onclick="selectTool('select')"><span class="icon">👆</span><span class="label">Sélection</span></button>
+    <button class="tool-btn" data-tool="sticker" onclick="selectTool('sticker')"><span class="icon">🏷️</span><span class="label">Vignette</span></button>
+    <button class="tool-btn" data-tool="text" onclick="selectTool('text')"><span class="icon">✏️</span><span class="label">Texte</span></button>
+    <button class="tool-btn" data-tool="draw" onclick="selectTool('draw')"><span class="icon">🖌️</span><span class="label">Dessin</span></button>
+    <button class="tool-btn" data-tool="erase" onclick="selectTool('erase')"><span class="icon">🧹</span><span class="label">Gomme</span></button>
+    <div class="tool-sep"></div>
+    <button class="tool-btn" onclick="undoAction()"><span class="icon">↩️</span><span class="label">Annuler</span></button>
+    <button class="tool-btn" onclick="resetView()"><span class="icon">🔍</span><span class="label">Recadrer</span></button>
+    <div id="color-options" class="sub-options" style="display:none"></div>
+    <div id="brush-options" class="sub-options" style="display:none"></div>
+  </div>
+  <div id="canvas-area">
+    <svg id="grid-svg"><defs><pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse"><circle cx="20" cy="20" r="0.7" fill="#C0C0C0"/></pattern></defs><rect width="100%" height="100%" fill="url(#grid)"/></svg>
+    <img id="plan-img" alt="Plan"><canvas id="draw-canvas"></canvas>
+    <div id="elements-layer"></div>
+    <div id="zoom-badge">100%</div>
+    <div id="empty-state"><div class="big-icon">📐</div><p>Chargez un plan PDF ou une image<br>pour commencer à annoter</p><div class="hint">📄 Formats acceptés : PDF, JPG, PNG</div></div>
+  </div>
+  <div id="catalog-overlay">
+    <div id="catalog-header"><span>🏷️ Catalogue de vignettes</span><button class="catalog-close" onclick="closeCatalog()">✕</button></div>
+    <div id="catalog-sections"></div>
+  </div>
+  <div id="snapshot-modal" onclick="closeSnapshot()">
+    <div id="snapshot-inner" onclick="event.stopPropagation()">
+      <div id="snapshot-header"><span>📸 Capture du plan annoté</span><div style="display:flex;gap:8px;align-items:center"><a id="snapshot-download" class="btn-download" download="geoter-plan-annote.png">💾 Télécharger</a><button class="catalog-close" onclick="closeSnapshot()">✕</button></div></div>
+      <img id="snapshot-img" alt="Snapshot">
+    </div>
+  </div>
+  <div id="photo-section">
+    <div id="photo-header"><h3><span>📸</span> Photos du terrain</h3><button class="btn-photo" onclick="openCamera()">+ Prendre une photo</button></div>
+    <div id="photo-empty">Aucune photo pour l'instant.<br>Appuyez sur le bouton ci-dessus pour capturer.</div>
+    <div id="photo-grid"></div>
+  </div>
+  <div id="camera-overlay">
+    <video id="camera-video" autoplay playsinline></video>
+    <div id="camera-controls"><button class="cam-btn-close" onclick="closeCamera()">✕</button><button class="cam-btn-snap" onclick="takePhoto()">📷</button></div>
+  </div>
+</div>
+<script>
+pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+// ═══ SVG ICONS ═══
+const SVG = {
+  // SONDAGES
+  penetro_dyn: `<svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="14" y="2" width="4" height="20" rx="1" fill="#D94040"/><polygon points="16,28 12,22 20,22" fill="#D94040"/><line x1="10" y1="6" x2="22" y2="6" stroke="#D94040" stroke-width="2"/><line x1="10" y1="10" x2="22" y2="10" stroke="#D94040" stroke-width="1.5" stroke-dasharray="2 1"/><circle cx="16" cy="4" r="2" fill="#F2B705"/></svg>`,
+  penetro_stat: `<svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="14" y="4" width="4" height="18" rx="1" fill="#3D7AB5"/><polygon points="16,28 12,22 20,22" fill="#3D7AB5"/><rect x="10" y="2" width="12" height="4" rx="1" fill="#3D7AB5"/><line x1="16" y1="6" x2="16" y2="22" stroke="#fff" stroke-width="1" stroke-dasharray="2 2"/></svg>`,
+  pressio: `<svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="13" y="3" width="6" height="22" rx="2" fill="#F2B705" stroke="#1A1A1A" stroke-width="1"/><ellipse cx="16" cy="18" rx="5" ry="3" fill="none" stroke="#F2B705" stroke-width="2"/><ellipse cx="16" cy="14" rx="4" ry="2.5" fill="none" stroke="#F2B705" stroke-width="1.5" opacity="0.5"/><polygon points="16,30 14,25 18,25" fill="#1A1A1A"/><circle cx="16" cy="5" r="1.5" fill="#1A1A1A"/></svg>`,
+  pelle_meca: `<svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="4" y="22" width="16" height="7" rx="2" fill="#F2B705"/><rect x="6" y="18" width="12" height="5" rx="1" fill="#1A1A1A"/><line x1="18" y1="18" x2="24" y2="8" stroke="#1A1A1A" stroke-width="2.5" stroke-linecap="round"/><line x1="24" y1="8" x2="28" y2="14" stroke="#1A1A1A" stroke-width="2" stroke-linecap="round"/><path d="M28 14 L30 16 L26 18 L28 14Z" fill="#7A7A7A"/><circle cx="8" cy="28" r="2" fill="#4A4A4A"/><circle cx="16" cy="28" r="2" fill="#4A4A4A"/></svg>`,
+  pelle_main: `<svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><line x1="16" y1="4" x2="16" y2="20" stroke="#8B6914" stroke-width="3" stroke-linecap="round"/><path d="M10 20 Q16 30 22 20" fill="#7A7A7A" stroke="#4A4A4A" stroke-width="1"/><line x1="12" y1="7" x2="20" y2="7" stroke="#8B6914" stroke-width="1.5"/></svg>`,
+  tariere: `<svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="14.5" y="2" width="3" height="22" rx="1" fill="#4A4A4A"/><path d="M12 24 Q16 30 20 24" fill="none" stroke="#4A4A4A" stroke-width="2"/><path d="M12 10 C16 14 16 14 20 10" fill="none" stroke="#7A7A7A" stroke-width="1.5"/><path d="M11 15 C16 19 16 19 21 15" fill="none" stroke="#7A7A7A" stroke-width="1.5"/><path d="M10 20 C16 24 16 24 22 20" fill="none" stroke="#7A7A7A" stroke-width="1.5"/><line x1="12" y1="3" x2="20" y2="3" stroke="#4A4A4A" stroke-width="2"/></svg>`,
+  carottage: `<svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="12" y="3" width="8" height="24" rx="2" fill="none" stroke="#D94040" stroke-width="2"/><rect x="13.5" y="5" width="5" height="4" rx="1" fill="#C8A876"/><rect x="13.5" y="10" width="5" height="3" rx="1" fill="#8B7355"/><rect x="13.5" y="14" width="5" height="5" rx="1" fill="#A0A0A0"/><rect x="13.5" y="20" width="5" height="4" rx="1" fill="#6B8E5A"/><line x1="12" y1="28" x2="20" y2="28" stroke="#D94040" stroke-width="2"/></svg>`,
+  piezo: `<svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="14" y="2" width="4" height="24" rx="1" fill="#3D7AB5"/><circle cx="16" cy="28" r="3" fill="none" stroke="#3D7AB5" stroke-width="2"/><line x1="10" y1="8" x2="22" y2="8" stroke="#3D7AB5" stroke-width="1"/><line x1="10" y1="12" x2="22" y2="12" stroke="#3D7AB5" stroke-width="1"/><path d="M11 16 L13 14 L13 18Z" fill="#3D7AB5"/><text x="16" y="29" text-anchor="middle" font-size="5" font-weight="bold" fill="#3D7AB5">P</text></svg>`,
+  forage_destr: `<svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="14" y="2" width="4" height="20" rx="1" fill="#7A7A7A"/><circle cx="16" cy="26" r="4" fill="none" stroke="#D94040" stroke-width="2" stroke-dasharray="3 2"/><line x1="13" y1="24" x2="19" y2="28" stroke="#D94040" stroke-width="1.5"/><line x1="19" y1="24" x2="13" y2="28" stroke="#D94040" stroke-width="1.5"/><rect x="12" y="2" width="8" height="3" rx="1" fill="#4A4A4A"/></svg>`,
+  essai_plaque: `<svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="4" y="18" width="24" height="3" rx="1" fill="#7A7A7A"/><rect x="14" y="8" width="4" height="10" rx="1" fill="#4A4A4A"/><polygon points="16,6 13,10 19,10" fill="#F2B705"/><line x1="4" y1="22" x2="28" y2="22" stroke="#8B6914" stroke-width="2" stroke-dasharray="3 2"/><line x1="8" y1="22" x2="8" y2="28" stroke="#B0B0B0" stroke-width="1"/><line x1="24" y1="22" x2="24" y2="28" stroke="#B0B0B0" stroke-width="1"/></svg>`,
+  infiltro: `<svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="16" cy="14" r="8" fill="none" stroke="#3D7AB5" stroke-width="2"/><path d="M16 10 L16 18" stroke="#3D7AB5" stroke-width="2"/><path d="M12 22 C14 26 18 26 20 22" fill="#3D7AB5" opacity="0.3"/><path d="M14 24 L14 28" stroke="#3D7AB5" stroke-width="1" stroke-dasharray="1 2"/><path d="M18 24 L18 28" stroke="#3D7AB5" stroke-width="1" stroke-dasharray="1 2"/><path d="M16 23 L16 30" stroke="#3D7AB5" stroke-width="1" stroke-dasharray="1 2"/></svg>`,
+  // ENVIRONNEMENT
+  arbre: `<svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="14" y="20" width="4" height="8" rx="1" fill="#8B6914"/><circle cx="16" cy="13" r="9" fill="#4CAF50"/><circle cx="12" cy="11" r="5" fill="#66BB6A"/><circle cx="20" cy="12" r="4.5" fill="#43A047"/></svg>`,
+  arbre_dessus: `<svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="16" cy="16" r="13" fill="#4CAF50" opacity="0.7"/><circle cx="16" cy="16" r="13" fill="none" stroke="#2E7D32" stroke-width="1.5"/><circle cx="12" cy="12" r="5" fill="#66BB6A"/><circle cx="20" cy="11" r="4" fill="#81C784"/><circle cx="18" cy="19" r="5" fill="#43A047"/><circle cx="10" cy="18" r="3.5" fill="#66BB6A"/><circle cx="16" cy="15" r="3" fill="#A5D6A7"/><circle cx="16" cy="16" r="1.5" fill="#5D4037"/></svg>`,
+  buisson: `<svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><ellipse cx="16" cy="20" rx="12" ry="7" fill="#4CAF50"/><ellipse cx="11" cy="18" rx="6" ry="5" fill="#66BB6A"/><ellipse cx="21" cy="19" rx="5" ry="4.5" fill="#43A047"/><ellipse cx="16" cy="16" rx="5" ry="4" fill="#81C784"/></svg>`,
+  buisson_dessus: `<svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><ellipse cx="16" cy="16" rx="10" ry="8" fill="#66BB6A" opacity="0.6"/><ellipse cx="16" cy="16" rx="10" ry="8" fill="none" stroke="#388E3C" stroke-width="1.2"/><ellipse cx="12" cy="14" r="4" fill="#81C784"/><ellipse cx="20" cy="15" r="3.5" fill="#4CAF50"/><ellipse cx="16" cy="18" r="3" fill="#A5D6A7"/></svg>`,
+  haie: `<svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="14" width="28" height="12" rx="6" fill="#4CAF50"/><rect x="6" y="12" width="8" height="10" rx="4" fill="#66BB6A"/><rect x="18" y="13" width="8" height="10" rx="4" fill="#43A047"/></svg>`,
+  haie_dessus: `<svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="10" width="28" height="12" rx="5" fill="#4CAF50" opacity="0.6"/><rect x="2" y="10" width="28" height="12" rx="5" fill="none" stroke="#2E7D32" stroke-width="1.2"/><ellipse cx="8" cy="16" rx="4" ry="3.5" fill="#66BB6A"/><ellipse cx="16" cy="15" rx="4" ry="4" fill="#81C784"/><ellipse cx="24" cy="16" rx="4" ry="3.5" fill="#43A047"/></svg>`,
+  etang: `<svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><ellipse cx="16" cy="18" rx="13" ry="8" fill="#90CAF9" opacity="0.5"/><ellipse cx="16" cy="18" rx="13" ry="8" fill="none" stroke="#3D7AB5" stroke-width="1.5"/><path d="M8 16 Q10 14 12 16 Q14 18 16 16 Q18 14 20 16 Q22 18 24 16" fill="none" stroke="#3D7AB5" stroke-width="1.2"/><path d="M10 20 Q12 18 14 20 Q16 22 18 20 Q20 18 22 20" fill="none" stroke="#3D7AB5" stroke-width="1" opacity="0.5"/></svg>`,
+  mare_dessus: `<svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><ellipse cx="16" cy="16" rx="14" ry="11" fill="#90CAF9" opacity="0.45"/><ellipse cx="16" cy="16" rx="14" ry="11" fill="none" stroke="#1976D2" stroke-width="1.8"/><ellipse cx="13" cy="14" rx="5" ry="3" fill="#64B5F6" opacity="0.5"/><ellipse cx="19" cy="18" rx="4" ry="2.5" fill="#64B5F6" opacity="0.4"/><path d="M7 15 Q9 13 11 15" fill="none" stroke="#1976D2" stroke-width="0.8" opacity="0.6"/><path d="M20 13 Q22 11 24 13" fill="none" stroke="#1976D2" stroke-width="0.8" opacity="0.6"/><path d="M12 19 Q14 17 16 19" fill="none" stroke="#1976D2" stroke-width="0.8" opacity="0.6"/></svg>`,
+  zone_humide: `<svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="20" width="28" height="8" rx="2" fill="#90CAF9" opacity="0.3"/><line x1="4" y1="22" x2="28" y2="22" stroke="#3D7AB5" stroke-width="1" stroke-dasharray="4 2"/><line x1="6" y1="25" x2="26" y2="25" stroke="#3D7AB5" stroke-width="1" stroke-dasharray="3 3"/><path d="M10 10 L10 20" stroke="#4CAF50" stroke-width="2"/><path d="M8 10 Q10 6 12 10" fill="#4CAF50"/><path d="M18 12 L18 20" stroke="#4CAF50" stroke-width="2"/><path d="M16 12 Q18 8 20 12" fill="#4CAF50"/><path d="M24 14 L24 20" stroke="#4CAF50" stroke-width="1.5"/><path d="M22.5 14 Q24 11 25.5 14" fill="#66BB6A"/></svg>`,
+  talus: `<svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><polygon points="4,28 16,8 28,28" fill="#C8A876" opacity="0.5" stroke="#8B6914" stroke-width="1.5"/><line x1="10" y1="18" x2="10" y2="28" stroke="#8B6914" stroke-width="1" stroke-dasharray="2 2"/><line x1="16" y1="8" x2="16" y2="28" stroke="#8B6914" stroke-width="1" stroke-dasharray="2 2"/><line x1="22" y1="18" x2="22" y2="28" stroke="#8B6914" stroke-width="1" stroke-dasharray="2 2"/></svg>`,
+  // ANNOTATIONS
+  nappe: `<svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="16" width="28" height="12" rx="2" fill="#90CAF9" opacity="0.35"/><line x1="2" y1="16" x2="30" y2="16" stroke="#1565C0" stroke-width="2"/><path d="M6 20 Q8 18 10 20 Q12 22 14 20 Q16 18 18 20 Q20 22 22 20 Q24 18 26 20" fill="none" stroke="#1565C0" stroke-width="1.2" opacity="0.6"/><text x="16" y="12" text-anchor="middle" font-size="7" font-weight="bold" fill="#1565C0">▽</text></svg>`,
+  fissure: `<svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M16 2 L14 8 L18 12 L13 18 L17 22 L15 30" fill="none" stroke="#D94040" stroke-width="2.5" stroke-linecap="round"/><line x1="10" y1="10" x2="13" y2="12" stroke="#D94040" stroke-width="1"/><line x1="20" y1="18" x2="17" y2="20" stroke="#D94040" stroke-width="1"/></svg>`,
+  remblai: `<svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><polygon points="4,28 16,10 28,28" fill="none" stroke="#8B6914" stroke-width="2"/><line x1="8" y1="28" x2="12" y2="20" stroke="#8B6914" stroke-width="1"/><line x1="16" y1="28" x2="16" y2="10" stroke="#8B6914" stroke-width="1"/><line x1="24" y1="28" x2="20" y2="20" stroke="#8B6914" stroke-width="1"/><circle cx="12" cy="24" r="1.5" fill="#C8A876"/><circle cx="20" cy="24" r="1.5" fill="#C8A876"/><circle cx="16" cy="20" r="1.5" fill="#C8A876"/></svg>`,
+  regard: `<svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="8" y="8" width="16" height="16" rx="2" fill="none" stroke="#4A4A4A" stroke-width="2"/><line x1="8" y1="16" x2="24" y2="16" stroke="#4A4A4A" stroke-width="1.5"/><line x1="16" y1="8" x2="16" y2="24" stroke="#4A4A4A" stroke-width="1.5"/><circle cx="16" cy="16" r="3" fill="none" stroke="#4A4A4A" stroke-width="1.5"/></svg>`,
+  cloture: `<svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><line x1="4" y1="8" x2="4" y2="26" stroke="#7A7A7A" stroke-width="2"/><line x1="16" y1="6" x2="16" y2="26" stroke="#7A7A7A" stroke-width="2"/><line x1="28" y1="8" x2="28" y2="26" stroke="#7A7A7A" stroke-width="2"/><line x1="4" y1="12" x2="28" y2="12" stroke="#B0B0B0" stroke-width="1.5"/><line x1="4" y1="18" x2="28" y2="18" stroke="#B0B0B0" stroke-width="1.5"/><line x1="4" y1="24" x2="28" y2="24" stroke="#B0B0B0" stroke-width="1.5"/></svg>`,
+  repere: `<svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="16" cy="12" r="8" fill="#F2B705" stroke="#1A1A1A" stroke-width="2"/><line x1="16" y1="20" x2="16" y2="30" stroke="#1A1A1A" stroke-width="2.5"/><circle cx="16" cy="12" r="3" fill="#1A1A1A"/></svg>`,
+  photo_pt: `<svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="4" y="8" width="24" height="18" rx="3" fill="#4A4A4A"/><circle cx="16" cy="17" r="6" fill="none" stroke="#F2B705" stroke-width="2"/><circle cx="16" cy="17" r="3" fill="#F2B705"/><rect x="12" y="6" width="8" height="3" rx="1" fill="#7A7A7A"/></svg>`,
+  danger: `<svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><polygon points="16,4 2,28 30,28" fill="#F2B705" stroke="#1A1A1A" stroke-width="1.5"/><text x="16" y="24" text-anchor="middle" font-size="14" font-weight="bold" fill="#1A1A1A">!</text></svg>`,
+};
+
+const STICKER_SECTIONS = [
+  { title: '🔬 Sondages & Essais', items: [
+    {id:'penetro_dyn', svg:'penetro_dyn', label:'Pénétro. dynamique', color:'#D94040'},
+    {id:'penetro_stat', svg:'penetro_stat', label:'Pénétro. statique', color:'#3D7AB5'},
+    {id:'pressio', svg:'pressio', label:'Pressiomètre', color:'#F2B705'},
+    {id:'pelle_meca', svg:'pelle_meca', label:'Pelle mécanique', color:'#F2B705'},
+    {id:'pelle_main', svg:'pelle_main', label:'Pelle à main', color:'#8B6914'},
+    {id:'tariere', svg:'tariere', label:'Tarière', color:'#4A4A4A'},
+    {id:'carottage', svg:'carottage', label:'Carottage', color:'#D94040'},
+    {id:'piezo', svg:'piezo', label:'Piézomètre', color:'#3D7AB5'},
+    {id:'forage_destr', svg:'forage_destr', label:'Forage destructif', color:'#7A7A7A'},
+    {id:'essai_plaque', svg:'essai_plaque', label:'Essai plaque', color:'#7A7A7A'},
+    {id:'infiltro', svg:'infiltro', label:'Infiltrométrie', color:'#3D7AB5'},
+  ]},
+  { title: '🌿 Environnement & Terrain', items: [
+    {id:'arbre', svg:'arbre', label:'Arbre', color:'#4CAF50'},
+    {id:'arbre_dessus', svg:'arbre_dessus', label:'Arbre (dessus)', color:'#2E7D32'},
+    {id:'buisson', svg:'buisson', label:'Buisson', color:'#4CAF50'},
+    {id:'buisson_dessus', svg:'buisson_dessus', label:'Buisson (dessus)', color:'#388E3C'},
+    {id:'haie', svg:'haie', label:'Haie', color:'#4CAF50'},
+    {id:'haie_dessus', svg:'haie_dessus', label:'Haie (dessus)', color:'#2E7D32'},
+    {id:'etang', svg:'etang', label:'Étang / Mare', color:'#3D7AB5'},
+    {id:'mare_dessus', svg:'mare_dessus', label:'Mare (dessus)', color:'#1976D2'},
+    {id:'zone_humide', svg:'zone_humide', label:'Zone humide', color:'#3D7AB5'},
+    {id:'talus', svg:'talus', label:'Talus', color:'#8B6914'},
+    {id:'nappe', svg:'nappe', label:'Nappe phréatique', color:'#1565C0'},
+    {id:'remblai', svg:'remblai', label:'Remblai', color:'#8B6914'},
+  ]},
+  { title: '📍 Annotations', items: [
+    {id:'fissure', svg:'fissure', label:'Fissure', color:'#D94040'},
+    {id:'regard', svg:'regard', label:'Regard', color:'#4A4A4A'},
+    {id:'cloture', svg:'cloture', label:'Clôture', color:'#7A7A7A'},
+    {id:'repere', svg:'repere', label:'Repère', color:'#F2B705'},
+    {id:'photo_pt', svg:'photo_pt', label:'Point photo', color:'#4A4A4A'},
+    {id:'danger', svg:'danger', label:'Danger', color:'#F2B705'},
+  ]},
+];
+
+// Flatten for lookup
+const ALL_STICKERS = STICKER_SECTIONS.flatMap(s => s.items);
+
+let currentTool='select',planImgSrc=null,planW=1200,planH=800,scale=1,offX=0,offY=0;
+let isPanning=false,panStartX=0,panStartY=0,panOX=0,panOY=0;
+let elements=[],selectedId=null,selectedStickerId=null;
+let drawColor='#D94040',brushSize=4,textColor='#1A1A1A';
+let drawPaths=[],currentPathPts=[],isDrawing=false,photos=[],cameraStream=null;
+const COLORS=['#1A1A1A','#D94040','#3D7AB5','#F2B705','#4CAF50','#E88D00','#9B59B6','#FFFFFF'];
+const BRUSHES=[2,4,8,12];
+
+const $area=document.getElementById('canvas-area'),$planImg=document.getElementById('plan-img');
+const $drawCanvas=document.getElementById('draw-canvas'),$elemLayer=document.getElementById('elements-layer');
+const $empty=document.getElementById('empty-state'),$zoom=document.getElementById('zoom-badge');
+const drawCtx=$drawCanvas.getContext('2d');
+
+buildCatalog();buildColorOptions();buildBrushOptions();resizeDrawCanvas();
+window.addEventListener('resize',resizeDrawCanvas);
+function resizeDrawCanvas(){const r=$area.getBoundingClientRect();$drawCanvas.width=r.width;$drawCanvas.height=r.height;redrawCanvas();}
+
+function selectTool(t){
+  currentTool=t;selectedId=null;
+  document.querySelectorAll('.tool-btn[data-tool]').forEach(b=>{b.className='tool-btn';if(b.dataset.tool===t){const c={select:'active',sticker:'active-yellow',text:'active-dark',draw:'active-red',erase:'active-orange'};b.classList.add(c[t]||'active');}});
+  $area.style.cursor={select:'grab',draw:'crosshair',erase:'cell',sticker:'crosshair',text:'text'}[t]||'crosshair';
+  document.getElementById('color-options').style.display=(t==='draw'||t==='text')?'flex':'none';
+  document.getElementById('brush-options').style.display=t==='draw'?'flex':'none';
+  if(t==='sticker')openCatalog();else closeCatalog();renderElements();
+}
+function buildColorOptions(){const $c=document.getElementById('color-options');COLORS.forEach(c=>{const d=document.createElement('button');d.className='color-dot';d.style.background=c;if(c==='#FFFFFF')d.style.border='2px solid #D4D4D4';d.onclick=()=>{if(currentTool==='draw')drawColor=c;else textColor=c;updateColorDots();};$c.appendChild(d);});updateColorDots();}
+function updateColorDots(){const a=currentTool==='draw'?drawColor:textColor;document.querySelectorAll('.color-dot').forEach((d,i)=>{d.classList.toggle('active',COLORS[i]===a);});}
+function buildBrushOptions(){const $b=document.getElementById('brush-options');BRUSHES.forEach(s=>{const btn=document.createElement('button');btn.className='brush-btn'+(s===brushSize?' active':'');btn.textContent=s;btn.onclick=()=>{brushSize=s;updateBrushBtns();};$b.appendChild(btn);});}
+function updateBrushBtns(){document.querySelectorAll('.brush-btn').forEach((b,i)=>{b.classList.toggle('active',BRUSHES[i]===brushSize);});}
+
+function buildCatalog(){
+  const $sec=document.getElementById('catalog-sections');
+  STICKER_SECTIONS.forEach(section=>{
+    const title=document.createElement('div');title.className='cat-section-title';title.textContent=section.title;$sec.appendChild(title);
+    const grid=document.createElement('div');grid.id='catalog-grid';
+    section.items.forEach(s=>{
+      const btn=document.createElement('button');btn.className='catalog-item';
+      btn.innerHTML=`<div class="cat-icon">${SVG[s.svg]}</div><span class="name" style="color:${s.color}">${s.label}</span>`;
+      btn.onclick=()=>{selectedStickerId=s.id;closeCatalog();updateCatalogActive();};
+      btn.dataset.sid=s.id;grid.appendChild(btn);
+    });
+    $sec.appendChild(grid);
+  });
+}
+function updateCatalogActive(){document.querySelectorAll('.catalog-item').forEach(b=>{b.classList.toggle('active',b.dataset.sid===selectedStickerId);});}
+function openCatalog(){document.getElementById('catalog-overlay').classList.add('open');updateCatalogActive();}
+function closeCatalog(){document.getElementById('catalog-overlay').classList.remove('open');}
+
+async function loadPlan(e){
+  const file=e.target.files[0];if(!file)return;
+  if(file.type==='application/pdf'){const buf=await file.arrayBuffer();const pdf=await pdfjsLib.getDocument({data:buf}).promise;const page=await pdf.getPage(1);const vp=page.getViewport({scale:2});const c=document.createElement('canvas');c.width=vp.width;c.height=vp.height;await page.render({canvasContext:c.getContext('2d'),viewport:vp}).promise;planImgSrc=c.toDataURL('image/png');planW=vp.width;planH=vp.height;}
+  else{planImgSrc=URL.createObjectURL(file);const img=new Image();await new Promise(r=>{img.onload=r;img.src=planImgSrc;});planW=img.naturalWidth;planH=img.naturalHeight;}
+  $planImg.src=planImgSrc;$planImg.style.display='block';$empty.style.display='none';resetView();
+}
+function resetView(){const r=$area.getBoundingClientRect();const sx=(r.width*0.9)/planW,sy=(r.height*0.9)/planH;scale=Math.min(sx,sy,1);offX=(r.width-planW*scale)/2;offY=(r.height-planH*scale)/2;updatePlanTransform();redrawCanvas();renderElements();updateZoomBadge();}
+function updatePlanTransform(){$planImg.style.left=offX+'px';$planImg.style.top=offY+'px';$planImg.style.width=(planW*scale)+'px';$planImg.style.height=(planH*scale)+'px';}
+function updateZoomBadge(){$zoom.textContent=Math.round(scale*100)+'%';}
+
+$area.addEventListener('pointerdown',onPD);$area.addEventListener('pointermove',onPM);$area.addEventListener('pointerup',onPU);$area.addEventListener('wheel',onW,{passive:false});
+function gP(e){const r=$area.getBoundingClientRect();const cx=(e.clientX||0)-r.left,cy=(e.clientY||0)-r.top;return{sx:cx,sy:cy,px:(cx-offX)/scale,py:(cy-offY)/scale};}
+function onPD(e){
+  if(e.target.closest('.plan-element'))return;const pt=gP(e);
+  if(currentTool==='select'){selectedId=null;renderElements();isPanning=true;panStartX=e.clientX;panStartY=e.clientY;panOX=offX;panOY=offY;$area.style.cursor='grabbing';$area.setPointerCapture(e.pointerId);return;}
+  if(currentTool==='sticker'&&selectedStickerId){const s=ALL_STICKERS.find(x=>x.id===selectedStickerId);elements.push({id:Date.now(),type:'sticker',x:pt.px,y:pt.py,svgKey:s.svg,label:s.label,color:s.color,sScale:1});renderElements();return;}
+  if(currentTool==='text'){const text=prompt('Entrez votre texte :');if(text){elements.push({id:Date.now(),type:'text',x:pt.px,y:pt.py,text,color:textColor});renderElements();}return;}
+  if(currentTool==='draw'||currentTool==='erase'){isDrawing=true;currentPathPts=[{x:pt.px,y:pt.py}];$area.setPointerCapture(e.pointerId);}
+}
+function onPM(e){if(isPanning){offX=panOX+(e.clientX-panStartX);offY=panOY+(e.clientY-panStartY);updatePlanTransform();redrawCanvas();renderElements();return;}if(isDrawing){const pt=gP(e);currentPathPts.push({x:pt.px,y:pt.py});redrawCanvas();}}
+function onPU(){if(isPanning){isPanning=false;$area.style.cursor='grab';return;}if(isDrawing){isDrawing=false;if(currentPathPts.length>1)drawPaths.push({points:[...currentPathPts],color:currentTool==='erase'?'eraser':drawColor,size:brushSize});currentPathPts=[];redrawCanvas();}}
+function onW(e){e.preventDefault();const d=e.deltaY>0?0.92:1.08;const ns=Math.max(0.08,Math.min(6,scale*d));const r=$area.getBoundingClientRect();const mx=e.clientX-r.left,my=e.clientY-r.top;offX=mx-(mx-offX)*(ns/scale);offY=my-(my-offY)*(ns/scale);scale=ns;updatePlanTransform();redrawCanvas();renderElements();updateZoomBadge();}
+
+function redrawCanvas(){
+  const w=$drawCanvas.width,h=$drawCanvas.height;drawCtx.clearRect(0,0,w,h);
+  const all=[...drawPaths];if(currentPathPts.length>1)all.push({points:currentPathPts,color:currentTool==='erase'?'eraser':drawColor,size:brushSize});
+  for(const p of all){drawCtx.beginPath();drawCtx.lineCap='round';drawCtx.lineJoin='round';if(p.color==='eraser'){drawCtx.globalCompositeOperation='destination-out';drawCtx.lineWidth=p.size*3;}else{drawCtx.globalCompositeOperation='source-over';drawCtx.strokeStyle=p.color;drawCtx.lineWidth=p.size;}for(let i=0;i<p.points.length;i++){const sx=p.points[i].x*scale+offX,sy=p.points[i].y*scale+offY;if(i===0)drawCtx.moveTo(sx,sy);else drawCtx.lineTo(sx,sy);}drawCtx.stroke();}
+  drawCtx.globalCompositeOperation='source-over';
+}
+
+function renderElements(){
+  $elemLayer.innerHTML='';
+  elements.forEach(el=>{
+    const div=document.createElement('div');div.className='plan-element'+(selectedId===el.id?' selected':'');
+    div.style.left=(el.x*scale+offX)+'px';div.style.top=(el.y*scale+offY)+'px';div.style.transform='translate(-50%,-50%)';
+    if(el.type==='sticker'){
+      const ss=el.sScale||1;const sz=Math.round(28*ss);
+      div.innerHTML=`<div class="sticker-wrap"><div class="sticker-icon ${selectedId===el.id?'selected':''}" style="padding:${Math.round(4*ss)}px"><svg viewBox="0 0 32 32" width="${sz}" height="${sz}" xmlns="http://www.w3.org/2000/svg">${SVG[el.svgKey]?.replace(/<svg[^>]*>|<\/svg>/g,'')||'?'}</svg></div><span class="sticker-label" style="background:${el.color};font-size:${Math.max(6,Math.round(7*ss))}px">${el.label}</span></div><button class="del-btn" data-action="del" data-eid="${el.id}">×</button><div class="resize-controls"><button class="resize-btn minus" data-action="shrink" data-eid="${el.id}">−</button><button class="resize-btn plus" data-action="grow" data-eid="${el.id}">+</button></div>`;
+    }else if(el.type==='text'){
+      div.innerHTML=`<div class="text-box ${selectedId===el.id?'selected':''}" style="color:${el.color}">${el.text}</div><button class="del-btn" data-action="del" data-eid="${el.id}">×</button>`;
+      div.addEventListener('dblclick',e=>{e.stopPropagation();editText(el.id);});
+    }
+    div.addEventListener('pointerdown',e=>{
+      // Handle action buttons first
+      const actionBtn = e.target.closest('[data-action]');
+      if(actionBtn){
+        e.stopPropagation();
+        e.preventDefault();
+        const eid = Number(actionBtn.dataset.eid);
+        const action = actionBtn.dataset.action;
+        if(action==='del') deleteElement(eid);
+        else if(action==='shrink') resizeElement(eid, -0.25);
+        else if(action==='grow') resizeElement(eid, 0.25);
+        return;
+      }
+      e.stopPropagation();selectedId=el.id;renderElements();
+      const nd=$elemLayer.querySelector(`.plan-element:nth-child(${elements.indexOf(el)+1})`);if(!nd)return;
+      let dr=true;const r2=$area.getBoundingClientRect();
+      const dsx=e.clientX-(el.x*scale+offX+r2.left),dsy=e.clientY-(el.y*scale+offY+r2.top);
+      nd.setPointerCapture(e.pointerId);nd.classList.add('dragging');
+      const mH=ev=>{if(!dr)return;const r3=$area.getBoundingClientRect();el.x=(ev.clientX-dsx-r3.left-offX)/scale;el.y=(ev.clientY-dsy-r3.top-offY)/scale;nd.style.left=(el.x*scale+offX)+'px';nd.style.top=(el.y*scale+offY)+'px';};
+      const uH=()=>{dr=false;nd.classList.remove('dragging');nd.removeEventListener('pointermove',mH);nd.removeEventListener('pointerup',uH);};
+      nd.addEventListener('pointermove',mH);nd.addEventListener('pointerup',uH);
+    });
+    $elemLayer.appendChild(div);
+  });
+}
+function deleteElement(id){elements=elements.filter(e=>e.id!==id);selectedId=null;renderElements();}
+function resizeElement(id,delta){const el=elements.find(e=>e.id===id);if(!el)return;el.sScale=Math.max(0.4,Math.min(4,(el.sScale||1)+delta));renderElements();}
+function editText(id){const el=elements.find(e=>e.id===id);if(!el)return;const t=prompt('Modifier le texte :',el.text);if(t!==null){el.text=t;renderElements();}}
+function undoAction(){if(drawPaths.length>0){drawPaths.pop();redrawCanvas();}else if(elements.length>0){elements.pop();selectedId=null;renderElements();}}
+
+function captureSnapshot(){
+  const c=document.createElement('canvas');c.width=planW;c.height=planH;const ctx=c.getContext('2d');
+  const finish=()=>{
+    for(const p of drawPaths){ctx.beginPath();ctx.lineCap='round';ctx.lineJoin='round';if(p.color==='eraser'){ctx.globalCompositeOperation='destination-out';ctx.lineWidth=p.size*3;}else{ctx.globalCompositeOperation='source-over';ctx.strokeStyle=p.color;ctx.lineWidth=p.size;}for(let i=0;i<p.points.length;i++){if(i===0)ctx.moveTo(p.points[i].x,p.points[i].y);else ctx.lineTo(p.points[i].x,p.points[i].y);}ctx.stroke();}
+    ctx.globalCompositeOperation='source-over';
+    // Render stickers as SVG images
+    let pending=0;
+    const done=()=>{const url=c.toDataURL('image/png');document.getElementById('snapshot-img').src=url;document.getElementById('snapshot-download').href=url;document.getElementById('snapshot-modal').classList.add('open');};
+    const textEls=elements.filter(e=>e.type==='text');
+    const stickerEls=elements.filter(e=>e.type==='sticker');
+    textEls.forEach(el=>{ctx.font='bold 14px sans-serif';ctx.fillStyle=el.color;ctx.textAlign='left';ctx.fillText(el.text,el.x,el.y);});
+    if(stickerEls.length===0){done();return;}
+    stickerEls.forEach(el=>{
+      const svgStr=SVG[el.svgKey];if(!svgStr)return;
+      const ss=el.sScale||1;const sz=Math.round(32*ss);
+      const blob=new Blob([svgStr],{type:'image/svg+xml'});
+      const url=URL.createObjectURL(blob);
+      const img=new Image();pending++;
+      img.onload=()=>{ctx.drawImage(img,el.x-sz/2,el.y-sz/2,sz,sz);ctx.font=`bold ${Math.round(9*ss)}px sans-serif`;ctx.fillStyle=el.color;ctx.textAlign='center';ctx.fillText(el.label,el.x,el.y+sz/2+Math.round(10*ss));URL.revokeObjectURL(url);pending--;if(pending===0)done();};
+      img.src=url;
+    });
+  };
+  if(planImgSrc){const img=new Image();img.crossOrigin='anonymous';img.onload=()=>{ctx.drawImage(img,0,0,planW,planH);finish();};img.src=planImgSrc;}else{ctx.fillStyle='#fff';ctx.fillRect(0,0,planW,planH);finish();}
+}
+function closeSnapshot(){document.getElementById('snapshot-modal').classList.remove('open');}
+
+async function openCamera(){try{cameraStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment',width:{ideal:1920},height:{ideal:1080}}});document.getElementById('camera-video').srcObject=cameraStream;document.getElementById('camera-overlay').classList.add('open');}catch(err){alert("Impossible d'accéder à la caméra.");}}
+function closeCamera(){if(cameraStream){cameraStream.getTracks().forEach(t=>t.stop());cameraStream=null;}document.getElementById('camera-overlay').classList.remove('open');}
+function takePhoto(){const v=document.getElementById('camera-video');const c=document.createElement('canvas');c.width=v.videoWidth;c.height=v.videoHeight;c.getContext('2d').drawImage(v,0,0);photos.push({dataUrl:c.toDataURL('image/jpeg',0.85),timestamp:new Date().toLocaleString('fr-FR')});closeCamera();renderPhotos();}
+function deletePhoto(i){photos.splice(i,1);renderPhotos();}
+function renderPhotos(){const $e=document.getElementById('photo-empty'),$g=document.getElementById('photo-grid');if(photos.length===0){$e.style.display='block';$g.innerHTML='';return;}$e.style.display='none';$g.innerHTML=photos.map((p,i)=>`<div class="photo-card"><img src="${p.dataUrl}" alt="Photo ${i+1}"><div class="photo-time">${p.timestamp}</div><button class="photo-del" onclick="deletePhoto(${i})">×</button></div>`).join('');}
+</script>
+</body>
+</html>
