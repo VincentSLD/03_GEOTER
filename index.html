@@ -72,7 +72,7 @@
   .sticker-icon svg{display:block}
   .sticker-icon.selected{border-color:var(--yellow);box-shadow:0 0 0 3px var(--yellow-glow),var(--shadow-md)}
   .sticker-label{font-size:7px;font-weight:800;color:#fff;padding:2px 5px;border-radius:3px;margin-top:2px;white-space:nowrap;letter-spacing:.03em;text-transform:uppercase}
-  .text-box{background:rgba(255,255,255,0.95);border:1px solid var(--gray-200);border-radius:8px;padding:6px 10px;font-size:13px;max-width:240px;word-break:break-word;box-shadow:var(--shadow-sm);transition:all .15s}
+  .text-box{background:rgba(255,255,255,0.95);border:1px solid var(--gray-200);border-radius:8px;padding:6px 10px;font-size:13px;max-width:240px;word-break:break-word;box-shadow:var(--shadow-sm);transition:all .15s;text-align:center}
   .text-box b,.text-box strong{font-weight:800}.text-box i,.text-box em{font-style:italic}.text-box u{text-decoration:underline}.text-box font{line-height:1.3}
   .text-box.selected{border:2px solid var(--yellow);box-shadow:0 0 0 3px var(--yellow-glow),var(--shadow-md)}
   .del-btn{position:absolute;top:-9px;right:-9px;background:var(--red);color:#fff;border:none;border-radius:50%;width:20px;height:20px;font-size:12px;line-height:20px;text-align:center;font-weight:800;display:none;box-shadow:0 2px 6px rgba(217,64,64,0.4)}
@@ -85,6 +85,8 @@
   .resize-btn.minus{background:var(--gray-100);color:var(--black)}
   .resize-btn.plus{background:var(--yellow);color:var(--black)}
   .resize-btn:hover{transform:scale(1.15)}
+  .rotate-btn{position:absolute;top:-9px;left:50%;transform:translateX(-50%);background:#3D7AB5;color:#fff;border:none;border-radius:50%;width:20px;height:20px;font-size:11px;line-height:20px;text-align:center;font-weight:800;display:none;box-shadow:0 2px 6px rgba(61,122,181,0.4);cursor:grab}
+  .plan-element.selected .rotate-btn{display:block}
 
   #catalog-overlay{position:fixed;top:0;left:0;right:0;background:var(--white);border-radius:0 0 20px 20px;box-shadow:0 6px 32px rgba(0,0,0,0.2);padding:14px 16px 20px;z-index:150;max-height:60vh;overflow-y:auto;transform:translateY(-100%);transition:transform .3s cubic-bezier(.4,0,.2,1)}
   #catalog-overlay.open{transform:translateY(0)}
@@ -187,7 +189,7 @@
   .te-sep{width:1px;height:28px;background:var(--gray-200);margin:0 4px;flex-shrink:0}
   #te-font-size{width:60px;height:36px;border:1px solid var(--gray-200);border-radius:6px;background:var(--white);padding:0 6px;font-family:inherit;font-size:12px;font-weight:700;text-align:center;color:var(--black)}
   #te-color-picker{width:36px;height:36px;border:none;border-radius:6px;cursor:pointer;padding:0;background:transparent}
-  #text-editor-content{min-height:120px;max-height:40vh;overflow-y:auto;padding:14px 16px;font-family:'Nunito Sans',sans-serif;font-size:13px;line-height:1.5;outline:none;color:var(--black);word-break:break-word}
+  #text-editor-content{min-height:120px;max-height:40vh;overflow-y:auto;padding:14px 16px;font-family:'Nunito Sans',sans-serif;font-size:13px;line-height:1.5;outline:none;color:var(--black);word-break:break-word;text-align:center}
   #text-editor-content:empty::before{content:'Saisissez votre texte ici...';color:var(--gray-300);pointer-events:none}
   #text-editor-actions{display:flex;justify-content:flex-end;gap:8px;padding:12px 16px;border-top:1px solid var(--gray-200)}
   .te-cancel{background:var(--gray-100);color:var(--gray-700);border:none;border-radius:8px;padding:10px 20px;font-size:12px;font-weight:700;cursor:pointer;transition:all .15s}
@@ -273,7 +275,7 @@
   </div>
   <div id="legend-modal" onclick="closeLegend()">
     <div id="legend-inner" onclick="event.stopPropagation()">
-      <div id="legend-header"><span>📋 Légende</span><button class="catalog-close" onclick="closeLegend()">✕</button></div>
+      <div id="legend-header"><span>📋 Légende</span><div style="display:flex;gap:6px;align-items:center"><button onclick="placeLegendOnPlan()" style="background:var(--yellow);color:var(--black);border:none;border-radius:6px;padding:4px 10px;font-size:11px;font-weight:800;cursor:pointer">📌 Coller sur le plan</button><button class="catalog-close" onclick="closeLegend()">✕</button></div></div>
       <div id="legend-content"></div>
     </div>
   </div>
@@ -415,6 +417,7 @@ const SVG = {
   repere: `<svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="16" cy="12" r="8" fill="#F2B705" stroke="#1A1A1A" stroke-width="2"/><line x1="16" y1="20" x2="16" y2="30" stroke="#1A1A1A" stroke-width="2.5"/><circle cx="16" cy="12" r="3" fill="#1A1A1A"/></svg>`,
   photo_pt: `<svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="4" y="8" width="24" height="18" rx="3" fill="#4A4A4A"/><circle cx="16" cy="17" r="6" fill="none" stroke="#F2B705" stroke-width="2"/><circle cx="16" cy="17" r="3" fill="#F2B705"/><rect x="12" y="6" width="8" height="3" rx="1" fill="#7A7A7A"/></svg>`,
   danger: `<svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><polygon points="16,4 2,28 30,28" fill="#F2B705" stroke="#1A1A1A" stroke-width="1.5"/><text x="16" y="24" text-anchor="middle" font-size="14" font-weight="bold" fill="#1A1A1A">!</text></svg>`,
+  boussole: `<svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="16" cy="16" r="14" fill="#F5F5F5" stroke="#1A1A1A" stroke-width="1.5"/><circle cx="16" cy="16" r="11" fill="none" stroke="#D4D4D4" stroke-width="0.5"/><polygon points="16,3 18.5,14 16,12 13.5,14" fill="#D94040"/><polygon points="16,29 18.5,18 16,20 13.5,18" fill="#1A1A1A"/><circle cx="16" cy="16" r="2" fill="#1A1A1A"/><text x="16" y="8" text-anchor="middle" font-size="5" font-weight="bold" fill="#D94040">N</text></svg>`,
 };
 
 const STICKER_SECTIONS = [
@@ -452,6 +455,7 @@ const STICKER_SECTIONS = [
     {id:'repere', svg:'repere', label:'Repère', color:'#F2B705'},
     {id:'photo_pt', svg:'photo_pt', label:'Point photo', color:'#4A4A4A'},
     {id:'danger', svg:'danger', label:'Danger', color:'#F2B705'},
+    {id:'boussole', svg:'boussole', label:'Boussole', color:'#D94040'},
   ]},
 ];
 
@@ -613,8 +617,8 @@ function renderElements(){
     const div=document.createElement('div');div.className='plan-element'+(selectedId===el.id?' selected':'');
     div.style.left=(el.x*scale+offX)+'px';div.style.top=(el.y*scale+offY)+'px';
     if(el.type==='sticker'){
-      const ss=el.sScale||1;const sz=Math.round(28*ss);
-      div.innerHTML=`<div class="sticker-wrap"><div class="sticker-icon ${selectedId===el.id?'selected':''}" style="padding:${Math.round(4*ss)}px"><svg viewBox="0 0 32 32" width="${sz}" height="${sz}" xmlns="http://www.w3.org/2000/svg">${SVG[el.svgKey]?.replace(/<svg[^>]*>|<\/svg>/g,'')||'?'}</svg></div></div><button class="del-btn" data-action="del" data-eid="${el.id}">×</button><div class="resize-controls"><button class="resize-btn minus" data-action="shrink" data-eid="${el.id}">−</button><button class="resize-btn plus" data-action="grow" data-eid="${el.id}">+</button></div>`;
+      const ss=el.sScale||1;const sz=Math.round(28*ss);const rot=el.rotation||0;
+      div.innerHTML=`<div class="sticker-wrap" style="transform:rotate(${rot}deg)"><div class="sticker-icon ${selectedId===el.id?'selected':''}" style="padding:${Math.round(4*ss)}px"><svg viewBox="0 0 32 32" width="${sz}" height="${sz}" xmlns="http://www.w3.org/2000/svg">${SVG[el.svgKey]?.replace(/<svg[^>]*>|<\/svg>/g,'')||'?'}</svg></div></div><button class="del-btn" data-action="del" data-eid="${el.id}">×</button><button class="rotate-btn" data-action="rotate" data-eid="${el.id}">↻</button><div class="resize-controls"><button class="resize-btn minus" data-action="shrink" data-eid="${el.id}">−</button><button class="resize-btn plus" data-action="grow" data-eid="${el.id}">+</button></div>`;
     }else if(el.type==='text'){
       div.innerHTML=`<div class="text-box ${selectedId===el.id?'selected':''}" style="color:${el.color}">${el.html||el.text||''}</div><button class="del-btn" data-action="del" data-eid="${el.id}">×</button><button class="edit-btn" data-action="edit" data-eid="${el.id}">✏️</button>`;
     }else if(el.type==='arrow'){
@@ -633,6 +637,8 @@ function renderElements(){
       </svg>
       <button class="del-btn" data-action="del" data-eid="${el.id}" style="left:${ox+lx2+6}px;top:${oy+ly2-10}px">×</button>
       <button class="edit-btn" data-action="togglehead" data-eid="${el.id}" style="left:${ox+lx1-20}px;top:${oy+ly1-10}px">⇄</button>`;
+    }else if(el.type==='legend'){
+      div.innerHTML=`<img src="${el.imgSrc}" style="width:${el.w}px;height:${el.h}px;pointer-events:none;display:block"><button class="del-btn" data-action="del" data-eid="${el.id}">×</button>`;
     }
     div.addEventListener('pointerdown',e=>{
       const actionBtn = e.target.closest('[data-action]');
@@ -645,6 +651,24 @@ function renderElements(){
         else if(action==='shrink') resizeElement(eid, -0.25);
         else if(action==='grow') resizeElement(eid, 0.25);
         else if(action==='togglehead'){const ae=elements.find(x=>x.id===eid);if(ae)ae.doubleHead=!ae.doubleHead;renderElements();}
+        else if(action==='rotate'){
+          const rel=elements.find(x=>x.id===eid);if(!rel)return;
+          const idx2=elements.indexOf(rel);
+          const nd2=$elemLayer.querySelector(`.plan-element:nth-child(${idx2+1})`);if(!nd2)return;
+          const rect=nd2.getBoundingClientRect();
+          const cx=rect.left+rect.width/2,cy=rect.top+rect.height/2;
+          const startAngle=Math.atan2(e.clientY-cy,e.clientX-cx)*180/Math.PI;
+          const startRot=rel.rotation||0;
+          const wrap=nd2.querySelector('.sticker-wrap');
+          const rMove=ev=>{
+            const angle=Math.atan2(ev.clientY-cy,ev.clientX-cx)*180/Math.PI;
+            rel.rotation=Math.round(startRot+(angle-startAngle));
+            if(wrap)wrap.style.transform=`rotate(${rel.rotation}deg)`;
+          };
+          const rUp=()=>{document.removeEventListener('pointermove',rMove);document.removeEventListener('pointerup',rUp);};
+          document.addEventListener('pointermove',rMove);
+          document.addEventListener('pointerup',rUp);
+        }
         return;
       }
       e.stopPropagation();selectedId=el.id;renderElements();
@@ -749,6 +773,53 @@ function openLegend(){
 
 function closeLegend(){document.getElementById('legend-modal').classList.remove('open');}
 
+function escXml(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+function placeLegendOnPlan(){
+  const stickers=elements.filter(e=>e.type==='sticker');
+  if(stickers.length===0){alert('Aucune vignette sur le plan.');return;}
+  closeLegend();
+  const counts={};
+  stickers.forEach(s=>{
+    if(!counts[s.svgKey])counts[s.svgKey]={count:0,label:s.label,color:s.color,svg:s.svgKey};
+    counts[s.svgKey].count++;
+  });
+  const items=Object.values(counts);
+  const rowH=30,padX=12,padY=10,titleH=32,iconSz=22,w=220;
+  const h=titleH+padY+items.length*rowH+padY;
+  let svgRows='';
+  items.forEach((item,i)=>{
+    const y=titleH+padY+i*rowH;
+    const svgContent=SVG[item.svg]?.replace(/<svg[^>]*>|<\/svg>/g,'')||'';
+    svgRows+=`<svg x="${padX}" y="${y}" width="${iconSz}" height="${iconSz}" viewBox="0 0 32 32">${svgContent}</svg>`;
+    svgRows+=`<text x="${padX+iconSz+8}" y="${y+iconSz/2+4}" font-family="Arial,sans-serif" font-size="11" font-weight="700" fill="${item.color}">${escXml(item.label)}</text>`;
+    svgRows+=`<text x="${w-padX}" y="${y+iconSz/2+4}" text-anchor="end" font-family="Arial,sans-serif" font-size="10" fill="#666">\u00d7${item.count}</text>`;
+  });
+  const svgStr=`<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}">
+    <rect x="0.5" y="0.5" width="${w-1}" height="${h-1}" rx="8" fill="white" stroke="#D1D5DB" stroke-width="1"/>
+    <rect x="0" y="0" width="${w}" height="4" rx="2" fill="#EAB308"/>
+    <text x="${padX}" y="24" font-family="Arial,sans-serif" font-size="13" font-weight="800" fill="#1A1A1A">L\u00e9gende</text>
+    <line x1="${padX}" y1="${titleH}" x2="${w-padX}" y2="${titleH}" stroke="#E5E7EB" stroke-width="1"/>
+    ${svgRows}
+  </svg>`;
+  const blob=new Blob([svgStr],{type:'image/svg+xml;charset=utf-8'});
+  const url=URL.createObjectURL(blob);
+  const img=new Image();
+  img.onload=()=>{
+    const canvas=document.createElement('canvas');
+    canvas.width=w*2;canvas.height=h*2;
+    const ctx2=canvas.getContext('2d');
+    ctx2.scale(2,2);ctx2.drawImage(img,0,0,w,h);
+    URL.revokeObjectURL(url);
+    const dataUrl=canvas.toDataURL('image/png');
+    const cx=(($area.clientWidth/2)-offX)/scale;
+    const cy=(($area.clientHeight/2)-offY)/scale;
+    elements.push({id:Date.now(),type:'legend',x:cx,y:cy,imgSrc:dataUrl,w:w,h:h});
+    selectedId=null;renderElements();
+  };
+  img.src=url;
+}
+
 // ═══ ENREGISTRER / OUVRIR PROJET ═══
 
 function exportProject(){
@@ -759,9 +830,10 @@ function exportProject(){
     planW:planW,
     planH:planH,
     elements:elements.map(el=>{
-      if(el.type==='sticker')return{type:'sticker',x:el.x,y:el.y,svgKey:el.svgKey,label:el.label,color:el.color,sScale:el.sScale||1};
+      if(el.type==='sticker')return{type:'sticker',x:el.x,y:el.y,svgKey:el.svgKey,label:el.label,color:el.color,sScale:el.sScale||1,rotation:el.rotation||0};
       if(el.type==='text')return{type:'text',x:el.x,y:el.y,html:el.html||'',text:el.text||'',color:el.color};
       if(el.type==='arrow')return{type:'arrow',x:el.x,y:el.y,x2:el.x2,y2:el.y2,color:el.color,doubleHead:el.doubleHead||false};
+      if(el.type==='legend')return{type:'legend',x:el.x,y:el.y,imgSrc:el.imgSrc,w:el.w,h:el.h};
       return el;
     }),
     drawPaths:drawPaths,
@@ -848,7 +920,7 @@ function captureSnapshot(){
       if(!content)return;
       const maxW=240,padX=10,padY=6;
       const wrap=document.createElement('div');
-      wrap.style.cssText=`position:absolute;left:-9999px;top:-9999px;font-family:sans-serif;font-size:13px;line-height:1.5;max-width:${maxW}px;padding:${padY}px ${padX}px;word-break:break-word;visibility:hidden`;
+      wrap.style.cssText=`position:absolute;left:-9999px;top:-9999px;font-family:sans-serif;font-size:13px;line-height:1.5;max-width:${maxW}px;padding:${padY}px ${padX}px;word-break:break-word;text-align:center;visibility:hidden`;
       wrap.innerHTML=content;
       document.body.appendChild(wrap);
       const boxW=wrap.offsetWidth,boxH=wrap.offsetHeight;
@@ -893,10 +965,12 @@ function captureSnapshot(){
       walkNode(wrap,{bold:false,italic:false,underline:false,color:el.color,size:13});
       document.body.removeChild(wrap);
     });
-    // Render stickers at screen coords
+    // Render stickers + legends at screen coords
     const stickerEls=elements.filter(e=>e.type==='sticker');
-    if(stickerEls.length===0){done();return;}
-    let pending=stickerEls.length;
+    const legendEls=elements.filter(e=>e.type==='legend');
+    const totalAsync=stickerEls.length+legendEls.length;
+    if(totalAsync===0){done();return;}
+    let pending=totalAsync;
     const check=()=>{pending--;if(pending===0)done();};
     stickerEls.forEach(el=>{
       const svgStr=SVG[el.svgKey];if(!svgStr){check();return;}
@@ -904,8 +978,14 @@ function captureSnapshot(){
       const blob=new Blob([svgStr],{type:'image/svg+xml'});
       const url=URL.createObjectURL(blob);
       const img=new Image();
-      img.onload=()=>{ctx.drawImage(img,toX(el.x)-sz/2,toY(el.y)-sz/2,sz,sz);URL.revokeObjectURL(url);check();};
+      img.onload=()=>{const dx=toX(el.x),dy=toY(el.y);const rot=(el.rotation||0)*Math.PI/180;if(rot){ctx.save();ctx.translate(dx,dy);ctx.rotate(rot);ctx.drawImage(img,-sz/2,-sz/2,sz,sz);ctx.restore();}else{ctx.drawImage(img,dx-sz/2,dy-sz/2,sz,sz);}URL.revokeObjectURL(url);check();};
       img.src=url;
+    });
+    legendEls.forEach(el=>{
+      const img=new Image();
+      img.onload=()=>{ctx.drawImage(img,toX(el.x)-el.w/2,toY(el.y)-el.h/2,el.w,el.h);check();};
+      img.onerror=()=>{check();};
+      img.src=el.imgSrc;
     });
   };
   // Background + plan image at screen position
