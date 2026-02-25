@@ -326,6 +326,9 @@
         <button class="btn-scan3d btn-scan3d-measure" id="btn-ngf" onclick="toggleNgfMode()">📌 Réf. NGF</button>
         <button class="btn-scan3d btn-scan3d-measure" id="btn-erase" onclick="toggleEraseMode()">✏️ Gomme</button>
         <button class="btn-scan3d btn-scan3d-clear" onclick="clearMeasurements()">🗑️ Tout effacer</button>
+        <button class="btn-scan3d btn-scan3d-reset" onclick="exportScan3DProject()">💾 Exporter</button>
+        <button class="btn-scan3d btn-scan3d-import" onclick="document.getElementById('scan3dProjectInput').click()">📂 Charger projet</button>
+        <input type="file" id="scan3dProjectInput" accept=".geoter3d" style="display:none" onchange="importScan3DProject(event)">
         <button class="btn-scan3d btn-scan3d-reset" onclick="captureScan3D()">📸 Capture</button>
         <button class="btn-scan3d btn-scan3d-reset" onclick="resetScan3DView()">🔄 Recentrer</button>
         <button class="btn-scan3d btn-scan3d-close" onclick="closeScan3D()">✕</button>
@@ -877,6 +880,10 @@ let scan3dScene,scan3dCamera,scan3dRenderer,scan3dControls,scan3dAnimId=null,sca
 let scan3dRaycaster,scan3dMouse=new THREE.Vector2();
 let measureMode=false,altiMode=false,eraseMode=false,measurePending=[],measureObjects=[],measureGroups=[],scanScaleFactor=1,scanOrigCenter=new THREE.Vector3();
 let ngfMode=false,ngfOffset=null,ngfPendingRawY=0,ngfPendingPt=null;
+let scanRawData=null,scanFileName='',scanFileType='';
+
+function arrayBufferToBase64(buf){const bytes=new Uint8Array(buf);let bin='';for(let i=0;i<bytes.length;i++)bin+=String.fromCharCode(bytes[i]);return btoa(bin);}
+function base64ToArrayBuffer(b64){const bin=atob(b64);const bytes=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)bytes[i]=bin.charCodeAt(i);return bytes.buffer;}
 
 function initScan3D(){
   const canvas=document.getElementById('scan3d-canvas');
@@ -946,9 +953,11 @@ window.resetScan3DView=function(){
 window.loadScanFile=function(e){
   const file=e.target.files[0];if(!file)return;
   const ext=file.name.split('.').pop().toLowerCase();
+  scanFileName=file.name;scanFileType=ext;
   const reader=new FileReader();
   if(ext==='ply'){
     reader.onload=function(ev){
+      scanRawData=ev.target.result;
       const loader=new PLYLoader();
       const geometry=loader.parse(ev.target.result);
       addScanToScene(geometry,file.name);
@@ -956,9 +965,9 @@ window.loadScanFile=function(e){
     reader.readAsArrayBuffer(file);
   }else if(ext==='obj'){
     reader.onload=function(ev){
+      scanRawData=ev.target.result;
       const loader=new OBJLoader();
       const group=loader.parse(ev.target.result);
-      // OBJ returns a Group, add it directly
       if(scan3dMesh){scan3dScene.remove(scan3dMesh);}
       scan3dMesh=group;
       // Center
@@ -1270,6 +1279,152 @@ window.captureScan3D=function(){
   document.getElementById('snapshot-img').src=url;
   document.getElementById('snapshot-download').href=url;
   document.getElementById('snapshot-modal').classList.add('open');
+};
+
+// ═══ EXPORT / IMPORT PROJET ═══
+
+window.exportScan3DProject=function(){
+  if(!scanRawData){alert('Aucun scan chargé à exporter.');return;}
+  const project={version:1,scanFileName,scanFileType};
+  // Scan data
+  if(scanFileType==='ply') project.scanData=arrayBufferToBase64(scanRawData);
+  else project.scanData=btoa(unescape(encodeURIComponent(scanRawData)));
+  // Scale & origin
+  project.scanScaleFactor=scanScaleFactor;
+  project.scanOrigCenter={x:scanOrigCenter.x,y:scanOrigCenter.y,z:scanOrigCenter.z};
+  // NGF
+  project.ngfOffset=ngfOffset;
+  if(ngfPendingPt)project.ngfRefPoint={x:ngfPendingPt.x,y:ngfPendingPt.y,z:ngfPendingPt.z};
+  project.ngfPendingRawY=ngfPendingRawY;
+  // Camera
+  project.camera={
+    position:{x:scan3dCamera.position.x,y:scan3dCamera.position.y,z:scan3dCamera.position.z},
+    target:{x:scan3dControls.target.x,y:scan3dControls.target.y,z:scan3dControls.target.z}
+  };
+  // Measurements
+  project.measurements=measureGroups.map(g=>{
+    if(g.type==='altitude'){
+      const marker=g.objects[0];
+      const p=marker.position;
+      const realPt=toRealCoord(p);
+      return {type:'altitude',point:{x:p.x,y:p.y,z:p.z},realY:realPt.y};
+    }else{
+      const m1=g.objects[0],m2=g.objects[1];
+      const p1=m1.position,p2=m2.position;
+      const rp1=toRealCoord(p1),rp2=toRealCoord(p2);
+      return {type:'distance',point1:{x:p1.x,y:p1.y,z:p1.z},point2:{x:p2.x,y:p2.y,z:p2.z},distance:rp1.distanceTo(rp2)};
+    }
+  });
+  // Download
+  const blob=new Blob([JSON.stringify(project)],{type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=(scanFileName.replace(/\.[^.]+$/,'')||'projet')+'.geoter3d';
+  a.click();URL.revokeObjectURL(a.href);
+};
+
+window.importScan3DProject=function(e){
+  const file=e.target.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=function(ev){
+    let project;
+    try{project=JSON.parse(ev.target.result);}catch(err){alert('Fichier projet invalide.');return;}
+    if(!project.scanData){alert('Pas de données scan dans ce fichier.');return;}
+    // Clear existing
+    clearMeasurements();
+    ngfOffset=null;ngfPendingPt=null;ngfPendingRawY=0;
+    document.getElementById('scan3d-ngf-ref').style.display='none';
+    // Decode scan data
+    scanFileName=project.scanFileName||'scan';
+    scanFileType=project.scanFileType||'ply';
+    if(scanFileType==='ply'){
+      scanRawData=base64ToArrayBuffer(project.scanData);
+      const loader=new PLYLoader();
+      const geometry=loader.parse(scanRawData);
+      addScanToScene(geometry,scanFileName);
+    }else{
+      scanRawData=decodeURIComponent(escape(atob(project.scanData)));
+      const loader=new OBJLoader();
+      const group=loader.parse(scanRawData);
+      if(scan3dMesh){scan3dScene.remove(scan3dMesh);}
+      scan3dMesh=group;
+      const box=new THREE.Box3().setFromObject(group);
+      const center=box.getCenter(new THREE.Vector3());
+      const size=box.getSize(new THREE.Vector3());
+      scanOrigCenter.copy(center);
+      group.position.sub(center);
+      const maxDim=Math.max(size.x,size.y,size.z);
+      const s=5/maxDim;group.scale.set(s,s,s);
+      scanScaleFactor=s;
+      scan3dScene.add(group);
+      document.getElementById('scan3d-empty').style.display='none';
+      document.getElementById('scan3d-info').style.display='block';
+      document.getElementById('scan3d-info').textContent=`${scanFileName} — mesh`;
+    }
+    // Restore NGF
+    if(project.ngfOffset!=null){
+      ngfOffset=project.ngfOffset;
+      ngfPendingRawY=project.ngfPendingRawY||0;
+      if(project.ngfRefPoint){
+        ngfPendingPt=new THREE.Vector3(project.ngfRefPoint.x,project.ngfRefPoint.y,project.ngfRefPoint.z);
+        const refMarker=new THREE.Mesh(new THREE.SphereGeometry(0.05,16,16),new THREE.MeshBasicMaterial({color:0xE53935}));
+        refMarker.position.copy(ngfPendingPt);
+        scan3dScene.add(refMarker);
+        const ngfAlt=toNgfAlt(toRealCoord(ngfPendingPt).y);
+        const refLabel=createTextSprite(`${ngfAlt.toFixed(2)} m`,0xE53935);
+        refLabel.position.copy(ngfPendingPt).add(new THREE.Vector3(0,0.14,0));
+        scan3dScene.add(refLabel);
+        measureObjects.push(refMarker,refLabel);
+      }
+      const refDiv=document.getElementById('scan3d-ngf-ref');
+      refDiv.style.display='block';
+      const ngfVal=ngfPendingRawY+ngfOffset;
+      refDiv.textContent=`📌 Réf. NGF : ${ngfVal.toFixed(2)} m (décalage: ${ngfOffset>=0?'+':''}${ngfOffset.toFixed(2)} m)`;
+    }
+    // Restore measurements
+    if(project.measurements){
+      project.measurements.forEach(m=>{
+        if(m.type==='altitude'){
+          const pt=new THREE.Vector3(m.point.x,m.point.y,m.point.z);
+          const marker=new THREE.Mesh(new THREE.SphereGeometry(0.04,16,16),new THREE.MeshBasicMaterial({color:0xF2B705}));
+          marker.position.copy(pt);
+          scan3dScene.add(marker);
+          const rawY=m.realY;
+          const altText=ngfOffset!==null?`${toNgfAlt(rawY).toFixed(2)} m`:`${rawY.toFixed(2)} m`;
+          const aLabel=createTextSprite(altText,0xFFFFFF);
+          aLabel.position.copy(pt).add(new THREE.Vector3(0,0.12,0));
+          scan3dScene.add(aLabel);
+          measureGroups.push({type:'altitude',objects:[marker,aLabel]});
+          measureObjects.push(marker,aLabel);
+        }else if(m.type==='distance'){
+          const p1=new THREE.Vector3(m.point1.x,m.point1.y,m.point1.z);
+          const p2=new THREE.Vector3(m.point2.x,m.point2.y,m.point2.z);
+          const mk1=new THREE.Mesh(new THREE.SphereGeometry(0.04,16,16),new THREE.MeshBasicMaterial({color:0xF2B705}));
+          mk1.position.copy(p1);scan3dScene.add(mk1);
+          const mk2=new THREE.Mesh(new THREE.SphereGeometry(0.04,16,16),new THREE.MeshBasicMaterial({color:0xF2B705}));
+          mk2.position.copy(p2);scan3dScene.add(mk2);
+          const geom=new THREE.BufferGeometry().setFromPoints([p1,p2]);
+          const line=new THREE.Line(geom,new THREE.LineBasicMaterial({color:0xF2B705,linewidth:2}));
+          scan3dScene.add(line);
+          const mid=new THREE.Vector3().addVectors(p1,p2).multiplyScalar(0.5);
+          const dist=m.distance;
+          const label=createTextSprite(`${dist.toFixed(2)} m`,0xF2B705);
+          label.position.copy(mid).add(new THREE.Vector3(0,0.08,0));
+          scan3dScene.add(label);
+          measureGroups.push({type:'distance',objects:[mk1,mk2,line,label]});
+          measureObjects.push(mk1,mk2,line,label);
+        }
+      });
+    }
+    // Restore camera
+    if(project.camera){
+      scan3dCamera.position.set(project.camera.position.x,project.camera.position.y,project.camera.position.z);
+      scan3dControls.target.set(project.camera.target.x,project.camera.target.y,project.camera.target.z);
+      scan3dControls.update();
+    }
+  };
+  reader.readAsText(file);
+  e.target.value='';
 };
 </script>
 </body>
