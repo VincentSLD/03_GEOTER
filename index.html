@@ -241,6 +241,10 @@
     <button class="tool-btn" onclick="openCropTool()"><span class="icon">✂️</span><span class="label">Rogner</span></button>
     <button class="tool-btn" onclick="togglePhotoSection()"><span class="icon">📸</span><span class="label">Photos</span></button>
     <button class="tool-btn" onclick="openScan3D()"><span class="icon">📡</span><span class="label">Scan 3D</span></button>
+    <div class="tool-sep"></div>
+    <button class="tool-btn" onclick="exportProject()"><span class="icon">💾</span><span class="label">Enregistrer</span></button>
+    <button class="tool-btn" onclick="document.getElementById('projectInput').click()"><span class="icon">📂</span><span class="label">Ouvrir</span></button>
+    <input type="file" id="projectInput" accept=".geoter" style="display:none" onchange="importProject(event)">
     <div id="color-options" class="sub-options" style="display:none"></div>
     <div id="brush-options" class="sub-options" style="display:none"></div>
   </div>
@@ -692,6 +696,64 @@ function teExec(cmd){document.execCommand(cmd,false,null);document.getElementByI
 function teSetFontSize(sz){document.execCommand('fontSize',false,sz);document.getElementById('text-editor-content').focus();}
 function teSetColor(c){document.execCommand('foreColor',false,c);document.getElementById('text-editor-content').focus();}
 function undoAction(){if(drawPaths.length>0){drawPaths.pop();redrawCanvas();}else if(elements.length>0){elements.pop();selectedId=null;renderElements();}}
+
+// ═══ ENREGISTRER / OUVRIR PROJET ═══
+
+function exportProject(){
+  if(!planImgSrc){alert('Aucun plan chargé.');return;}
+  const project={
+    version:1,
+    planImgSrc:planImgSrc,
+    planW:planW,
+    planH:planH,
+    elements:elements.map(el=>{
+      if(el.type==='sticker')return{type:'sticker',x:el.x,y:el.y,svgKey:el.svgKey,label:el.label,color:el.color,sScale:el.sScale||1};
+      if(el.type==='text')return{type:'text',x:el.x,y:el.y,html:el.html||'',text:el.text||'',color:el.color};
+      if(el.type==='arrow')return{type:'arrow',x:el.x,y:el.y,x2:el.x2,y2:el.y2,color:el.color,doubleHead:el.doubleHead||false};
+      return el;
+    }),
+    drawPaths:drawPaths,
+    photos:photos.map(p=>({src:p.src,name:p.name||''}))
+  };
+  const blob=new Blob([JSON.stringify(project)],{type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='projet-geoter.geoter';
+  a.click();URL.revokeObjectURL(a.href);
+}
+
+function importProject(e){
+  const file=e.target.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=function(ev){
+    let project;
+    try{project=JSON.parse(ev.target.result);}catch(err){alert('Fichier projet invalide.');return;}
+    if(!project.planImgSrc){alert('Pas de plan dans ce fichier.');return;}
+    // Restore plan image
+    planImgSrc=project.planImgSrc;
+    planW=project.planW||1200;
+    planH=project.planH||800;
+    const $img=document.getElementById('plan-img');
+    $img.src=planImgSrc;
+    $img.onload=function(){
+      document.getElementById('empty-state').style.display='none';
+      const $dc=document.getElementById('draw-canvas');
+      $dc.width=$area.clientWidth;$dc.height=$area.clientHeight;
+      resetView();
+      // Restore elements
+      elements=(project.elements||[]).map(el=>{el.id=el.id||Date.now()+Math.random();return el;});
+      // Restore draw paths
+      drawPaths=project.drawPaths||[];
+      // Restore photos
+      if(project.photos)photos=project.photos;
+      selectedId=null;
+      redrawCanvas();
+      renderElements();
+    };
+  };
+  reader.readAsText(file);
+  e.target.value='';
+}
 
 function captureSnapshot(){
   const rect=$area.getBoundingClientRect();
