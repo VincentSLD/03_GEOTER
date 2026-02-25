@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(gh auth status)",
+      "Bash(git --version)",
+      "Bash(cmd.exe //c \"where gh\")",
+      "Bash(export PATH=\"$PATH:/c/Program Files/GitHub CLI:/c/Users/vsalaud/AppData/Local/Microsoft/WinGet/Packages/GitHub.cli_Microsoft.Winget.Source_8wekyb3d8bbwe\")",
+      "Bash(cmd.exe //c \"refreshenv >nul 2>&1 & gh --version\")",
+      "Bash(cmd.exe //c \"gh auth status\")",
+      "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" auth status)",
+      "Bash(\"/c/Users/vsalaud/AppData/Local/Programs/GitHub CLI/gh.exe\" auth status)",
+      "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" auth login -p https -w)",
+      "Bash(git init)",
+      "Bash(git add index.html)",
+      "Bash(git commit -m \"Initial commit\")",
+      "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" repo create 03_GEOTER --private --source=. --remote=origin --push)",
+      "Bash(git remote set-url origin https://github.com/VincentSLD/03_GEOTER.git)",
+      "Bash(git push -u origin main)"
+    ]
+  }
+}
