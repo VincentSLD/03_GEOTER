@@ -362,7 +362,7 @@ const STICKER_SECTIONS = [
 // Flatten for lookup
 const ALL_STICKERS = STICKER_SECTIONS.flatMap(s => s.items);
 
-let currentTool='select',planImgSrc=null,planW=1200,planH=800,scale=1,offX=0,offY=0;
+let currentTool='select',planImgSrc=null,planW=1200,planH=800,scale=1,baseScale=1,offX=0,offY=0;
 let isPanning=false,panStartX=0,panStartY=0,panOX=0,panOY=0;
 let elements=[],selectedId=null,selectedStickerId=null;
 let drawColor='#D94040',brushSize=4,textColor='#1A1A1A';
@@ -461,9 +461,17 @@ async function showPdfPageModal(pdf){
   loading.style.display='none';
 }
 function closePdfPageModal(){document.getElementById('pdf-page-modal').classList.remove('open');}
-function resetView(){const r=$area.getBoundingClientRect();scale=1;offX=(r.width-planW)/2;offY=(r.height-planH)/2;updatePlanTransform();redrawCanvas();renderElements();updateZoomBadge();}
+function resetView(){
+  if(!planImgSrc)return;
+  const r=$area.getBoundingClientRect();
+  const vw=r.width*0.95,vh=r.height*0.95;
+  baseScale=Math.min(vw/planW,vh/planH,1);
+  scale=baseScale;
+  offX=(r.width-planW*scale)/2;offY=(r.height-planH*scale)/2;
+  updatePlanTransform();redrawCanvas();renderElements();updateZoomBadge();
+}
 function updatePlanTransform(){$planImg.style.left=offX+'px';$planImg.style.top=offY+'px';$planImg.style.width=(planW*scale)+'px';$planImg.style.height=(planH*scale)+'px';}
-function updateZoomBadge(){$zoom.textContent=Math.round(scale*100)+'%';}
+function updateZoomBadge(){$zoom.textContent=Math.round((scale/baseScale)*100)+'%';}
 
 $area.addEventListener('pointerdown',onPD);$area.addEventListener('pointermove',onPM);$area.addEventListener('pointerup',onPU);$area.addEventListener('wheel',onW,{passive:false});
 function gP(e){const r=$area.getBoundingClientRect();const cx=(e.clientX||0)-r.left,cy=(e.clientY||0)-r.top;return{sx:cx,sy:cy,px:(cx-offX)/scale,py:(cy-offY)/scale};}
