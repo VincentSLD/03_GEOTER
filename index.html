@@ -87,6 +87,8 @@
   .resize-btn:hover{transform:scale(1.15)}
   .rotate-btn{position:absolute;top:-9px;left:50%;transform:translateX(-50%);background:#3D7AB5;color:#fff;border:none;border-radius:50%;width:20px;height:20px;font-size:11px;line-height:20px;text-align:center;font-weight:800;display:none;box-shadow:0 2px 6px rgba(61,122,181,0.4);cursor:grab}
   .plan-element.selected .rotate-btn{display:block}
+  .arrow-handle{position:absolute;width:14px;height:14px;border-radius:50%;background:#fff;border:2.5px solid;cursor:grab;transform:translate(-50%,-50%);display:none;z-index:15;box-shadow:0 1px 4px rgba(0,0,0,0.3)}
+  .plan-element.selected .arrow-handle{display:block}
 
   #catalog-overlay{position:fixed;top:0;left:0;right:0;background:var(--white);border-radius:0 0 20px 20px;box-shadow:0 6px 32px rgba(0,0,0,0.2);padding:14px 16px 20px;z-index:150;max-height:60vh;overflow-y:auto;transform:translateY(-100%);transition:transform .3s cubic-bezier(.4,0,.2,1)}
   #catalog-overlay.open{transform:translateY(0)}
@@ -632,9 +634,10 @@ function renderElements(){
       div.innerHTML=`<svg width="${w}" height="${h}" style="position:absolute;left:${ox}px;top:${oy}px;overflow:visible;pointer-events:none" xmlns="http://www.w3.org/2000/svg">
         <defs><marker id="ah-${el.id}" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><polygon points="0 0,10 3.5,0 7" fill="${el.color}"/></marker>
         ${el.doubleHead?`<marker id="ah2-${el.id}" markerWidth="10" markerHeight="7" refX="1" refY="3.5" orient="auto"><polygon points="10 0,0 3.5,10 7" fill="${el.color}"/></marker>`:''}</defs>
-        <line x1="${lx1}" y1="${ly1}" x2="${lx2}" y2="${ly2}" stroke="${el.color}" stroke-width="${sel?3:2}" marker-end="url(#ah-${el.id})" ${el.doubleHead?`marker-start="url(#ah2-${el.id})"`:''} style="pointer-events:stroke;cursor:move" stroke-linecap="round"/>
-        ${sel?`<circle cx="${lx1}" cy="${ly1}" r="5" fill="${el.color}" opacity="0.5"/><circle cx="${lx2}" cy="${ly2}" r="5" fill="${el.color}" opacity="0.5"/>`:''}
+        <line x1="${lx1}" y1="${ly1}" x2="${lx2}" y2="${ly2}" stroke="${el.color}" stroke-width="${sel?4:2}" marker-end="url(#ah-${el.id})" ${el.doubleHead?`marker-start="url(#ah2-${el.id})"`:''} style="pointer-events:stroke;cursor:move" stroke-linecap="round"/>
       </svg>
+      <div class="arrow-handle" data-handle="1" style="left:${sx1-mx}px;top:${sy1-my}px;border-color:${el.color}"></div>
+      <div class="arrow-handle" data-handle="2" style="left:${sx2-mx}px;top:${sy2-my}px;border-color:${el.color}"></div>
       <button class="del-btn" data-action="del" data-eid="${el.id}" style="left:${ox+lx2+6}px;top:${oy+ly2-10}px">×</button>
       <button class="edit-btn" data-action="togglehead" data-eid="${el.id}" style="left:${ox+lx1-20}px;top:${oy+ly1-10}px">⇄</button>`;
     }else if(el.type==='legend'){
@@ -669,6 +672,23 @@ function renderElements(){
           document.addEventListener('pointermove',rMove);
           document.addEventListener('pointerup',rUp);
         }
+        return;
+      }
+      const handleEl=e.target.closest('[data-handle]');
+      if(handleEl&&el.type==='arrow'){
+        e.stopPropagation();e.preventDefault();selectedId=el.id;
+        const hid=handleEl.dataset.handle;
+        const startHX=e.clientX,startHY=e.clientY;
+        const origPx=hid==='1'?el.x:el.x2,origPy=hid==='1'?el.y:el.y2;
+        const hMove=ev=>{
+          const dx=(ev.clientX-startHX)/scale,dy=(ev.clientY-startHY)/scale;
+          if(hid==='1'){el.x=origPx+dx;el.y=origPy+dy;}
+          else{el.x2=origPx+dx;el.y2=origPy+dy;}
+          renderElements();
+        };
+        const hUp=()=>{document.removeEventListener('pointermove',hMove);document.removeEventListener('pointerup',hUp);};
+        document.addEventListener('pointermove',hMove);
+        document.addEventListener('pointerup',hUp);
         return;
       }
       e.stopPropagation();selectedId=el.id;renderElements();
@@ -924,7 +944,7 @@ function captureSnapshot(){
       wrap.innerHTML=content;
       document.body.appendChild(wrap);
       const boxW=wrap.offsetWidth,boxH=wrap.offsetHeight;
-      const bx=toX(el.x),by=toY(el.y),r=8;
+      const bx=toX(el.x)-boxW/2,by=toY(el.y)-boxH/2,r=8;
       ctx.fillStyle='rgba(255,255,255,0.95)';
       ctx.beginPath();ctx.moveTo(bx+r,by);ctx.lineTo(bx+boxW-r,by);ctx.quadraticCurveTo(bx+boxW,by,bx+boxW,by+r);ctx.lineTo(bx+boxW,by+boxH-r);ctx.quadraticCurveTo(bx+boxW,by+boxH,bx+boxW-r,by+boxH);ctx.lineTo(bx+r,by+boxH);ctx.quadraticCurveTo(bx,by+boxH,bx,by+boxH-r);ctx.lineTo(bx,by+r);ctx.quadraticCurveTo(bx,by,bx+r,by);ctx.closePath();ctx.fill();
       ctx.strokeStyle='#D4D4D4';ctx.lineWidth=1;ctx.stroke();
