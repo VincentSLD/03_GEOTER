@@ -48,13 +48,22 @@
   .tool-sep{width:1px;height:30px;background:var(--gray-200);margin:0 4px;flex-shrink:0}
   .color-dot{width:22px;height:22px;border-radius:50%;border:2px solid var(--gray-200);cursor:pointer;flex-shrink:0;transition:all .15s}
   .color-dot:hover{transform:scale(1.15)}.color-dot.active{border:3px solid var(--black);box-shadow:0 0 0 2px var(--yellow-glow)}
-  .brush-btn{width:28px;height:28px;border-radius:6px;background:var(--gray-100);border:none;font-size:10px;font-weight:700;color:var(--gray-500);transition:all .15s}
-  .brush-btn:hover{background:var(--gray-200)}.brush-btn.active{background:var(--black);color:var(--yellow)}
-  .sub-options{display:flex;gap:3px;align-items:center;margin-left:6px}
+  .sub-options{display:flex;gap:6px;align-items:center;margin-left:6px}
+  #arrow-options{display:none;gap:6px;align-items:center;margin-left:6px;flex-wrap:wrap}
+  #arrow-options.show{display:flex}
+  .arr-opt-group{display:flex;align-items:center;gap:3px}
+  .arr-opt-group label{font-size:9px;font-weight:800;color:var(--gray-500);text-transform:uppercase;letter-spacing:.04em}
+  .arr-mode-btn{width:28px;height:28px;border-radius:6px;background:var(--gray-100);border:2px solid transparent;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .15s}
+  .arr-mode-btn:hover{background:var(--gray-200)}
+  .arr-mode-btn.active{border-color:var(--black);background:var(--yellow-pale)}
+  .arr-mode-btn svg{width:20px;height:20px}
+  .arr-input{width:42px;height:24px;border:1.5px solid var(--gray-200);border-radius:6px;text-align:center;font-size:10px;font-weight:700;color:var(--black);outline:none;padding:0 2px;font-family:inherit}
+  .arr-input:focus{border-color:var(--yellow);box-shadow:0 0 0 2px var(--yellow-glow)}
+  .arr-color-input{width:24px;height:24px;border:none;border-radius:6px;padding:0;cursor:pointer;background:none}
 
-  #canvas-area{flex:1;position:relative;overflow:hidden;touch-action:none;background:radial-gradient(ellipse at 15% 25%,rgba(242,183,5,0.03),transparent 50%),radial-gradient(ellipse at 85% 75%,rgba(26,26,26,0.03),transparent 50%),var(--gray-50)}
+  #canvas-area{flex:1;position:relative;overflow:hidden;touch-action:none;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent;background:radial-gradient(ellipse at 15% 25%,rgba(242,183,5,0.03),transparent 50%),radial-gradient(ellipse at 85% 75%,rgba(26,26,26,0.03),transparent 50%),var(--gray-50)}
   #grid-svg{position:absolute;inset:0;width:100%;height:100%;opacity:.18;pointer-events:none}
-  #plan-img{position:absolute;pointer-events:none;box-shadow:var(--shadow-lg);border-radius:3px;display:none}
+  #plan-img{position:absolute;pointer-events:none;box-shadow:var(--shadow-lg);border-radius:3px;display:none;-webkit-user-select:none;user-select:none;-webkit-user-drag:none;outline:none}
   #draw-canvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
   #elements-layer{position:absolute;inset:0}
   #zoom-badge{position:absolute;bottom:12px;right:12px;background:var(--black);color:var(--yellow);padding:4px 12px;border-radius:6px;font-size:11px;font-weight:800;z-index:50;pointer-events:none;border:1px solid rgba(242,183,5,0.3)}
@@ -79,12 +88,8 @@
   .edit-btn{position:absolute;top:-9px;left:-9px;background:var(--yellow);color:var(--black);border:none;border-radius:50%;width:20px;height:20px;font-size:10px;line-height:20px;text-align:center;font-weight:800;display:none;box-shadow:0 2px 6px var(--yellow-glow);cursor:pointer}
   .plan-element.selected .del-btn{display:block}
   .plan-element.selected .edit-btn{display:block}
-  .resize-controls{display:none;position:absolute;bottom:-12px;left:50%;transform:translateX(-50%);flex-direction:row;gap:3px;z-index:20}
-  .plan-element.selected .resize-controls{display:flex}
-  .resize-btn{width:22px;height:22px;border-radius:50%;border:none;font-size:14px;font-weight:900;line-height:22px;text-align:center;cursor:pointer;box-shadow:var(--shadow-sm);transition:all .15s}
-  .resize-btn.minus{background:var(--gray-100);color:var(--black)}
-  .resize-btn.plus{background:var(--yellow);color:var(--black)}
-  .resize-btn:hover{transform:scale(1.15)}
+  .resize-handle{position:absolute;bottom:-6px;right:-6px;width:14px;height:14px;background:var(--yellow);border:2px solid var(--black);border-radius:3px;cursor:nwse-resize;display:none;z-index:20;box-shadow:0 1px 4px rgba(0,0,0,0.3)}
+  .plan-element.selected .resize-handle{display:block}
   .rotate-btn{position:absolute;top:-9px;left:50%;transform:translateX(-50%);background:#3D7AB5;color:#fff;border:none;border-radius:50%;width:20px;height:20px;font-size:11px;line-height:20px;text-align:center;font-weight:800;display:none;box-shadow:0 2px 6px rgba(61,122,181,0.4);cursor:grab}
   .plan-element.selected .rotate-btn{display:block}
   .arrow-handle{position:absolute;width:14px;height:14px;border-radius:50%;background:#fff;border:2.5px solid;cursor:grab;transform:translate(-50%,-50%);display:none;z-index:15;box-shadow:0 1px 4px rgba(0,0,0,0.3)}
@@ -236,7 +241,7 @@
 <div id="app">
   <div id="header">
     <div class="logo">
-      <div class="logo-text">Géo<span class="highlight">Ter'</span></div>
+      <div class="logo-text">Géo<span class="highlight">Ter'</span><span style="font-size:0.25em;font-weight:400;color:rgba(255,255,255,0.4);font-family:'Space Grotesk',sans-serif;letter-spacing:0.05em;margin-left:0.6em;vertical-align:baseline">by GPH</span></div>
     </div>
     <div class="actions">
       <input type="file" id="fileInput" accept=".pdf,image/*" style="display:none" onchange="loadPlan(event)">
@@ -252,6 +257,7 @@
     <button class="tool-btn" data-tool="erase" onclick="selectTool('erase')"><span class="icon">🧹</span><span class="label">Gomme</span></button>
     <div class="tool-sep"></div>
     <button class="tool-btn" onclick="undoAction()"><span class="icon">↩️</span><span class="label">Annuler</span></button>
+    <button class="tool-btn" onclick="redoAction()"><span class="icon">↪️</span><span class="label">Remettre</span></button>
     <button class="tool-btn" onclick="resetView()"><span class="icon">🔍</span><span class="label">Recadrer</span></button>
     <button class="tool-btn" onclick="openCropTool()"><span class="icon">✂️</span><span class="label">Rogner</span></button>
     <button class="tool-btn" onclick="togglePhotoSection()"><span class="icon">📸</span><span class="label">Photos</span></button>
@@ -262,11 +268,24 @@
     <button class="tool-btn" onclick="document.getElementById('projectInput').click()"><span class="icon">📂</span><span class="label">Ouvrir</span></button>
     <input type="file" id="projectInput" accept=".geoter" style="display:none" onchange="importProject(event)">
     <div id="color-options" class="sub-options" style="display:none"></div>
-    <div id="brush-options" class="sub-options" style="display:none"></div>
+    <div id="brush-options" class="sub-options" style="display:none">
+      <div class="arr-opt-group"><label>Épaisseur</label><input type="number" class="arr-input" id="draw-width" min="1" max="24" step="1" value="4" onchange="brushSize=Math.min(24,Math.max(1,+this.value));this.value=brushSize"></div>
+      <div class="arr-opt-group"><label>Opacité %</label><input type="number" class="arr-input" id="draw-opacity" min="10" max="100" step="5" value="100" onchange="drawOpacity=Math.min(100,Math.max(10,+this.value))/100;this.value=Math.round(drawOpacity*100)"></div>
+    </div>
+    <div id="arrow-options">
+      <div class="arr-opt-group"><label>Type</label>
+        <button class="arr-mode-btn active" data-arrmode="single" onclick="setArrowMode('single')" title="Flèche simple"><svg viewBox="0 0 24 24"><line x1="4" y1="20" x2="18" y2="6" stroke="#1A1A1A" stroke-width="2" stroke-linecap="round"/><polygon points="20,4 14,6 18,10" fill="#1A1A1A"/></svg></button>
+        <button class="arr-mode-btn" data-arrmode="double" onclick="setArrowMode('double')" title="Flèche double"><svg viewBox="0 0 24 24"><line x1="7" y1="17" x2="17" y2="7" stroke="#1A1A1A" stroke-width="2" stroke-linecap="round"/><polygon points="20,4 14,6 18,10" fill="#1A1A1A"/><polygon points="4,20 10,18 6,14" fill="#1A1A1A"/></svg></button>
+        <button class="arr-mode-btn" data-arrmode="line" onclick="setArrowMode('line')" title="Trait simple"><svg viewBox="0 0 24 24"><line x1="4" y1="20" x2="20" y2="4" stroke="#1A1A1A" stroke-width="2" stroke-linecap="round"/></svg></button>
+      </div>
+      <div class="arr-opt-group"><label>Couleur</label><input type="color" class="arr-color-input" id="arr-color" value="#D94040" onchange="arrowColor=this.value"></div>
+      <div class="arr-opt-group"><label>Opacité %</label><input type="number" class="arr-input" id="arr-opacity" min="10" max="100" step="5" value="100" onchange="arrowOpacity=Math.min(100,Math.max(10,+this.value))/100;this.value=Math.round(arrowOpacity*100)"></div>
+      <div class="arr-opt-group"><label>Épaisseur</label><input type="number" class="arr-input" id="arr-width" min="1" max="24" step="1" value="2" onchange="arrowWidth=Math.min(24,Math.max(1,+this.value));this.value=arrowWidth"></div>
+    </div>
   </div>
   <div id="canvas-area">
     <svg id="grid-svg"><defs><pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse"><circle cx="20" cy="20" r="0.7" fill="#C0C0C0"/></pattern></defs><rect width="100%" height="100%" fill="url(#grid)"/></svg>
-    <img id="plan-img" alt="Plan"><canvas id="draw-canvas"></canvas>
+    <img id="plan-img" alt="Plan" draggable="false"><canvas id="draw-canvas"></canvas>
     <div id="elements-layer"></div>
     <div id="zoom-badge">100%</div>
     <div id="empty-state"><div class="big-icon">📐</div><p>Chargez un plan PDF ou une image<br>pour commencer à annoter</p><button class="btn-load-center" onclick="document.getElementById('fileInput').click()">📄 Charger un plan</button><div class="hint">PDF, JPG, PNG</div></div>
@@ -467,19 +486,19 @@ const ALL_STICKERS = STICKER_SECTIONS.flatMap(s => s.items);
 let currentTool='select',planImgSrc=null,planW=1200,planH=800,scale=1,baseScale=1,offX=0,offY=0;
 let isPanning=false,panStartX=0,panStartY=0,panOX=0,panOY=0;
 let elements=[],selectedId=null,selectedStickerId=null;
-let drawColor='#D94040',brushSize=4,textColor='#1A1A1A';
+let drawColor='#D94040',brushSize=4,drawOpacity=1,textColor='#1A1A1A';
 let drawPaths=[],currentPathPts=[],isDrawing=false,photos=[],cameraStream=null;
 let teEditingId=null,teOriginX=0,teOriginY=0;
 let arrowStartPt=null,arrowPreviewEnd=null,arrowDoubleHead=false;
+let arrowMode='single',arrowColor='#D94040',arrowOpacity=1,arrowWidth=2;
 const COLORS=['#1A1A1A','#D94040','#3D7AB5','#F2B705','#4CAF50','#E88D00','#9B59B6','#FFFFFF'];
-const BRUSHES=[2,4,8,12];
 
 const $area=document.getElementById('canvas-area'),$planImg=document.getElementById('plan-img');
 const $drawCanvas=document.getElementById('draw-canvas'),$elemLayer=document.getElementById('elements-layer');
 const $empty=document.getElementById('empty-state'),$zoom=document.getElementById('zoom-badge');
 const drawCtx=$drawCanvas.getContext('2d');
 
-buildCatalog();buildColorOptions();buildBrushOptions();resizeDrawCanvas();
+buildCatalog();buildColorOptions();resizeDrawCanvas();
 window.addEventListener('resize',resizeDrawCanvas);
 function resizeDrawCanvas(){const r=$area.getBoundingClientRect();$drawCanvas.width=r.width;$drawCanvas.height=r.height;redrawCanvas();}
 
@@ -487,14 +506,15 @@ function selectTool(t){
   currentTool=t;selectedId=null;
   document.querySelectorAll('.tool-btn[data-tool]').forEach(b=>{b.className='tool-btn';if(b.dataset.tool===t){const c={select:'active',sticker:'active-yellow',text:'active-dark',draw:'active-red',erase:'active-orange',arrow:'active-red'};b.classList.add(c[t]||'active');}});
   $area.style.cursor={select:'grab',draw:'crosshair',erase:'cell',sticker:'crosshair',text:'text',arrow:'crosshair'}[t]||'crosshair';
-  document.getElementById('color-options').style.display=(t==='draw'||t==='text'||t==='arrow')?'flex':'none';
+  document.getElementById('color-options').style.display=(t==='draw'||t==='text')?'flex':'none';
   document.getElementById('brush-options').style.display=t==='draw'?'flex':'none';
+  document.getElementById('arrow-options').classList.toggle('show',t==='arrow');
   if(t==='sticker')openCatalog();else closeCatalog();renderElements();
 }
 function buildColorOptions(){const $c=document.getElementById('color-options');COLORS.forEach(c=>{const d=document.createElement('button');d.className='color-dot';d.style.background=c;if(c==='#FFFFFF')d.style.border='2px solid #D4D4D4';d.onclick=()=>{if(currentTool==='draw')drawColor=c;else textColor=c;updateColorDots();};$c.appendChild(d);});updateColorDots();}
 function updateColorDots(){const a=currentTool==='draw'?drawColor:textColor;document.querySelectorAll('.color-dot').forEach((d,i)=>{d.classList.toggle('active',COLORS[i]===a);});}
-function buildBrushOptions(){const $b=document.getElementById('brush-options');BRUSHES.forEach(s=>{const btn=document.createElement('button');btn.className='brush-btn'+(s===brushSize?' active':'');btn.textContent=s;btn.onclick=()=>{brushSize=s;updateBrushBtns();};$b.appendChild(btn);});}
-function updateBrushBtns(){document.querySelectorAll('.brush-btn').forEach((b,i)=>{b.classList.toggle('active',BRUSHES[i]===brushSize);});}
+
+function setArrowMode(m){arrowMode=m;arrowDoubleHead=(m==='double');document.querySelectorAll('.arr-mode-btn').forEach(b=>b.classList.toggle('active',b.dataset.arrmode===m));}
 
 function buildCatalog(){
   const $sec=document.getElementById('catalog-sections');
@@ -597,19 +617,19 @@ function onPU(){
   if(arrowStartPt&&arrowPreviewEnd){
     const dx=arrowPreviewEnd.x-arrowStartPt.x,dy=arrowPreviewEnd.y-arrowStartPt.y;
     if(Math.sqrt(dx*dx+dy*dy)>5){
-      elements.push({id:Date.now(),type:'arrow',x:arrowStartPt.x,y:arrowStartPt.y,x2:arrowPreviewEnd.x,y2:arrowPreviewEnd.y,color:drawColor,doubleHead:arrowDoubleHead});
+      elements.push({id:Date.now(),type:'arrow',x:arrowStartPt.x,y:arrowStartPt.y,x2:arrowPreviewEnd.x,y2:arrowPreviewEnd.y,color:arrowColor,doubleHead:arrowMode==='double',lineOnly:arrowMode==='line',opacity:arrowOpacity,strokeWidth:arrowWidth});
     }
     arrowStartPt=null;arrowPreviewEnd=null;renderElements();return;
   }
   arrowStartPt=null;arrowPreviewEnd=null;
-  if(isDrawing){isDrawing=false;if(currentPathPts.length>1)drawPaths.push({points:[...currentPathPts],color:currentTool==='erase'?'eraser':drawColor,size:brushSize});currentPathPts=[];redrawCanvas();}
+  if(isDrawing){isDrawing=false;if(currentPathPts.length>1)drawPaths.push({points:[...currentPathPts],color:currentTool==='erase'?'eraser':drawColor,size:brushSize,opacity:drawOpacity});currentPathPts=[];redrawCanvas();}
 }
 function onW(e){e.preventDefault();const d=e.deltaY>0?0.92:1.08;const ns=Math.max(0.08,Math.min(6,scale*d));const r=$area.getBoundingClientRect();const mx=e.clientX-r.left,my=e.clientY-r.top;offX=mx-(mx-offX)*(ns/scale);offY=my-(my-offY)*(ns/scale);scale=ns;updatePlanTransform();redrawCanvas();renderElements();updateZoomBadge();}
 
 function redrawCanvas(){
   const w=$drawCanvas.width,h=$drawCanvas.height;drawCtx.clearRect(0,0,w,h);
-  const all=[...drawPaths];if(currentPathPts.length>1)all.push({points:currentPathPts,color:currentTool==='erase'?'eraser':drawColor,size:brushSize});
-  for(const p of all){drawCtx.beginPath();drawCtx.lineCap='round';drawCtx.lineJoin='round';if(p.color==='eraser'){drawCtx.globalCompositeOperation='destination-out';drawCtx.lineWidth=p.size*3;}else{drawCtx.globalCompositeOperation='source-over';drawCtx.strokeStyle=p.color;drawCtx.lineWidth=p.size;}for(let i=0;i<p.points.length;i++){const sx=p.points[i].x*scale+offX,sy=p.points[i].y*scale+offY;if(i===0)drawCtx.moveTo(sx,sy);else drawCtx.lineTo(sx,sy);}drawCtx.stroke();}
+  const all=[...drawPaths];if(currentPathPts.length>1)all.push({points:currentPathPts,color:currentTool==='erase'?'eraser':drawColor,size:brushSize,opacity:drawOpacity});
+  for(const p of all){drawCtx.save();drawCtx.beginPath();drawCtx.lineCap='round';drawCtx.lineJoin='round';if(p.color==='eraser'){drawCtx.globalCompositeOperation='destination-out';drawCtx.lineWidth=p.size*scale*3;}else{drawCtx.globalCompositeOperation='source-over';drawCtx.globalAlpha=p.opacity!=null?p.opacity:1;drawCtx.strokeStyle=p.color;drawCtx.lineWidth=p.size*scale;}for(let i=0;i<p.points.length;i++){const sx=p.points[i].x*scale+offX,sy=p.points[i].y*scale+offY;if(i===0)drawCtx.moveTo(sx,sy);else drawCtx.lineTo(sx,sy);}drawCtx.stroke();drawCtx.restore();}
   drawCtx.globalCompositeOperation='source-over';
 }
 
@@ -620,21 +640,26 @@ function renderElements(){
     div.style.left=(el.x*scale+offX)+'px';div.style.top=(el.y*scale+offY)+'px';
     if(el.type==='sticker'){
       const ss=el.sScale||1;const sz=Math.round(28*ss);const rot=el.rotation||0;
-      div.innerHTML=`<div class="sticker-wrap" style="transform:rotate(${rot}deg)"><div class="sticker-icon ${selectedId===el.id?'selected':''}" style="padding:${Math.round(4*ss)}px"><svg viewBox="0 0 32 32" width="${sz}" height="${sz}" xmlns="http://www.w3.org/2000/svg">${SVG[el.svgKey]?.replace(/<svg[^>]*>|<\/svg>/g,'')||'?'}</svg></div></div><button class="del-btn" data-action="del" data-eid="${el.id}">×</button><button class="rotate-btn" data-action="rotate" data-eid="${el.id}">↻</button><div class="resize-controls"><button class="resize-btn minus" data-action="shrink" data-eid="${el.id}">−</button><button class="resize-btn plus" data-action="grow" data-eid="${el.id}">+</button></div>`;
+      div.innerHTML=`<div class="sticker-wrap" style="transform:rotate(${rot}deg)"><div class="sticker-icon ${selectedId===el.id?'selected':''}" style="padding:${Math.round(4*ss)}px"><svg viewBox="0 0 32 32" width="${sz}" height="${sz}" xmlns="http://www.w3.org/2000/svg">${SVG[el.svgKey]?.replace(/<svg[^>]*>|<\/svg>/g,'')||'?'}</svg></div></div><button class="del-btn" data-action="del" data-eid="${el.id}">×</button><button class="rotate-btn" data-action="rotate" data-eid="${el.id}">↻</button><div class="resize-handle" data-resize="1"></div>`;
     }else if(el.type==='text'){
       div.innerHTML=`<div class="text-box ${selectedId===el.id?'selected':''}" style="color:${el.color}">${el.html||el.text||''}</div><button class="del-btn" data-action="del" data-eid="${el.id}">×</button><button class="edit-btn" data-action="edit" data-eid="${el.id}">✏️</button>`;
     }else if(el.type==='arrow'){
       const sx1=el.x*scale+offX,sy1=el.y*scale+offY,sx2=el.x2*scale+offX,sy2=el.y2*scale+offY;
       const mx=(sx1+sx2)/2,my=(sy1+sy2)/2;
       div.style.left=mx+'px';div.style.top=my+'px';
-      const w=Math.abs(sx2-sx1)+40,h=Math.abs(sy2-sy1)+40;
-      const ox=Math.min(sx1,sx2)-mx+20,oy=Math.min(sy1,sy2)-my+20;
-      const lx1=sx1-mx-ox+20,ly1=sy1-my-oy+20,lx2=sx2-mx-ox+20,ly2=sy2-my-oy+20;
-      const sel=selectedId===el.id;
-      div.innerHTML=`<svg width="${w}" height="${h}" style="position:absolute;left:${ox}px;top:${oy}px;overflow:visible;pointer-events:none" xmlns="http://www.w3.org/2000/svg">
-        <defs><marker id="ah-${el.id}" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><polygon points="0 0,10 3.5,0 7" fill="${el.color}"/></marker>
-        ${el.doubleHead?`<marker id="ah2-${el.id}" markerWidth="10" markerHeight="7" refX="1" refY="3.5" orient="auto"><polygon points="10 0,0 3.5,10 7" fill="${el.color}"/></marker>`:''}</defs>
-        <line x1="${lx1}" y1="${ly1}" x2="${lx2}" y2="${ly2}" stroke="${el.color}" stroke-width="${sel?4:2}" marker-end="url(#ah-${el.id})" ${el.doubleHead?`marker-start="url(#ah2-${el.id})"`:''} style="pointer-events:stroke;cursor:move" stroke-linecap="round"/>
+      const sw=el.strokeWidth||2;const op=el.opacity!=null?el.opacity:1;const lo=el.lineOnly||false;
+      const sel=selectedId===el.id;const dsw=sel?sw+2:sw;
+      const pad=Math.max(40,sw*3);
+      const w=Math.abs(sx2-sx1)+pad*2,h=Math.abs(sy2-sy1)+pad*2;
+      const ox=Math.min(sx1,sx2)-pad-mx,oy=Math.min(sy1,sy2)-pad-my;
+      const lx1=sx1-mx-ox,ly1=sy1-my-oy,lx2=sx2-mx-ox,ly2=sy2-my-oy;
+      const mw=Math.max(12,sw*2.5),mh=Math.max(8,sw*1.8),mry=mh/2;
+      const markerEnd=lo?'':`marker-end="url(#ah-${el.id})"`;
+      const markerStart=(el.doubleHead&&!lo)?`marker-start="url(#ah2-${el.id})"`:'';
+      div.innerHTML=`<svg width="${w}" height="${h}" style="position:absolute;left:${ox}px;top:${oy}px;overflow:visible;pointer-events:none;opacity:${op}" xmlns="http://www.w3.org/2000/svg">
+        ${lo?'':`<defs><marker id="ah-${el.id}" markerWidth="${mw}" markerHeight="${mh}" refX="${mw-1}" refY="${mry}" orient="auto" markerUnits="userSpaceOnUse"><polygon points="0 0,${mw} ${mry},0 ${mh}" fill="${el.color}"/></marker>
+        ${el.doubleHead?`<marker id="ah2-${el.id}" markerWidth="${mw}" markerHeight="${mh}" refX="1" refY="${mry}" orient="auto" markerUnits="userSpaceOnUse"><polygon points="${mw} 0,0 ${mry},${mw} ${mh}" fill="${el.color}"/></marker>`:''}</defs>`}
+        <line x1="${lx1}" y1="${ly1}" x2="${lx2}" y2="${ly2}" stroke="${el.color}" stroke-width="${dsw}" ${markerEnd} ${markerStart} style="pointer-events:stroke;cursor:move" stroke-linecap="round"/>
       </svg>
       <div class="arrow-handle" data-handle="1" style="left:${sx1-mx}px;top:${sy1-my}px;border-color:${el.color}"></div>
       <div class="arrow-handle" data-handle="2" style="left:${sx2-mx}px;top:${sy2-my}px;border-color:${el.color}"></div>
@@ -651,9 +676,7 @@ function renderElements(){
         const action = actionBtn.dataset.action;
         if(action==='del') deleteElement(eid);
         else if(action==='edit') editText(eid);
-        else if(action==='shrink') resizeElement(eid, -0.25);
-        else if(action==='grow') resizeElement(eid, 0.25);
-        else if(action==='togglehead'){const ae=elements.find(x=>x.id===eid);if(ae)ae.doubleHead=!ae.doubleHead;renderElements();}
+        else if(action==='togglehead'){const ae=elements.find(x=>x.id===eid);if(ae){if(ae.lineOnly){ae.lineOnly=false;ae.doubleHead=false;}else if(!ae.doubleHead){ae.doubleHead=true;}else{ae.doubleHead=false;ae.lineOnly=true;}}renderElements();}
         else if(action==='rotate'){
           const rel=elements.find(x=>x.id===eid);if(!rel)return;
           const idx2=elements.indexOf(rel);
@@ -672,6 +695,21 @@ function renderElements(){
           document.addEventListener('pointermove',rMove);
           document.addEventListener('pointerup',rUp);
         }
+        return;
+      }
+      const resizeEl=e.target.closest('[data-resize]');
+      if(resizeEl&&el.type==='sticker'){
+        e.stopPropagation();e.preventDefault();selectedId=el.id;
+        const startY=e.clientY;
+        const startScale=el.sScale||1;
+        const sMove=ev=>{
+          const dy=startY-ev.clientY;
+          el.sScale=Math.max(0.15,startScale+dy/80);
+          renderElements();
+        };
+        const sUp=()=>{document.removeEventListener('pointermove',sMove);document.removeEventListener('pointerup',sUp);};
+        document.addEventListener('pointermove',sMove);
+        document.addEventListener('pointerup',sUp);
         return;
       }
       const handleEl=e.target.closest('[data-handle]');
@@ -711,17 +749,22 @@ function renderElements(){
   });
   // Arrow preview during drawing
   if(arrowStartPt&&arrowPreviewEnd){
-    const div=document.createElement('div');div.className='plan-element';div.style.left='0px';div.style.top='0px';div.style.transform='none';div.style.pointerEvents='none';
+    const div=document.createElement('div');div.style.cssText='position:absolute;inset:0;pointer-events:none;z-index:10';
     const sx1=arrowStartPt.x*scale+offX,sy1=arrowStartPt.y*scale+offY,sx2=arrowPreviewEnd.x*scale+offX,sy2=arrowPreviewEnd.y*scale+offY;
-    div.innerHTML=`<svg width="100%" height="100%" style="position:fixed;inset:0;overflow:visible;pointer-events:none" xmlns="http://www.w3.org/2000/svg">
-      <defs><marker id="ah-preview" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><polygon points="0 0,10 3.5,0 7" fill="${drawColor}"/></marker></defs>
-      <line x1="${sx1}" y1="${sy1}" x2="${sx2}" y2="${sy2}" stroke="${drawColor}" stroke-width="2" marker-end="url(#ah-preview)" stroke-dasharray="6,4" stroke-linecap="round"/>
+    const plo=arrowMode==='line';
+    const pmw=Math.max(12,arrowWidth*2.5),pmh=Math.max(8,arrowWidth*1.8),pmry=pmh/2;
+    const pMarkerEnd=plo?'':`marker-end="url(#ah-preview)"`;
+    const pMarkerStart=(arrowMode==='double'&&!plo)?`marker-start="url(#ah2-preview)"`:'';
+    div.innerHTML=`<svg width="100%" height="100%" style="position:absolute;inset:0;overflow:visible;pointer-events:none;opacity:${arrowOpacity}" xmlns="http://www.w3.org/2000/svg">
+      ${plo?'':`<defs><marker id="ah-preview" markerWidth="${pmw}" markerHeight="${pmh}" refX="${pmw-1}" refY="${pmry}" orient="auto" markerUnits="userSpaceOnUse"><polygon points="0 0,${pmw} ${pmry},0 ${pmh}" fill="${arrowColor}"/></marker>
+      ${arrowMode==='double'?`<marker id="ah2-preview" markerWidth="${pmw}" markerHeight="${pmh}" refX="1" refY="${pmry}" orient="auto" markerUnits="userSpaceOnUse"><polygon points="${pmw} 0,0 ${pmry},${pmw} ${pmh}" fill="${arrowColor}"/></marker>`:''}</defs>`}
+      <line x1="${sx1}" y1="${sy1}" x2="${sx2}" y2="${sy2}" stroke="${arrowColor}" stroke-width="${arrowWidth}" ${pMarkerEnd} ${pMarkerStart} stroke-dasharray="6,4" stroke-linecap="round"/>
     </svg>`;
     $elemLayer.appendChild(div);
   }
 }
 function deleteElement(id){elements=elements.filter(e=>e.id!==id);selectedId=null;renderElements();}
-function resizeElement(id,delta){const el=elements.find(e=>e.id===id);if(!el)return;el.sScale=Math.max(0.4,Math.min(4,(el.sScale||1)+delta));renderElements();}
+
 function editText(id){const el=elements.find(e=>e.id===id);if(!el)return;openTextEditorForEdit(id);}
 
 function openTextEditor(px,py){
@@ -760,7 +803,9 @@ function applyTextEdit(){
 function teExec(cmd){document.execCommand(cmd,false,null);document.getElementById('text-editor-content').focus();}
 function teSetFontSize(sz){document.execCommand('fontSize',false,sz);document.getElementById('text-editor-content').focus();}
 function teSetColor(c){document.execCommand('foreColor',false,c);document.getElementById('text-editor-content').focus();}
-function undoAction(){if(drawPaths.length>0){drawPaths.pop();redrawCanvas();}else if(elements.length>0){elements.pop();selectedId=null;renderElements();}}
+let redoStack=[];
+function undoAction(){if(drawPaths.length>0){redoStack.push({type:'path',data:drawPaths.pop()});redrawCanvas();}else if(elements.length>0){redoStack.push({type:'element',data:elements.pop()});selectedId=null;renderElements();}}
+function redoAction(){if(redoStack.length===0)return;const item=redoStack.pop();if(item.type==='path'){drawPaths.push(item.data);redrawCanvas();}else if(item.type==='element'){elements.push(item.data);renderElements();}}
 
 // ═══ LÉGENDE ═══
 
@@ -852,7 +897,7 @@ function exportProject(){
     elements:elements.map(el=>{
       if(el.type==='sticker')return{type:'sticker',x:el.x,y:el.y,svgKey:el.svgKey,label:el.label,color:el.color,sScale:el.sScale||1,rotation:el.rotation||0};
       if(el.type==='text')return{type:'text',x:el.x,y:el.y,html:el.html||'',text:el.text||'',color:el.color};
-      if(el.type==='arrow')return{type:'arrow',x:el.x,y:el.y,x2:el.x2,y2:el.y2,color:el.color,doubleHead:el.doubleHead||false};
+      if(el.type==='arrow')return{type:'arrow',x:el.x,y:el.y,x2:el.x2,y2:el.y2,color:el.color,doubleHead:el.doubleHead||false,lineOnly:el.lineOnly||false,opacity:el.opacity!=null?el.opacity:1,strokeWidth:el.strokeWidth||2};
       if(el.type==='legend')return{type:'legend',x:el.x,y:el.y,imgSrc:el.imgSrc,w:el.w,h:el.h};
       return el;
     }),
@@ -906,31 +951,37 @@ function captureSnapshot(){
   const toX=px=>px*scale+offX;
   const toY=py=>py*scale+offY;
   const finish=()=>{
-    // Draw paths at screen coords
-    for(const p of drawPaths){ctx.beginPath();ctx.lineCap='round';ctx.lineJoin='round';if(p.color==='eraser'){ctx.globalCompositeOperation='destination-out';ctx.lineWidth=p.size*scale*3;}else{ctx.globalCompositeOperation='source-over';ctx.strokeStyle=p.color;ctx.lineWidth=p.size*scale;}for(let i=0;i<p.points.length;i++){if(i===0)ctx.moveTo(toX(p.points[i].x),toY(p.points[i].y));else ctx.lineTo(toX(p.points[i].x),toY(p.points[i].y));}ctx.stroke();}
-    ctx.globalCompositeOperation='source-over';
+    // Draw paths on offscreen canvas (so eraser only affects strokes, not plan)
+    const oc=document.createElement('canvas');oc.width=vw;oc.height=vh;const octx=oc.getContext('2d');
+    for(const p of drawPaths){octx.save();octx.beginPath();octx.lineCap='round';octx.lineJoin='round';if(p.color==='eraser'){octx.globalCompositeOperation='destination-out';octx.lineWidth=p.size*scale*3;}else{octx.globalCompositeOperation='source-over';octx.globalAlpha=p.opacity!=null?p.opacity:1;octx.strokeStyle=p.color;octx.lineWidth=p.size*scale;}for(let i=0;i<p.points.length;i++){if(i===0)octx.moveTo(toX(p.points[i].x),toY(p.points[i].y));else octx.lineTo(toX(p.points[i].x),toY(p.points[i].y));}octx.stroke();octx.restore();}
+    ctx.drawImage(oc,0,0);
     // Render arrows
     elements.filter(e=>e.type==='arrow').forEach(el=>{
       const ax1=toX(el.x),ay1=toY(el.y),ax2=toX(el.x2),ay2=toY(el.y2);
       const angle=Math.atan2(ay2-ay1,ax2-ax1);
-      const headLen=12;
-      ctx.strokeStyle=el.color;ctx.fillStyle=el.color;ctx.lineWidth=2;ctx.lineCap='round';
+      const sw=el.strokeWidth||2;const op=el.opacity!=null?el.opacity:1;const lo=el.lineOnly||false;
+      const headLen=Math.max(12,sw*2.5);
+      ctx.save();ctx.globalAlpha=op;
+      ctx.strokeStyle=el.color;ctx.fillStyle=el.color;ctx.lineWidth=sw;ctx.lineCap='round';
       ctx.beginPath();ctx.moveTo(ax1,ay1);ctx.lineTo(ax2,ay2);ctx.stroke();
-      // End arrowhead
-      ctx.beginPath();
-      ctx.moveTo(ax2,ay2);
-      ctx.lineTo(ax2-headLen*Math.cos(angle-Math.PI/6),ay2-headLen*Math.sin(angle-Math.PI/6));
-      ctx.lineTo(ax2-headLen*Math.cos(angle+Math.PI/6),ay2-headLen*Math.sin(angle+Math.PI/6));
-      ctx.closePath();ctx.fill();
-      // Start arrowhead (double)
-      if(el.doubleHead){
-        const a2=angle+Math.PI;
+      if(!lo){
+        // End arrowhead
         ctx.beginPath();
-        ctx.moveTo(ax1,ay1);
-        ctx.lineTo(ax1-headLen*Math.cos(a2-Math.PI/6),ay1-headLen*Math.sin(a2-Math.PI/6));
-        ctx.lineTo(ax1-headLen*Math.cos(a2+Math.PI/6),ay1-headLen*Math.sin(a2+Math.PI/6));
+        ctx.moveTo(ax2,ay2);
+        ctx.lineTo(ax2-headLen*Math.cos(angle-Math.PI/6),ay2-headLen*Math.sin(angle-Math.PI/6));
+        ctx.lineTo(ax2-headLen*Math.cos(angle+Math.PI/6),ay2-headLen*Math.sin(angle+Math.PI/6));
         ctx.closePath();ctx.fill();
+        // Start arrowhead (double)
+        if(el.doubleHead){
+          const a2=angle+Math.PI;
+          ctx.beginPath();
+          ctx.moveTo(ax1,ay1);
+          ctx.lineTo(ax1-headLen*Math.cos(a2-Math.PI/6),ay1-headLen*Math.sin(a2-Math.PI/6));
+          ctx.lineTo(ax1-headLen*Math.cos(a2+Math.PI/6),ay1-headLen*Math.sin(a2+Math.PI/6));
+          ctx.closePath();ctx.fill();
+        }
       }
+      ctx.restore();
     });
     const done=()=>{const url=c.toDataURL('image/png');document.getElementById('snapshot-img').src=url;document.getElementById('snapshot-download').href=url;document.getElementById('snapshot-modal').classList.add('open');};
     // Render rich text at screen coords
