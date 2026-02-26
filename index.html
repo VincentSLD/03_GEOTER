@@ -255,18 +255,18 @@
   #ngf-input-modal.open{display:flex}
   #ngf-input-inner{background:var(--white);border-radius:var(--radius-lg);padding:20px;width:300px;max-width:90vw;box-shadow:var(--shadow-lg);border-top:4px solid var(--yellow)}
   /* ═══ MISE EN PAGE ═══ */
-  #mep-modal{position:fixed;inset:0;background:rgba(0,0,0,0.92);display:none;flex-direction:column;z-index:850;backdrop-filter:blur(4px)}
-  #mep-modal.open{display:flex}
-  #mep-inner{display:flex;flex-direction:column;width:100%;height:100%}
-  #mep-header{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:var(--black);border-bottom:3px solid var(--yellow);flex-shrink:0;z-index:2}
-  #mep-header>span{font-weight:800;font-size:14px;color:var(--yellow);display:flex;align-items:center;gap:6px}
-  .mep-controls{display:flex;gap:8px;align-items:center}
-  .mep-orientation{display:flex;gap:4px}
-  .mep-ori-btn{border:none;border-radius:8px;padding:8px 14px;font-size:11px;font-weight:700;cursor:pointer;transition:all .2s;background:var(--black-mid);color:#fff;border:1px solid rgba(255,255,255,0.15)}
-  .mep-ori-btn:hover{background:var(--gray-700)}
+  #main-body{display:flex;flex:1;overflow:hidden}
+  #mep-panel{width:270px;display:none;flex-direction:column;flex-shrink:0;background:var(--white);border-right:2px solid var(--yellow);overflow-y:auto}
+  #mep-panel.open{display:flex}
+  .mep-panel-header{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--black);border-bottom:2px solid var(--yellow);flex-shrink:0}
+  .mep-panel-header>span{font-weight:800;font-size:13px;color:var(--yellow);display:flex;align-items:center;gap:6px}
+  .mep-panel-close{background:none;border:none;color:#fff;font-size:18px;cursor:pointer;padding:2px 6px;border-radius:4px}
+  .mep-panel-close:hover{background:rgba(255,255,255,0.15)}
+  .mep-panel-body{padding:14px;display:flex;flex-direction:column;gap:2px;flex:1;overflow-y:auto}
+  .mep-orientation{display:flex;gap:4px;margin-bottom:4px}
+  .mep-ori-btn{flex:1;border:1px solid var(--gray-200);border-radius:6px;padding:7px;font-size:11px;font-weight:700;cursor:pointer;transition:all .2s;background:var(--white);color:var(--gray-500)}
+  .mep-ori-btn:hover{border-color:var(--yellow)}
   .mep-ori-btn.active{background:var(--yellow);color:var(--black);border-color:var(--yellow);font-weight:800}
-  #mep-body{flex:1;display:flex;overflow:hidden}
-  #mep-sidebar{width:260px;background:var(--white);border-right:1px solid var(--gray-200);overflow-y:auto;flex-shrink:0;padding:14px}
   .mep-sidebar-title{font-weight:800;font-size:13px;color:var(--black);margin-bottom:10px;padding-bottom:8px;border-bottom:2px solid var(--yellow)}
   .mep-legend-row{display:flex;align-items:center;gap:8px;padding:6px 4px;border-bottom:1px solid var(--gray-100)}
   .mep-legend-row:last-child{border-bottom:none}
@@ -275,16 +275,26 @@
   .mep-legend-row .mep-label-input{flex:1;border:1px solid transparent;border-radius:4px;padding:2px 6px;font-size:12px;font-weight:700;font-family:inherit;background:transparent;color:var(--black);outline:none;transition:border-color .2s}
   .mep-legend-row .mep-label-input:hover{border-color:var(--gray-200)}
   .mep-legend-row .mep-label-input:focus{border-color:var(--yellow);background:var(--yellow-pale)}
+  .mep-sidebar-section{margin-bottom:12px}
+  .mep-check-row{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:700;color:var(--black);cursor:pointer;margin-bottom:6px}
+  .mep-check-row input[type="checkbox"]{width:16px;height:16px;accent-color:var(--yellow);cursor:pointer}
+  .mep-text-input{width:100%;border:1px solid var(--gray-200);border-radius:6px;padding:6px 10px;font-size:12px;font-weight:700;font-family:inherit;color:var(--black);outline:none;transition:border-color .2s;box-sizing:border-box}
+  .mep-text-input:focus{border-color:var(--yellow);background:var(--yellow-pale)}
+  .mep-text-input:disabled{background:var(--gray-50);color:var(--gray-300);cursor:not-allowed}
+  .mep-pos-toggle{display:flex;gap:4px}
+  .mep-pos-btn{flex:1;border:1px solid var(--gray-200);border-radius:6px;padding:6px;font-size:11px;font-weight:700;cursor:pointer;transition:all .2s;background:var(--white);color:var(--gray-500)}
+  .mep-pos-btn:hover{border-color:var(--yellow)}
+  .mep-pos-btn.active{background:var(--yellow);color:var(--black);border-color:var(--yellow);font-weight:800}
   .mep-legend-empty{color:var(--gray-500);font-size:12px;text-align:center;padding:20px 0}
-  #mep-preview-wrap{flex:1;display:flex;align-items:center;justify-content:center;padding:20px;background:#555;overflow:auto}
-  #mep-canvas{background:var(--white);box-shadow:0 4px 30px rgba(0,0,0,0.5);max-width:100%;max-height:100%;object-fit:contain}
+  .mep-download-btn{width:100%;padding:10px;border:none;border-radius:8px;background:var(--yellow);color:var(--black);font-size:13px;font-weight:800;cursor:pointer;transition:all .2s;margin-top:auto;flex-shrink:0}
+  .mep-download-btn:hover{background:#e0a800;transform:scale(1.02)}
 </style>
 </head>
 <body>
 <div id="app">
   <div id="header">
     <div class="logo">
-      <div class="logo-text">Géo<span class="highlight">Ter'</span><span style="font-size:0.25em;font-weight:400;color:rgba(255,255,255,0.4);font-family:'Space Grotesk',sans-serif;letter-spacing:0.05em;margin-left:0.6em;vertical-align:baseline">by GPH</span></div>
+      <div class="logo-text">Géo<span class="highlight">Ter'</span><span style="font-size:0.25em;font-weight:400;color:rgba(255,255,255,0.65);font-family:'Space Grotesk',sans-serif;letter-spacing:0.05em;margin-left:0.6em;vertical-align:baseline">by GPH</span></div>
     </div>
     <div class="actions">
       <input type="text" id="project-ref" placeholder="N° réf. projet" spellcheck="false">
@@ -294,12 +304,13 @@
   </div>
   <div id="toolbar">
     <button class="tool-btn active" data-tool="select" onclick="selectTool('select')"><span class="icon">👆</span><span class="label">Sélection</span></button>
-    <button class="tool-btn" data-tool="sticker" onclick="selectTool('sticker')"><span class="icon">🏷️</span><span class="label">Vignette</span></button>
+    <button class="tool-btn" data-tool="sticker" onclick="selectTool('sticker')"><span class="icon">🏷️</span><span class="label">Vignettes</span></button>
     <button class="tool-btn" data-tool="text" onclick="selectTool('text')"><span class="icon">✏️</span><span class="label">Texte</span></button>
-    <button class="tool-btn" data-tool="arrow" onclick="selectTool('arrow')"><span class="icon">↗️</span><span class="label">Flèche</span></button>
+    <button class="tool-btn" data-tool="arrow" onclick="selectTool('arrow')"><span class="icon" style="font-size:14px;line-height:1">─➜</span><span class="label">Traits</span></button>
     <button class="tool-btn" data-tool="draw" onclick="selectTool('draw')"><span class="icon">🖌️</span><span class="label">Dessin</span></button>
-    <button class="tool-btn" data-tool="erase" onclick="selectTool('erase')"><span class="icon">🧹</span><span class="label">Gomme</span></button>
+    <button class="tool-btn" data-tool="erase" onclick="selectTool('erase')"><span class="icon" style="font-size:15px;line-height:1"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 20H7L3 16c-.8-.8-.8-2 0-2.8L14.6 1.6c.8-.8 2-.8 2.8 0l4 4c.8.8.8 2 0 2.8L12 18"/><path d="M7 20l-4-4"/></svg></span><span class="label">Gomme</span></button>
     <button class="tool-btn" data-tool="mrpropre" onclick="selectTool('mrpropre')"><span class="icon">🧽</span><span class="label">Mr Propre</span></button>
+    <button class="tool-btn" data-tool="cleanzone" onclick="selectTool('cleanzone')"><span class="icon" style="position:relative;display:inline-block"><span style="position:relative;z-index:1">🧽</span><span style="position:absolute;inset:-1px;border:2px dashed #1A1A1A;border-radius:4px;z-index:0"></span></span><span class="label">Mr Très Propre</span></button>
     <div class="tool-sep"></div>
     <button class="tool-btn" onclick="undoAction()"><span class="icon">↩️</span><span class="label">Annuler</span></button>
     <button class="tool-btn" onclick="redoAction()"><span class="icon">↪️</span><span class="label">Remettre</span></button>
@@ -340,6 +351,36 @@
       <div class="arr-opt-group"><label>Épaisseur</label><input type="number" class="arr-input" id="arr-width" min="1" max="24" step="1" value="2" onchange="arrowWidth=Math.min(24,Math.max(1,+this.value));this.value=arrowWidth"></div>
     </div>
   </div>
+  <div id="main-body">
+  <div id="mep-panel">
+    <div class="mep-panel-header">
+      <span>📐 Mise en Page</span>
+      <button class="mep-panel-close" onclick="closeMep()">✕</button>
+    </div>
+    <div class="mep-panel-body">
+      <div class="mep-sidebar-title">Orientation</div>
+      <div class="mep-sidebar-section">
+        <div class="mep-orientation">
+          <button class="mep-ori-btn active" data-ori="portrait" onclick="mepSetOrientation('portrait')">📄 Portrait</button>
+          <button class="mep-ori-btn" data-ori="landscape" onclick="mepSetOrientation('landscape')">📄 Paysage</button>
+        </div>
+      </div>
+      <div class="mep-sidebar-title">Titre</div>
+      <div class="mep-sidebar-section">
+        <label class="mep-check-row"><input type="checkbox" id="mep-title-check" onchange="mepToggleTitle(this.checked)"><span>Afficher le titre</span></label>
+        <input type="text" id="mep-title-input" class="mep-text-input" placeholder="Saisir un titre..." oninput="mepUpdateTitle(this.value)" disabled>
+      </div>
+      <div class="mep-sidebar-title">Légende</div>
+      <div class="mep-sidebar-section">
+        <div class="mep-pos-toggle">
+          <button class="mep-pos-btn active" data-pos="bottom" onclick="mepSetLegendPos('bottom')">En bas</button>
+          <button class="mep-pos-btn" data-pos="right" onclick="mepSetLegendPos('right')">À droite</button>
+        </div>
+      </div>
+      <div id="mep-legend-items"></div>
+      <button class="mep-download-btn" onclick="mepDownload()">💾 Télécharger PNG</button>
+    </div>
+  </div>
   <div id="canvas-area">
     <svg id="grid-svg"><defs><pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse"><circle cx="20" cy="20" r="0.7" fill="#C0C0C0"/></pattern></defs><rect width="100%" height="100%" fill="url(#grid)"/></svg>
     <img id="plan-img" alt="Plan" draggable="false"><canvas id="clean-canvas"></canvas><canvas id="draw-canvas"></canvas>
@@ -349,6 +390,7 @@
     <div id="empty-state"><div class="big-icon">📐</div><p>Chargez un plan PDF ou une image<br>pour commencer à annoter</p><button class="btn-load-center" onclick="document.getElementById('fileInput').click()">📄 Charger un plan</button><div class="hint">PDF, JPG, PNG</div></div>
     <button id="btn-recadrer" onclick="resetView()" title="Recadrer">🎯</button>
   </div>
+  </div><!-- /main-body -->
   <div id="catalog-overlay">
     <div id="catalog-header"><span>🏷️ Catalogue de vignettes</span><button class="catalog-close" onclick="closeCatalog()">✕</button></div>
     <div id="catalog-sections"></div>
@@ -459,31 +501,6 @@
       </div>
     </div>
   </div>
-  <!-- MISE EN PAGE MODAL -->
-  <div id="mep-modal" onclick="closeMep()">
-    <div id="mep-inner" onclick="event.stopPropagation()">
-      <div id="mep-header">
-        <span>📐 Mise en Page</span>
-        <div class="mep-controls">
-          <div class="mep-orientation">
-            <button class="mep-ori-btn active" data-ori="portrait" onclick="mepSetOrientation('portrait')">📄 Portrait</button>
-            <button class="mep-ori-btn" data-ori="landscape" onclick="mepSetOrientation('landscape')">📄 Paysage</button>
-          </div>
-          <button class="btn-download" onclick="mepDownload()">💾 Télécharger PNG</button>
-          <button class="catalog-close" onclick="closeMep()">✕</button>
-        </div>
-      </div>
-      <div id="mep-body">
-        <div id="mep-sidebar">
-          <div class="mep-sidebar-title">Légende</div>
-          <div id="mep-legend-items"></div>
-        </div>
-        <div id="mep-preview-wrap">
-          <canvas id="mep-canvas"></canvas>
-        </div>
-      </div>
-    </div>
-  </div>
 </div>
 <script>
 pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
@@ -572,6 +589,7 @@ let isPanning=false,panStartX=0,panStartY=0,panOX=0,panOY=0;
 let elements=[],selectedId=null,selectedStickerId=null;
 let drawColor='#1A1A1A',brushSize=4,drawOpacity=1,eraserSize=20,mrPropreSize=30,textColor='#1A1A1A';
 let drawPaths=[],cleanPaths=[],currentPathPts=[],isDrawing=false,photos=[],cameraStream=null;
+let czPoints=[],czPreview=null;
 let teEditingId=null,teOriginX=0,teOriginY=0;
 let arrowStartPt=null,arrowPreviewEnd=null,arrowDoubleHead=false;
 let arrowMode='single',arrowColor='#1A1A1A',arrowOpacity=1,arrowWidth=2;
@@ -589,8 +607,8 @@ function resizeDrawCanvas(){const r=$area.getBoundingClientRect();$drawCanvas.wi
 
 function selectTool(t){
   currentTool=t;selectedId=null;
-  document.querySelectorAll('.tool-btn[data-tool]').forEach(b=>{b.className='tool-btn';if(b.dataset.tool===t){const c={select:'active',sticker:'active-yellow',text:'active-dark',draw:'active-red',erase:'active-orange',mrpropre:'active',arrow:'active-red'};b.classList.add(c[t]||'active');}});
-  $area.style.cursor={select:'grab',draw:'crosshair',erase:'none',mrpropre:'none',sticker:'crosshair',text:'text',arrow:'crosshair'}[t]||'crosshair';
+  document.querySelectorAll('.tool-btn[data-tool]').forEach(b=>{b.className='tool-btn';if(b.dataset.tool===t){const c={select:'active',sticker:'active-yellow',text:'active-dark',draw:'active-red',erase:'active-orange',mrpropre:'active',cleanzone:'active',arrow:'active-red'};b.classList.add(c[t]||'active');}});
+  $area.style.cursor={select:'grab',draw:'crosshair',erase:'none',mrpropre:'none',cleanzone:'crosshair',sticker:'crosshair',text:'text',arrow:'crosshair'}[t]||'crosshair';
   document.getElementById('color-options').style.display=(t==='draw'||t==='text')?'flex':'none';
   document.getElementById('brush-options').style.display=t==='draw'?'flex':'none';
   document.getElementById('erase-options').style.display=t==='erase'?'flex':'none';
@@ -599,6 +617,7 @@ function selectTool(t){
   document.getElementById('mrpropre-options').style.display=t==='mrpropre'?'flex':'none';
   document.getElementById('mrpropre-cursor').style.display=t==='mrpropre'?'block':'none';
   if(t==='mrpropre')updateMrPropreCursor();
+  czPoints=[];czPreview=null;
   document.getElementById('arrow-options').classList.toggle('show',t==='arrow');
   if(t==='sticker')openCatalog();else closeCatalog();renderElements();
 }
@@ -698,7 +717,42 @@ function updateMrPropreCursor(){const el=document.getElementById('mrpropre-curso
 function redrawCleanCanvas(){
   const w=$cleanCanvas.width,h=$cleanCanvas.height;cleanCtx.clearRect(0,0,w,h);
   const all=[...cleanPaths];if(currentPathPts.length>1&&currentTool==='mrpropre')all.push({points:currentPathPts,size:mrPropreSize});
-  for(const p of all){cleanCtx.save();cleanCtx.beginPath();cleanCtx.lineCap='round';cleanCtx.lineJoin='round';cleanCtx.strokeStyle='#FFFFFF';cleanCtx.lineWidth=p.size*scale;for(let i=0;i<p.points.length;i++){const sx=p.points[i].x*scale+offX,sy=p.points[i].y*scale+offY;if(i===0)cleanCtx.moveTo(sx,sy);else cleanCtx.lineTo(sx,sy);}cleanCtx.stroke();cleanCtx.restore();}
+  for(const p of all){
+    if(p.type==='zone'){
+      cleanCtx.save();cleanCtx.fillStyle='#FFFFFF';
+      cleanCtx.beginPath();cleanCtx.rect(0,0,w,h);
+      for(let i=p.points.length-1;i>=0;i--){const sx=p.points[i].x*scale+offX,sy=p.points[i].y*scale+offY;if(i===p.points.length-1)cleanCtx.moveTo(sx,sy);else cleanCtx.lineTo(sx,sy);}
+      cleanCtx.closePath();cleanCtx.fill('evenodd');cleanCtx.restore();
+    }else{
+      cleanCtx.save();cleanCtx.beginPath();cleanCtx.lineCap='round';cleanCtx.lineJoin='round';cleanCtx.strokeStyle='#FFFFFF';cleanCtx.lineWidth=p.size*scale;for(let i=0;i<p.points.length;i++){const sx=p.points[i].x*scale+offX,sy=p.points[i].y*scale+offY;if(i===0)cleanCtx.moveTo(sx,sy);else cleanCtx.lineTo(sx,sy);}cleanCtx.stroke();cleanCtx.restore();
+    }
+  }
+  // Live preview of cleanzone polygon
+  if(czPoints.length>0&&currentTool==='cleanzone'){
+    cleanCtx.save();cleanCtx.strokeStyle='#F2B705';cleanCtx.lineWidth=2;cleanCtx.setLineDash([6,4]);
+    cleanCtx.beginPath();
+    for(let i=0;i<czPoints.length;i++){const sx=czPoints[i].x*scale+offX,sy=czPoints[i].y*scale+offY;if(i===0)cleanCtx.moveTo(sx,sy);else cleanCtx.lineTo(sx,sy);}
+    // Preview line to cursor
+    if(czPreview){const spx=czPreview.x*scale+offX,spy=czPreview.y*scale+offY;cleanCtx.lineTo(spx,spy);}
+    cleanCtx.stroke();cleanCtx.restore();
+    // Point markers
+    for(let i=0;i<czPoints.length;i++){
+      const sx=czPoints[i].x*scale+offX,sy=czPoints[i].y*scale+offY;
+      cleanCtx.save();cleanCtx.beginPath();cleanCtx.arc(sx,sy,i===0?6:3,0,Math.PI*2);
+      cleanCtx.fillStyle=i===0?'#F2B705':'#fff';cleanCtx.fill();
+      cleanCtx.strokeStyle=i===0?'#fff':'#F2B705';cleanCtx.lineWidth=2;cleanCtx.stroke();cleanCtx.restore();
+    }
+    // Start point grows green when cursor is near
+    if(czPreview&&czPoints.length>2){
+      const dx=(czPreview.x-czPoints[0].x)*scale,dy=(czPreview.y-czPoints[0].y)*scale;
+      if(Math.sqrt(dx*dx+dy*dy)<15){
+        const sx0=czPoints[0].x*scale+offX,sy0=czPoints[0].y*scale+offY;
+        cleanCtx.save();cleanCtx.beginPath();cleanCtx.arc(sx0,sy0,10,0,Math.PI*2);
+        cleanCtx.fillStyle='#4CAF50';cleanCtx.fill();
+        cleanCtx.strokeStyle='#fff';cleanCtx.lineWidth=2;cleanCtx.stroke();cleanCtx.restore();
+      }
+    }
+  }
 }
 $area.addEventListener('mousemove',function(e){const r=$area.getBoundingClientRect();const x=e.clientX-r.left,y=e.clientY-r.top;if(currentTool==='erase'){const el=document.getElementById('eraser-cursor');el.style.left=x+'px';el.style.top=y+'px';}if(currentTool==='mrpropre'){const el=document.getElementById('mrpropre-cursor');el.style.left=x+'px';el.style.top=y+'px';}});
 
@@ -714,11 +768,18 @@ function onPD(e){
   if(currentTool==='arrow'){arrowStartPt={x:pt.px,y:pt.py};arrowPreviewEnd=null;$area.setPointerCapture(e.pointerId);return;}
   if(currentTool==='draw'||currentTool==='erase'){isDrawing=true;currentPathPts=[{x:pt.px,y:pt.py}];$area.setPointerCapture(e.pointerId);}
   if(currentTool==='mrpropre'){isDrawing=true;currentPathPts=[{x:pt.px,y:pt.py}];$area.setPointerCapture(e.pointerId);}
+  if(currentTool==='cleanzone'){
+    let nx=pt.px,ny=pt.py;
+    if(e.shiftKey&&czPoints.length>0){const lp=czPoints[czPoints.length-1];const adx=pt.px-lp.x,ady=pt.py-lp.y;const dist=Math.sqrt(adx*adx+ady*ady);const ang=Math.round(Math.atan2(ady,adx)/(Math.PI/12))*(Math.PI/12);nx=lp.x+dist*Math.cos(ang);ny=lp.y+dist*Math.sin(ang);}
+    if(czPoints.length>2){const dx=(nx-czPoints[0].x)*scale,dy=(ny-czPoints[0].y)*scale;if(Math.sqrt(dx*dx+dy*dy)<15){cleanPaths.push({type:'zone',points:[...czPoints]});czPoints=[];czPreview=null;redrawCleanCanvas();return;}}
+    czPoints.push({x:nx,y:ny});redrawCleanCanvas();return;
+  }
 }
 function onPM(e){
   if(isPanning){offX=panOX+(e.clientX-panStartX);offY=panOY+(e.clientY-panStartY);updatePlanTransform();redrawCanvas();redrawCleanCanvas();renderElements();return;}
   if(arrowStartPt){const pt=gP(e);if(e.shiftKey){const adx=pt.px-arrowStartPt.x,ady=pt.py-arrowStartPt.y;const dist=Math.sqrt(adx*adx+ady*ady);const ang=Math.round(Math.atan2(ady,adx)/(Math.PI/12))*(Math.PI/12);arrowPreviewEnd={x:arrowStartPt.x+dist*Math.cos(ang),y:arrowStartPt.y+dist*Math.sin(ang)};}else{arrowPreviewEnd={x:pt.px,y:pt.py};}renderElements();return;}
   if(isDrawing&&currentTool==='mrpropre'){const pt=gP(e);currentPathPts.push({x:pt.px,y:pt.py});redrawCleanCanvas();return;}
+  if(czPoints.length>0&&currentTool==='cleanzone'){const pt=gP(e);const lp=czPoints[czPoints.length-1];if(e.shiftKey){const adx=pt.px-lp.x,ady=pt.py-lp.y;const dist=Math.sqrt(adx*adx+ady*ady);const ang=Math.round(Math.atan2(ady,adx)/(Math.PI/12))*(Math.PI/12);czPreview={x:lp.x+dist*Math.cos(ang),y:lp.y+dist*Math.sin(ang)};}else{czPreview={x:pt.px,y:pt.py};}redrawCleanCanvas();return;}
   if(isDrawing){const pt=gP(e);currentPathPts.push({x:pt.px,y:pt.py});redrawCanvas();}
 }
 function onPU(){
@@ -820,11 +881,11 @@ function renderElements(){
       const resizeEl=e.target.closest('[data-resize]');
       if(resizeEl&&el.type==='sticker'){
         e.stopPropagation();e.preventDefault();selectedId=el.id;
-        const startY=e.clientY;
-        const startScale=el.sScale||1;
+        const cx=el.x*scale+offX,cy=el.y*scale+offY;
         const sMove=ev=>{
-          const dy=startY-ev.clientY;
-          el.sScale=Math.max(0.15,startScale+dy/80);
+          const dx=ev.clientX-cx,dy=ev.clientY-cy;
+          const dist=Math.sqrt(dx*dx+dy*dy);
+          el.sScale=Math.max(0.15,dist/40);
           renderElements();
         };
         const sUp=()=>{document.removeEventListener('pointermove',sMove);document.removeEventListener('pointerup',sUp);};
@@ -1118,8 +1179,17 @@ function renderPlanToCanvas(cb){
   const toX=px=>px*scale;
   const toY=py=>py*scale;
   const finish=()=>{
-    // Mr Propre (white strokes on plan)
-    for(const p of cleanPaths){ctx.save();ctx.beginPath();ctx.lineCap='round';ctx.lineJoin='round';ctx.strokeStyle='#FFFFFF';ctx.lineWidth=p.size*scale;for(let i=0;i<p.points.length;i++){if(i===0)ctx.moveTo(toX(p.points[i].x),toY(p.points[i].y));else ctx.lineTo(toX(p.points[i].x),toY(p.points[i].y));}ctx.stroke();ctx.restore();}
+    // Mr Propre (white strokes + zone inverse on plan)
+    for(const p of cleanPaths){
+      if(p.type==='zone'){
+        ctx.save();ctx.fillStyle='#FFFFFF';
+        ctx.beginPath();ctx.rect(0,0,cw,ch);
+        for(let i=p.points.length-1;i>=0;i--){if(i===p.points.length-1)ctx.moveTo(toX(p.points[i].x),toY(p.points[i].y));else ctx.lineTo(toX(p.points[i].x),toY(p.points[i].y));}
+        ctx.closePath();ctx.fill('evenodd');ctx.restore();
+      }else{
+        ctx.save();ctx.beginPath();ctx.lineCap='round';ctx.lineJoin='round';ctx.strokeStyle='#FFFFFF';ctx.lineWidth=p.size*scale;for(let i=0;i<p.points.length;i++){if(i===0)ctx.moveTo(toX(p.points[i].x),toY(p.points[i].y));else ctx.lineTo(toX(p.points[i].x),toY(p.points[i].y));}ctx.stroke();ctx.restore();
+      }
+    }
     // Draw paths on offscreen canvas (so eraser only affects strokes, not plan)
     const oc=document.createElement('canvas');oc.width=cw;oc.height=ch;const octx=oc.getContext('2d');
     for(const p of drawPaths){octx.save();octx.beginPath();octx.lineCap='round';octx.lineJoin='round';if(p.color==='eraser'){octx.globalCompositeOperation='destination-out';octx.lineWidth=p.size*scale;}else{octx.globalCompositeOperation='source-over';octx.globalAlpha=p.opacity!=null?p.opacity:1;octx.strokeStyle=p.color;octx.lineWidth=p.size*scale;}for(let i=0;i<p.points.length;i++){if(i===0)octx.moveTo(toX(p.points[i].x),toY(p.points[i].y));else octx.lineTo(toX(p.points[i].x),toY(p.points[i].y));}octx.stroke();octx.restore();}
@@ -1243,6 +1313,9 @@ function closeSnapshot(){document.getElementById('snapshot-modal').classList.rem
 // ═══ MISE EN PAGE ═══
 let mepOrientation='portrait';
 let mepLegendData=[];
+let mepShowTitle=false;
+let mepTitleText='';
+let mepLegendPos='bottom';
 
 function roundRect(ctx,x,y,w,h,r){
   ctx.beginPath();ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.quadraticCurveTo(x+w,y,x+w,y+r);
@@ -1252,6 +1325,8 @@ function roundRect(ctx,x,y,w,h,r){
 
 function openMiseEnPage(){
   if(!planImgSrc){alert('Aucun plan chargé.');return;}
+  const panel=document.getElementById('mep-panel');
+  if(panel.classList.contains('open')){closeMep();return;}
   const stickers=elements.filter(e=>e.type==='sticker');
   const counts={};
   stickers.forEach(s=>{
@@ -1263,17 +1338,24 @@ function openMiseEnPage(){
     svgContent:SVG[item.svgKey]?.replace(/<svg[^>]*>|<\/svg>/g,'')||''
   }));
   mepOrientation='portrait';
+  mepLegendPos='bottom';
+  mepShowTitle=false;
+  mepTitleText='';
   document.querySelectorAll('.mep-ori-btn').forEach(b=>b.classList.toggle('active',b.dataset.ori==='portrait'));
+  document.querySelectorAll('.mep-pos-btn').forEach(b=>b.classList.toggle('active',b.dataset.pos==='bottom'));
+  document.getElementById('mep-title-check').checked=false;
+  document.getElementById('mep-title-input').value='';
+  document.getElementById('mep-title-input').disabled=true;
   mepRenderSidebar();
-  document.getElementById('mep-modal').classList.add('open');
-  mepRenderPreview();
+  panel.classList.add('open');
 }
-function closeMep(){document.getElementById('mep-modal').classList.remove('open');}
+function closeMep(){document.getElementById('mep-panel').classList.remove('open');}
 
 function mepSetOrientation(ori){
   mepOrientation=ori;
+  mepLegendPos=ori==='portrait'?'bottom':'right';
   document.querySelectorAll('.mep-ori-btn').forEach(b=>b.classList.toggle('active',b.dataset.ori===ori));
-  mepRenderPreview();
+  document.querySelectorAll('.mep-pos-btn').forEach(b=>b.classList.toggle('active',b.dataset.pos===mepLegendPos));
 }
 
 function mepRenderSidebar(){
@@ -1288,34 +1370,89 @@ function mepRenderSidebar(){
   }).join('');
 }
 
-function mepToggleItem(idx,checked){mepLegendData[idx].included=checked;mepRenderPreview();}
-function mepEditLabel(idx,newLabel){mepLegendData[idx].label=newLabel;mepRenderPreview();}
+function mepToggleItem(idx,checked){mepLegendData[idx].included=checked;}
+function mepEditLabel(idx,newLabel){mepLegendData[idx].label=newLabel;}
+function mepToggleTitle(checked){mepShowTitle=checked;document.getElementById('mep-title-input').disabled=!checked;}
+function mepUpdateTitle(val){mepTitleText=val;}
+function mepSetLegendPos(pos){mepLegendPos=pos;document.querySelectorAll('.mep-pos-btn').forEach(b=>b.classList.toggle('active',b.dataset.pos===pos));}
 
-function mepRenderPreview(){
+function mepDrawLegend(ctx,x,y,w,maxH,items,horizontal){
+  const padX=16,padY=14,titleH=40,rowH=36,iconSz=26;
+  if(horizontal){
+    // Horizontal layout (bottom): title left, items flow in columns
+    const colW=180,colH=rowH;
+    const cols=Math.max(1,Math.floor((w-padX*2)/colW));
+    const rows=Math.ceil(items.length/cols);
+    const h=Math.min(maxH,titleH+padY+rows*colH+padY);
+    ctx.fillStyle='#FFFFFF';ctx.strokeStyle='#D1D5DB';ctx.lineWidth=1;
+    roundRect(ctx,x,y,w,h,10);ctx.fill();ctx.stroke();
+    ctx.save();roundRect(ctx,x,y,w,6,10);ctx.clip();ctx.fillStyle='#F2B705';ctx.fillRect(x,y,w,6);ctx.restore();
+    ctx.fillStyle='#1A1A1A';ctx.font='bold 16px Arial,sans-serif';ctx.textAlign='left';ctx.textBaseline='middle';
+    ctx.fillText('Légende',x+padX,y+titleH/2+2);
+    ctx.strokeStyle='#E5E7EB';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(x+padX,y+titleH);ctx.lineTo(x+w-padX,y+titleH);ctx.stroke();
+    items.forEach((item,i)=>{
+      const col=i%cols,row=Math.floor(i/cols);
+      const ix=x+padX+col*colW,iy=y+titleH+padY+row*colH;
+      ctx.fillStyle=item.color;ctx.font='700 12px Arial,sans-serif';ctx.textAlign='left';ctx.textBaseline='middle';
+      ctx.fillText(item.label,ix+iconSz+8,iy+iconSz/2);
+      const svgStr=SVG[item.svgKey];if(!svgStr)return;
+      const blob=new Blob([svgStr],{type:'image/svg+xml'});
+      const url=URL.createObjectURL(blob);
+      const img=new Image();
+      img.onload=()=>{ctx.drawImage(img,ix,iy,iconSz,iconSz);URL.revokeObjectURL(url);};
+      img.onerror=()=>{URL.revokeObjectURL(url);};
+      img.src=url;
+    });
+  }else{
+    // Vertical layout (right side)
+    const h=Math.min(maxH,titleH+padY+items.length*rowH+padY);
+    ctx.fillStyle='#FFFFFF';ctx.strokeStyle='#D1D5DB';ctx.lineWidth=1;
+    roundRect(ctx,x,y,w,h,10);ctx.fill();ctx.stroke();
+    ctx.save();roundRect(ctx,x,y,w,6,10);ctx.clip();ctx.fillStyle='#F2B705';ctx.fillRect(x,y,w,6);ctx.restore();
+    ctx.fillStyle='#1A1A1A';ctx.font='bold 16px Arial,sans-serif';ctx.textAlign='left';ctx.textBaseline='middle';
+    ctx.fillText('Légende',x+padX,y+titleH/2+2);
+    ctx.strokeStyle='#E5E7EB';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(x+padX,y+titleH);ctx.lineTo(x+w-padX,y+titleH);ctx.stroke();
+    items.forEach((item,i)=>{
+      const rowY=y+titleH+padY+i*rowH;
+      ctx.fillStyle=item.color;ctx.font='700 13px Arial,sans-serif';ctx.textAlign='left';ctx.textBaseline='middle';
+      ctx.fillText(item.label,x+padX+iconSz+10,rowY+iconSz/2);
+      const svgStr=SVG[item.svgKey];if(!svgStr)return;
+      const blob=new Blob([svgStr],{type:'image/svg+xml'});
+      const url=URL.createObjectURL(blob);
+      const img=new Image();
+      img.onload=()=>{ctx.drawImage(img,x+padX,rowY,iconSz,iconSz);URL.revokeObjectURL(url);};
+      img.onerror=()=>{URL.revokeObjectURL(url);};
+      img.src=url;
+    });
+  }
+}
+
+function mepDownload(){
+  if(!planImgSrc){alert('Aucun plan chargé.');return;}
   const isP=mepOrientation==='portrait';
   const pageW=isP?1240:1754,pageH=isP?1754:1240;
-  const canvas=document.getElementById('mep-canvas');
+  const canvas=document.createElement('canvas');
   canvas.width=pageW;canvas.height=pageH;
   const ctx=canvas.getContext('2d');
   ctx.fillStyle='#FFFFFF';ctx.fillRect(0,0,pageW,pageH);
-  const margin=40,titleH=60,footerH=30,legendW=260;
+  const margin=40,footerH=30,legendSide=260,legendBot=200;
+  const titleH=mepShowTitle?60:10;
   const activeLegend=mepLegendData.filter(item=>item.included);
   const hasLegend=activeLegend.length>0;
+  const legRight=hasLegend&&mepLegendPos==='right';
+  const legBottom=hasLegend&&mepLegendPos==='bottom';
   const planAreaX=margin,planAreaY=margin+titleH;
-  const planAreaW=pageW-margin*2-(hasLegend?legendW+20:0);
-  const planAreaH=pageH-margin*2-titleH-footerH;
-  // Title
-  const refVal=document.getElementById('project-ref').value.trim();
-  ctx.fillStyle='#1A1A1A';ctx.font='bold 28px Arial,sans-serif';ctx.textAlign='left';ctx.textBaseline='middle';
-  ctx.fillText(refVal||'Plan annoté',margin,margin+titleH/2);
-  // Yellow accent line
-  ctx.fillStyle='#F2B705';ctx.fillRect(margin,margin+titleH-4,pageW-margin*2,4);
-  // Footer
+  const planAreaW=pageW-margin*2-(legRight?legendSide+20:0);
+  const planAreaH=pageH-margin*2-titleH-footerH-(legBottom?legendBot+20:0);
+  if(mepShowTitle&&mepTitleText){
+    ctx.fillStyle='#1A1A1A';ctx.font='bold 28px Arial,sans-serif';ctx.textAlign='left';ctx.textBaseline='middle';
+    ctx.fillText(mepTitleText,margin,margin+titleH/2);
+    ctx.fillStyle='#F2B705';ctx.fillRect(margin,margin+titleH-4,pageW-margin*2,4);
+  }
   const now=new Date().toLocaleDateString('fr-FR');
   ctx.fillStyle='#B0B0B0';ctx.font='600 12px Arial,sans-serif';
   ctx.textAlign='left';ctx.fillText("GéoTer' — "+now,margin,pageH-margin+10);
   ctx.textAlign='right';ctx.fillText('Annotateur de plans terrain',pageW-margin,pageH-margin+10);
-  // Render plan
   renderPlanToCanvas(planCanvas=>{
     const cw=planCanvas.width,ch=planCanvas.height;
     const fitScale=Math.min(planAreaW/cw,planAreaH/ch);
@@ -1323,54 +1460,18 @@ function mepRenderPreview(){
     const fitX=planAreaX+(planAreaW-fitW)/2,fitY=planAreaY+(planAreaH-fitH)/2;
     ctx.strokeStyle='#D4D4D4';ctx.lineWidth=1;ctx.strokeRect(fitX,fitY,fitW,fitH);
     ctx.drawImage(planCanvas,fitX,fitY,fitW,fitH);
-    // Legend
-    if(hasLegend){
-      mepDrawLegend(ctx,pageW-margin-legendW,planAreaY,legendW,planAreaH,activeLegend);
+    if(legRight){
+      mepDrawLegend(ctx,pageW-margin-legendSide,planAreaY,legendSide,planAreaH,activeLegend,false);
+    }else if(legBottom){
+      const legY=planAreaY+planAreaH+20;
+      const legW=pageW-margin*2;
+      mepDrawLegend(ctx,margin,legY,legW,legendBot,activeLegend,true);
     }
+    const refVal=document.getElementById('project-ref').value.trim();
+    const fileName='MEP_'+(refVal||'plan-geoter')+'_'+mepOrientation+'.png';
+    const url=canvas.toDataURL('image/png');
+    const a=document.createElement('a');a.href=url;a.download=fileName;document.body.appendChild(a);a.click();document.body.removeChild(a);
   });
-}
-
-function mepDrawLegend(ctx,x,y,w,maxH,items){
-  const padX=16,padY=14,titleH=40,rowH=36,iconSz=26;
-  const h=Math.min(maxH,titleH+padY+items.length*rowH+padY);
-  // Background box
-  ctx.fillStyle='#FFFFFF';ctx.strokeStyle='#D1D5DB';ctx.lineWidth=1;
-  roundRect(ctx,x,y,w,h,10);ctx.fill();ctx.stroke();
-  // Yellow top accent
-  ctx.save();
-  roundRect(ctx,x,y,w,6,10);ctx.clip();
-  ctx.fillStyle='#F2B705';ctx.fillRect(x,y,w,6);
-  ctx.restore();
-  // Title
-  ctx.fillStyle='#1A1A1A';ctx.font='bold 16px Arial,sans-serif';ctx.textAlign='left';ctx.textBaseline='middle';
-  ctx.fillText('Légende',x+padX,y+titleH/2+2);
-  // Separator
-  ctx.strokeStyle='#E5E7EB';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(x+padX,y+titleH);ctx.lineTo(x+w-padX,y+titleH);ctx.stroke();
-  // Items — draw labels immediately, icons async
-  let iconsPending=items.length;
-  items.forEach((item,i)=>{
-    const rowY=y+titleH+padY+i*rowH;
-    // Label text (sync)
-    ctx.fillStyle=item.color;ctx.font='700 13px Arial,sans-serif';ctx.textAlign='left';ctx.textBaseline='middle';
-    ctx.fillText(item.label,x+padX+iconSz+10,rowY+iconSz/2);
-    // SVG icon (async)
-    const svgStr=SVG[item.svgKey];
-    if(!svgStr){iconsPending--;return;}
-    const blob=new Blob([svgStr],{type:'image/svg+xml'});
-    const url=URL.createObjectURL(blob);
-    const img=new Image();
-    img.onload=()=>{ctx.drawImage(img,x+padX,rowY,iconSz,iconSz);URL.revokeObjectURL(url);iconsPending--;};
-    img.onerror=()=>{URL.revokeObjectURL(url);iconsPending--;};
-    img.src=url;
-  });
-}
-
-function mepDownload(){
-  const canvas=document.getElementById('mep-canvas');
-  const refVal=document.getElementById('project-ref').value.trim();
-  const fileName='MEP_'+(refVal||'plan-geoter')+'_'+mepOrientation+'.png';
-  const url=canvas.toDataURL('image/png');
-  const a=document.createElement('a');a.href=url;a.download=fileName;document.body.appendChild(a);a.click();document.body.removeChild(a);
 }
 
 async function openCamera(){try{cameraStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment',width:{ideal:1920},height:{ideal:1080}}});document.getElementById('camera-video').srcObject=cameraStream;document.getElementById('camera-overlay').classList.add('open');}catch(err){alert("Impossible d'accéder à la caméra.");}}
