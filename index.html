@@ -1453,6 +1453,7 @@ function importProject(e){
       cleanPaths=project.cleanPaths||[];
       // Restore photos
       if(project.photos)photos=project.photos.map(p=>({dataUrl:p.dataUrl||p.src||'',timestamp:p.timestamp||'',name:p.name||'',checked:p.checked!==false}));
+      renderPhotos();
       // Restore scan 3D data
       if(window.importScan3DFromProject) window.importScan3DFromProject(project.scan3d||null);
       selectedId=null;
