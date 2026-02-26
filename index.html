@@ -245,7 +245,7 @@
     </div>
     <div class="actions">
       <input type="file" id="fileInput" accept=".pdf,image/*" style="display:none" onchange="loadPlan(event)">
-      <button class="btn-header btn-capture" onclick="captureSnapshot()">📸 Capture</button>
+      <button class="btn-header btn-capture" onclick="captureSnapshot()">📸 Aperçu</button>
     </div>
   </div>
   <div id="toolbar">
@@ -302,7 +302,7 @@
   </div>
   <div id="snapshot-modal" onclick="closeSnapshot()">
     <div id="snapshot-inner" onclick="event.stopPropagation()">
-      <div id="snapshot-header"><span>📸 Capture du plan annoté</span><div style="display:flex;gap:8px;align-items:center"><a id="snapshot-download" class="btn-download" download="geoter-plan-annote.png">💾 Télécharger</a><button class="catalog-close" onclick="closeSnapshot()">✕</button></div></div>
+      <div id="snapshot-header"><span>📸 Aperçu du plan annoté</span><div style="display:flex;gap:8px;align-items:center"><a id="snapshot-download" class="btn-download" download="geoter-plan-annote.png">💾 Télécharger</a><button class="catalog-close" onclick="closeSnapshot()">✕</button></div></div>
       <img id="snapshot-img" alt="Snapshot">
     </div>
   </div>
@@ -438,7 +438,7 @@ const SVG = {
   repere: `<svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="16" cy="12" r="8" fill="#F2B705" stroke="#1A1A1A" stroke-width="2"/><line x1="16" y1="20" x2="16" y2="30" stroke="#1A1A1A" stroke-width="2.5"/><circle cx="16" cy="12" r="3" fill="#1A1A1A"/></svg>`,
   photo_pt: `<svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="4" y="8" width="24" height="18" rx="3" fill="#4A4A4A"/><circle cx="16" cy="17" r="6" fill="none" stroke="#F2B705" stroke-width="2"/><circle cx="16" cy="17" r="3" fill="#F2B705"/><rect x="12" y="6" width="8" height="3" rx="1" fill="#7A7A7A"/></svg>`,
   danger: `<svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><polygon points="16,4 2,28 30,28" fill="#F2B705" stroke="#1A1A1A" stroke-width="1.5"/><text x="16" y="24" text-anchor="middle" font-size="14" font-weight="bold" fill="#1A1A1A">!</text></svg>`,
-  boussole: `<svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="16" cy="16" r="14" fill="#F5F5F5" stroke="#1A1A1A" stroke-width="1.5"/><circle cx="16" cy="16" r="11" fill="none" stroke="#D4D4D4" stroke-width="0.5"/><polygon points="16,3 18.5,14 16,12 13.5,14" fill="#D94040"/><polygon points="16,29 18.5,18 16,20 13.5,18" fill="#1A1A1A"/><circle cx="16" cy="16" r="2" fill="#1A1A1A"/><text x="16" y="8" text-anchor="middle" font-size="5" font-weight="bold" fill="#D94040">N</text></svg>`,
+  boussole: `<svg viewBox="-2 -6 36 42" fill="none" xmlns="http://www.w3.org/2000/svg"><text x="16" y="-1" text-anchor="middle" font-size="6" font-weight="bold" fill="#D94040">N</text><circle cx="16" cy="16" r="14" fill="none" stroke="#1A1A1A" stroke-width="1.5"/><circle cx="16" cy="16" r="11" fill="none" stroke="rgba(0,0,0,0.15)" stroke-width="0.5"/><polygon points="16,3 18.5,14 16,12 13.5,14" fill="#D94040"/><polygon points="16,29 18.5,18 16,20 13.5,18" fill="#1A1A1A"/><circle cx="16" cy="16" r="2" fill="#1A1A1A"/></svg>`,
 };
 
 const STICKER_SECTIONS = [
@@ -640,7 +640,12 @@ function renderElements(){
     div.style.left=(el.x*scale+offX)+'px';div.style.top=(el.y*scale+offY)+'px';
     if(el.type==='sticker'){
       const ss=el.sScale||1;const sz=Math.round(28*ss);const rot=el.rotation||0;
-      div.innerHTML=`<div class="sticker-wrap" style="transform:rotate(${rot}deg)"><div class="sticker-icon ${selectedId===el.id?'selected':''}" style="padding:${Math.round(4*ss)}px"><svg viewBox="0 0 32 32" width="${sz}" height="${sz}" xmlns="http://www.w3.org/2000/svg">${SVG[el.svgKey]?.replace(/<svg[^>]*>|<\/svg>/g,'')||'?'}</svg></div></div><button class="del-btn" data-action="del" data-eid="${el.id}">×</button><button class="rotate-btn" data-action="rotate" data-eid="${el.id}">↻</button><div class="resize-handle" data-resize="1"></div>`;
+      const svgRaw=SVG[el.svgKey]||'';
+      const vbMatch=svgRaw.match(/viewBox="([^"]+)"/);
+      const vb=vbMatch?vbMatch[1]:'0 0 32 32';
+      const svgInner=svgRaw.replace(/<svg[^>]*>|<\/svg>/g,'')||'?';
+      const noBg=el.svgKey==='boussole';
+      div.innerHTML=`<div class="sticker-wrap" style="transform:rotate(${rot}deg)"><div class="sticker-icon ${selectedId===el.id?'selected':''}" style="padding:${Math.round(4*ss)}px${noBg?';background:none;box-shadow:none':''}"><svg viewBox="${vb}" width="${sz}" height="${Math.round(sz*1.2)}" xmlns="http://www.w3.org/2000/svg">${svgInner}</svg></div></div><button class="del-btn" data-action="del" data-eid="${el.id}">×</button><button class="rotate-btn" data-action="rotate" data-eid="${el.id}">↻</button><div class="resize-handle" data-resize="1"></div>`;
     }else if(el.type==='text'){
       div.innerHTML=`<div class="text-box ${selectedId===el.id?'selected':''}" style="color:${el.color}">${el.html||el.text||''}</div><button class="del-btn" data-action="del" data-eid="${el.id}">×</button><button class="edit-btn" data-action="edit" data-eid="${el.id}">✏️</button>`;
     }else if(el.type==='arrow'){
@@ -829,7 +834,6 @@ function openLegend(){
     html+=`<div class="legend-item">
       <svg viewBox="0 0 32 32" width="24" height="24" xmlns="http://www.w3.org/2000/svg">${svgContent}</svg>
       <span class="legend-label" style="color:${item.color}">${item.label}</span>
-      <span class="legend-count">×${item.count}</span>
     </div>`;
   });
   $content.innerHTML=html;
@@ -858,7 +862,6 @@ function placeLegendOnPlan(){
     const svgContent=SVG[item.svg]?.replace(/<svg[^>]*>|<\/svg>/g,'')||'';
     svgRows+=`<svg x="${padX}" y="${y}" width="${iconSz}" height="${iconSz}" viewBox="0 0 32 32">${svgContent}</svg>`;
     svgRows+=`<text x="${padX+iconSz+8}" y="${y+iconSz/2+4}" font-family="Arial,sans-serif" font-size="11" font-weight="700" fill="${item.color}">${escXml(item.label)}</text>`;
-    svgRows+=`<text x="${w-padX}" y="${y+iconSz/2+4}" text-anchor="end" font-family="Arial,sans-serif" font-size="10" fill="#666">\u00d7${item.count}</text>`;
   });
   const svgStr=`<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}">
     <rect x="0.5" y="0.5" width="${w-1}" height="${h-1}" rx="8" fill="white" stroke="#D1D5DB" stroke-width="1"/>
@@ -867,22 +870,11 @@ function placeLegendOnPlan(){
     <line x1="${padX}" y1="${titleH}" x2="${w-padX}" y2="${titleH}" stroke="#E5E7EB" stroke-width="1"/>
     ${svgRows}
   </svg>`;
-  const blob=new Blob([svgStr],{type:'image/svg+xml;charset=utf-8'});
-  const url=URL.createObjectURL(blob);
-  const img=new Image();
-  img.onload=()=>{
-    const canvas=document.createElement('canvas');
-    canvas.width=w*2;canvas.height=h*2;
-    const ctx2=canvas.getContext('2d');
-    ctx2.scale(2,2);ctx2.drawImage(img,0,0,w,h);
-    URL.revokeObjectURL(url);
-    const dataUrl=canvas.toDataURL('image/png');
-    const cx=(($area.clientWidth/2)-offX)/scale;
-    const cy=(($area.clientHeight/2)-offY)/scale;
-    elements.push({id:Date.now(),type:'legend',x:cx,y:cy,imgSrc:dataUrl,w:w,h:h});
-    selectedId=null;renderElements();
-  };
-  img.src=url;
+  const dataUrl='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svgStr);
+  const cx=(($area.clientWidth/2)-offX)/scale;
+  const cy=(($area.clientHeight/2)-offY)/scale;
+  elements.push({id:Date.now(),type:'legend',x:cx,y:cy,imgSrc:dataUrl,w:w,h:h});
+  selectedId=null;renderElements();
 }
 
 // ═══ ENREGISTRER / OUVRIR PROJET ═══
@@ -945,14 +937,13 @@ function importProject(e){
 }
 
 function captureSnapshot(){
-  const rect=$area.getBoundingClientRect();
-  const vw=rect.width,vh=rect.height;
-  const c=document.createElement('canvas');c.width=vw;c.height=vh;const ctx=c.getContext('2d');
-  const toX=px=>px*scale+offX;
-  const toY=py=>py*scale+offY;
+  const cw=Math.round(planW*scale),ch=Math.round(planH*scale);
+  const c=document.createElement('canvas');c.width=cw;c.height=ch;const ctx=c.getContext('2d');
+  const toX=px=>px*scale;
+  const toY=py=>py*scale;
   const finish=()=>{
     // Draw paths on offscreen canvas (so eraser only affects strokes, not plan)
-    const oc=document.createElement('canvas');oc.width=vw;oc.height=vh;const octx=oc.getContext('2d');
+    const oc=document.createElement('canvas');oc.width=cw;oc.height=ch;const octx=oc.getContext('2d');
     for(const p of drawPaths){octx.save();octx.beginPath();octx.lineCap='round';octx.lineJoin='round';if(p.color==='eraser'){octx.globalCompositeOperation='destination-out';octx.lineWidth=p.size*scale*3;}else{octx.globalCompositeOperation='source-over';octx.globalAlpha=p.opacity!=null?p.opacity:1;octx.strokeStyle=p.color;octx.lineWidth=p.size*scale;}for(let i=0;i<p.points.length;i++){if(i===0)octx.moveTo(toX(p.points[i].x),toY(p.points[i].y));else octx.lineTo(toX(p.points[i].x),toY(p.points[i].y));}octx.stroke();octx.restore();}
     ctx.drawImage(oc,0,0);
     // Render arrows
@@ -1049,7 +1040,7 @@ function captureSnapshot(){
       const blob=new Blob([svgStr],{type:'image/svg+xml'});
       const url=URL.createObjectURL(blob);
       const img=new Image();
-      img.onload=()=>{const dx=toX(el.x),dy=toY(el.y);const rot=(el.rotation||0)*Math.PI/180;if(rot){ctx.save();ctx.translate(dx,dy);ctx.rotate(rot);ctx.drawImage(img,-sz/2,-sz/2,sz,sz);ctx.restore();}else{ctx.drawImage(img,dx-sz/2,dy-sz/2,sz,sz);}URL.revokeObjectURL(url);check();};
+      img.onload=()=>{const dx=toX(el.x),dy=toY(el.y);const rot=(el.rotation||0)*Math.PI/180;const iw=sz,ih=Math.round(sz*(img.naturalHeight||img.height)/(img.naturalWidth||img.width))||sz;if(rot){ctx.save();ctx.translate(dx,dy);ctx.rotate(rot);ctx.drawImage(img,-iw/2,-ih/2,iw,ih);ctx.restore();}else{ctx.drawImage(img,dx-iw/2,dy-ih/2,iw,ih);}URL.revokeObjectURL(url);check();};
       img.src=url;
     });
     legendEls.forEach(el=>{
@@ -1059,9 +1050,8 @@ function captureSnapshot(){
       img.src=el.imgSrc;
     });
   };
-  // Background + plan image at screen position
-  ctx.fillStyle='#F5F5F5';ctx.fillRect(0,0,vw,vh);
-  if(planImgSrc){const img=new Image();img.crossOrigin='anonymous';img.onload=()=>{ctx.drawImage(img,offX,offY,planW*scale,planH*scale);finish();};img.src=planImgSrc;}else{finish();}
+  // Plan image filling the entire canvas (cropped to plan area)
+  if(planImgSrc){const img=new Image();img.crossOrigin='anonymous';img.onload=()=>{ctx.drawImage(img,0,0,cw,ch);finish();};img.src=planImgSrc;}else{ctx.fillStyle='#FFFFFF';ctx.fillRect(0,0,cw,ch);finish();}
 }
 function closeSnapshot(){document.getElementById('snapshot-modal').classList.remove('open');}
 
