@@ -214,6 +214,60 @@
   #photo-lightbox .lb-name{color:#fff;font-size:14px;font-weight:700;text-align:center}
   #photo-lightbox .lb-close{position:absolute;top:16px;right:20px;background:var(--red);color:#fff;border:none;border-radius:50%;width:44px;height:44px;font-size:22px;font-weight:800;cursor:pointer;box-shadow:0 4px 16px rgba(217,64,64,0.4);display:flex;align-items:center;justify-content:center}
 
+  /* ═══ SONDAGES ═══ */
+  #sondage-type-modal{position:fixed;inset:0;background:rgba(0,0,0,0.7);display:none;align-items:center;justify-content:center;z-index:950;backdrop-filter:blur(4px)}
+  #sondage-type-modal.open{display:flex}
+  #sondage-type-inner{background:var(--white);border-radius:var(--radius-lg);padding:28px;width:460px;max-width:92vw;box-shadow:var(--shadow-lg);border-top:4px solid var(--yellow);max-height:90vh;overflow-y:auto}
+  #sondage-type-inner h2{font-size:18px;font-weight:900;color:var(--black);margin:0 0 16px}
+  .sondage-type-btn{width:100%;padding:14px 16px;border:2px solid var(--gray-200);border-radius:var(--radius);background:var(--white);font-size:13px;font-weight:800;font-family:inherit;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:10px;margin-bottom:8px;color:var(--black)}
+  .sondage-type-btn:hover,.sondage-type-btn:active{border-color:var(--yellow);background:var(--yellow-pale)}
+  .sondage-type-icon{font-size:20px}
+  .sondage-list-title{font-size:12px;font-weight:800;color:var(--gray-500);text-transform:uppercase;letter-spacing:.04em;margin:16px 0 8px;padding-top:12px;border-top:2px solid var(--gray-100)}
+  .sondage-list-item{display:flex;align-items:center;justify-content:space-between;padding:8px 10px;border:1px solid var(--gray-200);border-radius:var(--radius);margin-bottom:4px;font-size:12px;font-weight:700;cursor:pointer;transition:all .15s}
+  .sondage-list-item:hover{border-color:var(--yellow);background:var(--yellow-pale)}
+  .sondage-list-item .sondage-list-del{background:none;border:none;font-size:14px;cursor:pointer;padding:2px 6px;border-radius:4px;opacity:.5}
+  .sondage-list-item .sondage-list-del:hover{opacity:1;background:var(--red);color:#fff}
+  #sondage-edit-modal{position:fixed;inset:0;background:var(--white);z-index:970;display:none;flex-direction:column}
+  #sondage-edit-modal.open{display:flex}
+  #sondage-edit-header{display:flex;align-items:center;justify-content:space-between;padding:10px 18px;background:var(--black);border-bottom:3px solid var(--yellow);flex-shrink:0;gap:10px}
+  #sondage-edit-header>span{font-weight:800;font-size:14px;color:var(--yellow);white-space:nowrap}
+  #sondage-edit-header .se-actions{display:flex;align-items:center;gap:8px}
+  #sondage-name{padding:6px 10px;border:2px solid var(--gray-700);border-radius:var(--radius);font-size:13px;font-weight:700;font-family:inherit;color:var(--yellow);background:var(--black-soft);outline:none;width:120px}
+  #sondage-name:focus{border-color:var(--yellow)}
+  #sondage-name::placeholder{color:var(--gray-500)}
+  .se-btn{padding:6px 14px;border:none;border-radius:var(--radius);font-size:12px;font-weight:800;font-family:inherit;cursor:pointer;transition:all .2s}
+  .se-btn-save{background:var(--yellow);color:var(--black)}
+  .se-btn-save:hover{background:var(--yellow-light)}
+  .se-btn-export{background:var(--blue);color:#fff}
+  .se-btn-export:hover{filter:brightness(1.15)}
+  .se-btn-close{background:none;color:#fff;font-size:20px;padding:2px 8px}
+  .se-btn-close:hover{background:rgba(255,255,255,0.15)}
+  #sondage-edit-body{display:flex;flex:1;overflow:hidden}
+  #sondage-table-wrap{width:340px;min-width:260px;overflow-y:auto;padding:12px;border-right:2px solid var(--gray-100);flex-shrink:0}
+  #sondage-graph-wrap{flex:1;overflow:auto;padding:16px;display:flex;align-items:flex-start;justify-content:center;background:var(--gray-50)}
+  .sondage-table{width:100%;border-collapse:collapse;font-size:11px}
+  .sondage-table th{background:var(--black);color:var(--yellow);padding:6px 4px;font-weight:800;font-size:10px;text-transform:uppercase;letter-spacing:.03em;position:sticky;top:0;z-index:2}
+  .sondage-table td{padding:2px 3px;border-bottom:1px solid var(--gray-100);text-align:center}
+  .sondage-table tr:hover{background:var(--yellow-pale)}
+  .sondage-table input[type="number"]{width:100%;padding:4px 2px;border:1px solid var(--gray-200);border-radius:4px;font-size:12px;font-weight:700;font-family:inherit;text-align:center;outline:none;box-sizing:border-box}
+  .sondage-table input[type="number"]:focus{border-color:var(--yellow);background:var(--yellow-pale)}
+  .sondage-table input[type="text"]{width:100%;padding:4px 4px;border:1px solid var(--gray-200);border-radius:4px;font-size:11px;font-weight:600;font-family:inherit;outline:none;box-sizing:border-box}
+  .sondage-table input[type="text"]:focus{border-color:var(--yellow);background:var(--yellow-pale)}
+  .sondage-table select{width:100%;padding:3px 2px;border:1px solid var(--gray-200);border-radius:4px;font-size:11px;font-weight:600;font-family:inherit;outline:none;background:var(--white)}
+  .sondage-table select:focus{border-color:var(--yellow)}
+  .sondage-table .depth-cell{font-weight:800;color:var(--black);font-size:11px;background:var(--gray-50)}
+  .sondage-table .refus-row{background:rgba(217,64,64,0.08)}
+  .sondage-table .refus-row td{color:var(--red);font-weight:800}
+  .sondage-add-row{margin-top:8px;display:flex;gap:6px}
+  .sondage-add-row button{flex:1;padding:8px;border:2px dashed var(--gray-200);border-radius:var(--radius);background:var(--white);font-size:11px;font-weight:800;font-family:inherit;cursor:pointer;color:var(--gray-500);transition:all .2s}
+  .sondage-add-row button:hover{border-color:var(--yellow);color:var(--black);background:var(--yellow-pale)}
+  .sondage-notes{width:100%;margin-top:10px;padding:6px 8px;border:1px solid var(--gray-200);border-radius:6px;font-size:11px;font-family:inherit;resize:vertical;min-height:40px;outline:none}
+  .sondage-notes:focus{border-color:var(--yellow)}
+  .fondation-form{display:flex;flex-direction:column;gap:10px;padding:4px 0}
+  .fondation-form label{font-size:11px;font-weight:800;color:var(--black);display:flex;flex-direction:column;gap:3px}
+  .fondation-form select,.fondation-form input,.fondation-form textarea{padding:6px 8px;border:1px solid var(--gray-200);border-radius:6px;font-size:12px;font-weight:600;font-family:inherit;outline:none}
+  .fondation-form select:focus,.fondation-form input:focus,.fondation-form textarea:focus{border-color:var(--yellow);background:var(--yellow-pale)}
+
   #camera-overlay{position:fixed;inset:0;background:#000;z-index:9999;display:none;flex-direction:column;align-items:center;justify-content:center}
   #camera-overlay.open{display:flex}
   #camera-video{width:100%;max-height:80vh;object-fit:contain}
@@ -516,7 +570,8 @@
     <div style="flex:1"></div>
     <div class="tool-sep"></div>
     <button class="tool-btn" onclick="togglePhotoSection()"><span class="icon">📸</span><span class="label">Photos</span></button>
-    <button class="tool-btn" onclick="openScan3D()"><span class="icon">📡</span><span class="label">Scan 3D</span></button>
+    <button class="tool-btn" onclick="openSondageTypeModal()"><span class="icon" style="display:inline-flex"><svg viewBox="0 0 32 32" width="17" height="17" fill="none"><rect x="14" y="2" width="4" height="20" rx="1" fill="#D94040"/><polygon points="16,28 12,22 20,22" fill="#D94040"/><line x1="10" y1="6" x2="22" y2="6" stroke="#D94040" stroke-width="2"/><circle cx="16" cy="4" r="2" fill="#F2B705"/></svg></span><span class="label">Sondages</span></button>
+    <button class="tool-btn" onclick="openScan3D()"><span class="icon">📡</span><span class="label">3D</span></button>
   </div>
   <div id="toolbar-options">
     <div id="color-options" class="sub-options" style="display:none"></div>
@@ -766,6 +821,34 @@
       </div>
     </div>
   </div>
+  <div id="sondage-type-modal">
+    <div id="sondage-type-inner">
+      <h2>🔬 Sondages</h2>
+      <button class="sondage-type-btn" onclick="newSondage('penetro_dyn')"><span class="sondage-type-icon">🔴</span> Pénétromètre Dynamique</button>
+      <button class="sondage-type-btn" onclick="newSondage('penetro_stat')"><span class="sondage-type-icon">🔵</span> Pénétromètre Statique</button>
+      <button class="sondage-type-btn" onclick="newSondage('tariere')"><span class="sondage-type-icon">⚫</span> Sondage à la Tarière</button>
+      <button class="sondage-type-btn" onclick="newSondage('pelle_meca')"><span class="sondage-type-icon">🟡</span> Sondage à la Pelle Mécanique</button>
+      <button class="sondage-type-btn" onclick="newSondage('fondation')"><span class="sondage-type-icon">🏗️</span> Reconnaissance de Fondation</button>
+      <div id="sondage-existing-list"></div>
+      <button class="img-choice-cancel" onclick="closeSondageTypeModal()">Fermer</button>
+    </div>
+  </div>
+  <div id="sondage-edit-modal">
+    <div id="sondage-edit-header">
+      <span id="sondage-edit-title">🔬 Sondage</span>
+      <div class="se-actions">
+        <input type="text" id="sondage-name" placeholder="Nom (ex: PD1)">
+        <button class="se-btn se-btn-save" onclick="saveSondage()">💾 Enregistrer</button>
+        <button class="se-btn" onclick="linkSondagePhoto()" style="background:#4CAF50;color:#fff">📸 Photo</button>
+        <button class="se-btn se-btn-export" onclick="exportSondageGraph()">📌 Coller sur le plan</button>
+        <button class="se-btn se-btn-close" onclick="closeSondageEdit()">✕</button>
+      </div>
+    </div>
+    <div id="sondage-edit-body">
+      <div id="sondage-table-wrap"></div>
+      <div id="sondage-graph-wrap"><canvas id="sondage-canvas"></canvas></div>
+    </div>
+  </div>
 </div>
 <script>
 pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
@@ -900,6 +983,7 @@ let elements=[],selectedId=null,selectedStickerId=null;
 let drawColor='#1A1A1A',brushSize=4,drawOpacity=1,eraserSize=20,mrPropreSize=30,textColor='#1A1A1A';
 let drawPaths=[],cleanPaths=[],currentPathPts=[],isDrawing=false,photos=[],cameraStream=null;
 let savedFileHandle=null,autoSaveInterval=null;
+let sondages=[],editingSondageId=null,editingSondageType=null;
 let czPoints=[],czPreview=null;
 let teEditingId=null,teOriginX=0,teOriginY=0;
 let arrowStartPt=null,arrowPreviewEnd=null,arrowDoubleHead=false;
@@ -1207,7 +1291,15 @@ function renderElements(){
         const svgH=(vbW!==vbH)?Math.round(sz*vbH/vbW):Math.round(sz*1.2);
         const gLocked2=el.groupId&&el.groupLocked;
         const lockBtn2=el.groupId?`<button class="lock-btn${gLocked2?'':' unlocked'}" data-action="toggleLock" data-eid="${el.id}" title="${gLocked2?'Déverrouiller':'Verrouiller'} le groupe">${gLocked2?'🔒':'🔓'}</button>`:'';
-        div.innerHTML=`<div class="sticker-wrap" style="transform:rotate(${rot}deg)"><div class="sticker-icon ${selectedId===el.id?'selected':''}" style="padding:${Math.round(4*ss)}px${noBg?';background:none;box-shadow:none':''}"><svg viewBox="${vb}" width="${sz}" height="${svgH}" xmlns="http://www.w3.org/2000/svg">${svgInner}</svg></div></div><button class="del-btn" data-action="del" data-eid="${el.id}">×</button>${lockBtn2}<button class="rotate-btn" data-action="rotate" data-eid="${el.id}">↻</button><div class="resize-handle" data-resize="1"></div>`;
+        let stickerLabel='';
+        const sondageBtn=el.sondageId?`<button class="edit-btn" data-action="openSondage" data-eid="${el.id}" title="Ouvrir la fiche sondage">📋</button>`:'';
+        if(el.sondageId&&el.label){
+          const sLk=sondages.find(x=>x.id===el.sondageId);
+          const altTxt=sLk&&sLk.tnAltitude!=null?' <span style="color:#1A1A1A;font-weight:600">('+sLk.tnAltitude.toFixed(2)+')</span>':'';
+          const lfs=Math.max(10,Math.round(10*ss));
+          stickerLabel=`<div style="margin-bottom:2px;font-size:${lfs}px;font-weight:700;color:${el.color||'#1A1A1A'};text-align:center;white-space:nowrap;text-shadow:0 0 3px #fff,0 0 3px #fff,0 0 3px #fff">${escXml(el.label)}${altTxt}</div>`;
+        }
+        div.innerHTML=`<div class="sticker-wrap" style="transform:rotate(${rot}deg)">${stickerLabel}<div class="sticker-icon ${selectedId===el.id?'selected':''}" style="padding:${Math.round(4*ss)}px${noBg?';background:none;box-shadow:none':''}"><svg viewBox="${vb}" width="${sz}" height="${svgH}" xmlns="http://www.w3.org/2000/svg">${svgInner}</svg></div></div><button class="del-btn" data-action="del" data-eid="${el.id}">×</button>${sondageBtn}${lockBtn2}<button class="rotate-btn" data-action="rotate" data-eid="${el.id}">↻</button><div class="resize-handle" data-resize="1"></div>`;
       }
     }else if(el.type==='text'){
       const bStyle=el.bordered?`;border:2px solid ${el.color};border-radius:4px`:'';
@@ -1259,6 +1351,7 @@ function renderElements(){
         else if(action==='duplicate') duplicateElement(eid);
         else if(action==='toggleLock') toggleGroupLock(eid);
         else if(action==='editImage') editImageOnPlan(eid);
+        else if(action==='openSondage'){const sEl=elements.find(e=>e.id===eid);if(sEl&&sEl.sondageId)editSondage(sEl.sondageId);}
         else if(action==='rotate'){
           const rel=elements.find(x=>x.id===eid);if(!rel)return;
           const idx2=elements.indexOf(rel);
@@ -1393,7 +1486,13 @@ function renderElements(){
       else if(f==='opacity'){ae.opacity=Math.min(100,Math.max(10,+inp.value))/100;}
       renderElements();
     });}
-    if(el.type==='sticker'&&el.isText){
+    if(el.type==='sticker'&&el.sondageId){
+      div.addEventListener('dblclick',ev=>{
+        ev.stopPropagation();ev.preventDefault();
+        editSondage(el.sondageId);
+      });
+    }
+    else if(el.type==='sticker'&&el.isText){
       div.addEventListener('dblclick',ev=>{
         ev.stopPropagation();ev.preventDefault();
         if(el.groupId&&el.groupLocked)return;
@@ -1727,7 +1826,7 @@ function buildProjectJSON(){
     planW:planW,
     planH:planH,
     elements:elements.map(el=>{
-      if(el.type==='sticker'){const o={type:'sticker',x:el.x,y:el.y,svgKey:el.svgKey,label:el.label,color:el.color,sScale:el.sScale||1,rotation:el.rotation||0};if(el.isText)o.isText=true;if(el.noBorder)o.noBorder=true;if(el.noLegend)o.noLegend=true;if(el.underline)o.underline=true;if(el.groupId)o.groupId=el.groupId;if(el.groupLocked)o.groupLocked=true;if(el.isShape){o.isShape=true;o.shapeType=el.shapeType;o.filled=!!el.filled;o.shapeW=el.shapeW;o.shapeH=el.shapeH;o.strokeWidth=el.strokeWidth||2;o.opacity=el.opacity!=null?el.opacity:1;if(el.fillColor)o.fillColor=el.fillColor;}return o;}
+      if(el.type==='sticker'){const o={type:'sticker',x:el.x,y:el.y,svgKey:el.svgKey,label:el.label,color:el.color,sScale:el.sScale||1,rotation:el.rotation||0};if(el.isText)o.isText=true;if(el.noBorder)o.noBorder=true;if(el.noLegend)o.noLegend=true;if(el.underline)o.underline=true;if(el.groupId)o.groupId=el.groupId;if(el.groupLocked)o.groupLocked=true;if(el.sondageId)o.sondageId=el.sondageId;if(el.isShape){o.isShape=true;o.shapeType=el.shapeType;o.filled=!!el.filled;o.shapeW=el.shapeW;o.shapeH=el.shapeH;o.strokeWidth=el.strokeWidth||2;o.opacity=el.opacity!=null?el.opacity:1;if(el.fillColor)o.fillColor=el.fillColor;}return o;}
       if(el.type==='text'){const o={type:'text',x:el.x,y:el.y,html:el.html||'',text:el.text||'',color:el.color};if(el.bordered)o.bordered=true;return o;}
       if(el.type==='arrow')return{type:'arrow',x:el.x,y:el.y,x2:el.x2,y2:el.y2,color:el.color,doubleHead:el.doubleHead||false,lineOnly:el.lineOnly||false,dashed:el.dashed||false,opacity:el.opacity!=null?el.opacity:1,strokeWidth:el.strokeWidth||2};
       if(el.type==='legend')return{type:'legend',x:el.x,y:el.y,imgSrc:el.imgSrc,w:el.w,h:el.h};
@@ -1736,7 +1835,8 @@ function buildProjectJSON(){
     }),
     drawPaths:drawPaths,
     cleanPaths:cleanPaths,
-    photos:photos.map(p=>({dataUrl:p.dataUrl,timestamp:p.timestamp||'',name:p.name||'',checked:!!p.checked}))
+    photos:photos.map(p=>({dataUrl:p.dataUrl,timestamp:p.timestamp||'',name:p.name||'',checked:!!p.checked})),
+    sondages:sondages.map(s=>({...s}))
   };
   if(window.getScan3DExportData){
     const s3d=window.getScan3DExportData();
@@ -1812,7 +1912,7 @@ async function closeProject(){
   // Réinitialiser toutes les données
   elements=[];selectedId=null;selectedStickerId=null;
   drawPaths=[];cleanPaths=[];currentPathPts=[];
-  photos=[];
+  photos=[];sondages=[];
   planImgSrc='';planW=1200;planH=800;
   document.getElementById('project-ref').value='';
   // Masquer le plan
@@ -1832,6 +1932,8 @@ async function closeProject(){
   // Fermer panels ouverts
   document.getElementById('photo-section').classList.remove('open');
   document.getElementById('mep-panel').classList.remove('open');
+  document.getElementById('sondage-type-modal').classList.remove('open');
+  document.getElementById('sondage-edit-modal').classList.remove('open');
   const st=document.getElementById('shape-toolbar');if(st)st.classList.remove('open');
   // Réinitialiser scan 3D
   if(window.importScan3DFromProject) window.importScan3DFromProject(null);
@@ -1873,6 +1975,8 @@ function importProject(e){
       // Restore photos
       if(project.photos)photos=project.photos.map(p=>({dataUrl:p.dataUrl||p.src||'',timestamp:p.timestamp||'',name:p.name||'',checked:p.checked!==false}));
       renderPhotos();
+      // Restore sondages
+      if(project.sondages)sondages=project.sondages;
       // Restore scan 3D data
       if(window.importScan3DFromProject) window.importScan3DFromProject(project.scan3d||null);
       selectedId=null;
@@ -2044,7 +2148,9 @@ function renderPlanToCanvas(cb){
         const blob=new Blob([svgStr],{type:'image/svg+xml'});
         const url=URL.createObjectURL(blob);
         const img=new Image();
-        img.onload=()=>{const dx=toX(el.x),dy=toY(el.y);const rot=(el.rotation||0)*Math.PI/180;const iw=sz,ih=Math.round(sz*(img.naturalHeight||img.height)/(img.naturalWidth||img.width))||sz;if(rot){ctx.save();ctx.translate(dx,dy);ctx.rotate(rot);ctx.drawImage(img,-iw/2,-ih/2,iw,ih);ctx.restore();}else{ctx.drawImage(img,dx-iw/2,dy-ih/2,iw,ih);}URL.revokeObjectURL(url);check();};
+        img.onload=()=>{const dx=toX(el.x),dy=toY(el.y);const rot=(el.rotation||0)*Math.PI/180;const iw=sz,ih=Math.round(sz*(img.naturalHeight||img.height)/(img.naturalWidth||img.width))||sz;
+        const drawSondageLabel=(cx,cy)=>{if(!el.sondageId||!el.label)return;const sLk=sondages.find(x=>x.id===el.sondageId);const altTxt=sLk&&sLk.tnAltitude!=null?' ('+sLk.tnAltitude.toFixed(2)+')':'';const fullTxt=el.label+altTxt;const lfs=Math.max(10,Math.round(10*ss));ctx.font=`700 ${lfs}px Arial,sans-serif`;ctx.textAlign='center';ctx.textBaseline='bottom';ctx.strokeStyle='#fff';ctx.lineWidth=3;ctx.strokeText(el.label,cx,cy-ih/2-2);ctx.fillStyle=el.color||'#1A1A1A';ctx.fillText(el.label,cx,cy-ih/2-2);if(altTxt){const nameW=ctx.measureText(el.label).width;ctx.font=`600 ${lfs}px Arial,sans-serif`;ctx.fillStyle='#1A1A1A';const altX=cx+nameW/2+2;ctx.textAlign='left';ctx.strokeStyle='#fff';ctx.lineWidth=3;ctx.strokeText(altTxt,altX,cy-ih/2-2);ctx.fillStyle='#1A1A1A';ctx.fillText(altTxt,altX,cy-ih/2-2);}};
+        if(rot){ctx.save();ctx.translate(dx,dy);ctx.rotate(rot);ctx.drawImage(img,-iw/2,-ih/2,iw,ih);drawSondageLabel(0,0);ctx.restore();}else{ctx.drawImage(img,dx-iw/2,dy-ih/2,iw,ih);drawSondageLabel(dx,dy);}URL.revokeObjectURL(url);check();};
         img.src=url;
       }
     });
@@ -2498,6 +2604,19 @@ function confirmPhotoName(){
   pendingPhotoDataUrl=null;pendingPhotoImg=null;
   document.getElementById('photo-name-modal').classList.remove('open');
   renderPhotos();
+  // Si on venait d'un sondage (callback photo), lier la photo et rouvrir le sondage
+  if(sondagePhotoCallback){
+    const sId=sondagePhotoCallback;sondagePhotoCallback=null;
+    const s=sondages.find(x=>x.id===sId);
+    if(s){
+      const idx=photos.length-1;
+      s.photoIndex=idx;
+      photos[idx].name=s.name;
+      renderPhotos();
+      editingSondageId=s.id;editingSondageType=s.type;
+      openSondageEdit(s);
+    }
+  }
 }
 
 function cancelPhotoName(){editingImageId=null;pendingPhotoDataUrl=null;pendingPhotoImg=null;document.getElementById('photo-name-modal').classList.remove('open');}
@@ -2535,6 +2654,675 @@ function closeLightbox(){document.getElementById('photo-lightbox').classList.rem
 document.getElementById('photo-lightbox').addEventListener('click',ev=>{if(ev.target.id==='photo-lightbox')closeLightbox();});
 document.addEventListener('keydown',ev=>{if(ev.key==='Escape'&&document.getElementById('photo-lightbox').classList.contains('open'))closeLightbox();});
 function togglePhotoSection(){document.getElementById('photo-section').classList.toggle('open');}
+
+// ═══ SONDAGES GÉOTECHNIQUES ═══
+const SOIL_TYPES={
+  terre_vegetale:{label:'Terre végétale',color:'#8B6914'},
+  remblai:{label:'Remblais',color:'#6C3483'},
+  argile:{label:'Argile',color:'#C0392B'},
+  limon:{label:'Limon',color:'#E67E22'},
+  sable:{label:'Sable',color:'#F1C40F'},
+  gravier:{label:'Gravier',color:'#95A5A6'},
+  marne:{label:'Marne',color:'#7D8B99'},
+  calcaire:{label:'Calcaire',color:'#ECF0F1'},
+  roche:{label:'Roche',color:'#566573'},
+  tourbe:{label:'Tourbe',color:'#1B4F08'},
+  craie:{label:'Craie',color:'#FDFEFE'},
+  gres:{label:'Grès',color:'#B7950B'},
+  schiste:{label:'Schiste',color:'#4A235A'}
+};
+const SONDAGE_LABELS={'penetro_dyn':'Pénétromètre Dynamique','penetro_stat':'Pénétromètre Statique','tariere':'Sondage à la Tarière','pelle_meca':'Sondage Pelle Mécanique','fondation':'Reconnaissance de Fondation'};
+const SONDAGE_ICONS={'penetro_dyn':'🔴','penetro_stat':'🔵','tariere':'⚫','pelle_meca':'🟡','fondation':'🏗️'};
+const FONDATION_TYPES=[{v:'semelle_filante',l:'Semelle filante'},{v:'semelle_isolee',l:'Semelle isolée'},{v:'radier',l:'Radier'},{v:'puits',l:'Puits'},{v:'pieux',l:'Pieux'},{v:'micropieux',l:'Micropieux'},{v:'autre',l:'Autre'}];
+const FONDATION_STATES=[{v:'bon',l:'Bon état'},{v:'moyen',l:'État moyen'},{v:'degrade',l:'Dégradé'},{v:'tres_degrade',l:'Très dégradé'}];
+
+function openSondageTypeModal(){
+  renderSondageList();
+  document.getElementById('sondage-type-modal').classList.add('open');
+}
+function closeSondageTypeModal(){document.getElementById('sondage-type-modal').classList.remove('open');}
+
+function renderSondageList(){
+  const $list=document.getElementById('sondage-existing-list');
+  if(sondages.length===0){$list.innerHTML='';return;}
+  $list.innerHTML=`<div class="sondage-list-title">Sondages existants (${sondages.length})</div>`+
+    sondages.map(s=>{
+      const hasSticker=s.stickerId&&elements.find(e=>e.id===s.stickerId);
+      const hasPhoto=s.photoIndex!=null&&s.photoIndex>=0&&s.photoIndex<photos.length;
+      const badges=(hasSticker?' <span title="Repère sur le plan" style="color:#4CAF50;font-size:11px">📍✓</span>':'')+(hasPhoto?' <span title="Photo associée" style="color:#4CAF50;font-size:11px">📸✓</span>':'');
+      return `<div class="sondage-list-item" onclick="editSondage(${s.id})">
+      <span>${SONDAGE_ICONS[s.type]||'🔬'} <b>${s.name||'Sans nom'}</b> — ${SONDAGE_LABELS[s.type]} — ${s.depth?s.depth+'m':'?'} ${s.date?'— '+s.date:''}${badges}</span>
+      <button class="sondage-list-del" onclick="event.stopPropagation();deleteSondage(${s.id})" title="Supprimer">🗑️</button>
+    </div>`;
+    }).join('');
+}
+
+const SONDAGE_SVG_MAP={'penetro_dyn':'penetro_dyn','penetro_stat':'penetro_stat','tariere':'tariere','pelle_meca':'pelle_meca','fondation':'regard'};
+const SONDAGE_COLOR_MAP={'penetro_dyn':'#D94040','penetro_stat':'#3D7AB5','tariere':'#4A4A4A','pelle_meca':'#F2B705','fondation':'#7A7A7A'};
+
+function newSondage(type){
+  closeSondageTypeModal();
+  const count=sondages.length+1;
+  const now=Date.now();
+  const s={
+    id:now,type:type,
+    name:'D'+count,
+    date:new Date().toLocaleDateString('fr-FR'),
+    depth:0,data:[],notes:'',
+    refusal:false,waterLevel:null,
+    tnAltitude:null,
+    stickerId:null,photoIndex:null
+  };
+  if(type==='penetro_dyn'){
+    for(let i=1;i<=40;i++) s.data.push({depth:+(i*0.20).toFixed(2),blows:null});
+  }else if(type==='penetro_stat'){
+    for(let i=1;i<=40;i++) s.data.push({depth:+(i*0.20).toFixed(2),qc:null,fs:null});
+  }else if(type==='tariere'||type==='pelle_meca'){
+    s.data.push({from:0.00,to:0.30,nature:'terre_vegetale',description:'Terre végétale'});
+  }else if(type==='fondation'){
+    s.data={fondationType:'semelle_filante',depth:0,dimensions:'',state:'bon',description:''};
+  }
+  // Placer un repère (sticker) automatiquement sur le plan
+  const stickerId=now+1;
+  const nel={id:stickerId,type:'sticker',x:(planW||1200)/2,y:(planH||800)/2,svgKey:SONDAGE_SVG_MAP[type]||'penetro_dyn',label:s.name,color:SONDAGE_COLOR_MAP[type]||'#D94040',sScale:1.8,sondageId:s.id};
+  elements.push(nel);
+  s.stickerId=stickerId;
+  renderElements();
+  sondages.push(s);
+  editingSondageId=s.id;editingSondageType=type;
+  openSondageEdit(s);
+}
+
+function editSondage(id){
+  const s=sondages.find(x=>x.id===id);if(!s)return;
+  closeSondageTypeModal();
+  editingSondageId=s.id;editingSondageType=s.type;
+  openSondageEdit(s);
+}
+
+function deleteSondage(id){
+  if(!confirm('Supprimer ce sondage ?'))return;
+  const s=sondages.find(x=>x.id===id);
+  if(s&&s.stickerId){elements=elements.filter(e=>e.id!==s.stickerId);renderElements();}
+  sondages=sondages.filter(s=>s.id!==id);
+  renderSondageList();
+}
+
+function openSondageEdit(s){
+  document.getElementById('sondage-edit-title').textContent=(SONDAGE_ICONS[s.type]||'🔬')+' '+SONDAGE_LABELS[s.type];
+  document.getElementById('sondage-name').value=s.name||'';
+  document.getElementById('sondage-edit-modal').classList.add('open');
+  renderSondageContent(s);
+}
+
+function closeSondageEdit(){
+  saveSondageFromUI();
+  document.getElementById('sondage-edit-modal').classList.remove('open');
+  editingSondageId=null;editingSondageType=null;
+}
+
+function getCurrentSondage(){return sondages.find(s=>s.id===editingSondageId);}
+
+function saveSondageFromUI(){
+  const s=getCurrentSondage();if(!s)return;
+  const oldName=s.name;
+  s.name=document.getElementById('sondage-name').value.trim()||s.name;
+  // Données lues depuis le tableau en temps réel (déjà modifiées par oninput)
+  // Calculer la profondeur max
+  if(s.type==='penetro_dyn'){
+    const last=s.data.filter(d=>d.blows!=null&&d.blows>=0);
+    s.depth=last.length>0?last[last.length-1].depth:0;
+  }else if(s.type==='penetro_stat'){
+    const last=s.data.filter(d=>d.qc!=null);
+    s.depth=last.length>0?last[last.length-1].depth:0;
+  }else if(s.type==='tariere'||s.type==='pelle_meca'){
+    s.depth=s.data.length>0?Math.max(...s.data.map(d=>d.to||0)):0;
+  }else if(s.type==='fondation'){
+    s.depth=s.data.depth||0;
+  }
+  const notesEl=document.querySelector('.sondage-notes');
+  if(notesEl)s.notes=notesEl.value;
+  // Synchroniser le nom avec le sticker et la photo liés
+  if(s.name!==oldName){
+    if(s.stickerId){const el=elements.find(e=>e.id===s.stickerId);if(el)el.label=s.name;renderElements();}
+    if(s.photoIndex!=null&&s.photoIndex>=0&&s.photoIndex<photos.length){photos[s.photoIndex].name=s.name;renderPhotos();}
+  }
+}
+
+function saveSondage(){
+  saveSondageFromUI();
+  alert('Sondage enregistré !');
+}
+
+function renderSondageContent(s){
+  const $table=document.getElementById('sondage-table-wrap');
+  const $graph=document.getElementById('sondage-graph-wrap');
+  if(s.type==='penetro_dyn'){renderPenetroDynTable(s,$table);renderPenetroDynGraph(s);}
+  else if(s.type==='penetro_stat'){renderPenetroStatTable(s,$table);renderPenetroStatGraph(s);}
+  else if(s.type==='tariere'||s.type==='pelle_meca'){renderStratiTable(s,$table);renderStratiGraph(s);}
+  else if(s.type==='fondation'){renderFondationForm(s,$table);renderFondationSummary(s);}
+}
+
+// ─── PÉNÉTROMÈTRE DYNAMIQUE ───
+function calcQd(blows,depth){
+  // Formule des Hollandais — NF P 94-115 / Eurocode 7
+  // qd = M² × g × H / (A × e × (M + P))
+  // PDA: M=64kg, H=0.75m, A=16cm²=0.0016m², tiges≈7kg/m, tête≈18kg
+  if(!blows||blows<=0)return null;
+  const M=64,g=9.81,H=0.75,A=0.0016;
+  const e=0.20/blows; // enfoncement moyen par coup (m)
+  const P=18+7*depth;  // masse frappée = tête(18kg) + tiges(7kg/m × prof)
+  const qd=(M*M*g*H)/(A*e*(M+P));
+  return qd/1e6; // Pa → MPa
+}
+
+function renderPenetroDynTable(s,$wrap){
+  const tnVal=s.tnAltitude!=null?s.tnAltitude:'';
+  let html=`<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;padding:4px 8px;background:#F5F5F5;border-radius:6px">
+    <label style="font-weight:600;font-size:12px;white-space:nowrap">Altitude TN (m NGF) :</label>
+    <input type="number" step="0.01" value="${tnVal}" placeholder="Ex: 125.30" style="width:110px;padding:4px 6px;border:1px solid #ccc;border-radius:4px;font-size:12px" oninput="sondageTnInput(this.value)">
+  </div>`;
+  html+=`<table class="sondage-table"><thead><tr><th>Prof. (m)</th><th>N (coups)</th><th>qd (MPa)</th></tr></thead><tbody>`;
+  s.data.forEach((d,i)=>{
+    const isRefus=s.refusal&&i===s.data.findIndex(x=>x.blows!=null&&x.blows>=100);
+    const qd=calcQd(d.blows,d.depth);
+    const qdStr=qd!=null?qd.toFixed(2):'—';
+    html+=`<tr class="${isRefus?'refus-row':''}"><td class="depth-cell">${d.depth.toFixed(2)}</td>
+    <td><input type="number" min="0" max="999" value="${d.blows!=null?d.blows:''}" placeholder="—"
+      oninput="sondageDynInput(${i},this.value)"></td>
+    <td style="text-align:center;font-size:11px;color:#555;font-weight:600">${qdStr}</td></tr>`;
+  });
+  html+=`</tbody></table>`;
+  html+=`<div class="sondage-add-row"><button onclick="toggleRefusal()">🛑 ${s.refusal?'Annuler le refus':'Marquer Refus'}</button></div>`;
+  html+=`<textarea class="sondage-notes" placeholder="Observations...">${s.notes||''}</textarea>`;
+  $wrap.innerHTML=html;
+}
+
+function sondageTnInput(val){
+  const s=getCurrentSondage();if(!s)return;
+  s.tnAltitude=val===''?null:parseFloat(val);
+  renderPenetroDynGraph(s);
+  renderElements();
+}
+
+function sondageDynInput(idx,val){
+  const s=getCurrentSondage();if(!s)return;
+  s.data[idx].blows=val===''?null:Math.max(0,parseInt(val)||0);
+  renderPenetroDynGraph(s);
+}
+
+function toggleRefusal(){
+  const s=getCurrentSondage();if(!s)return;
+  s.refusal=!s.refusal;
+  renderSondageContent(s);
+}
+
+function renderPenetroDynGraph(s){
+  const cvs=document.getElementById('sondage-canvas');
+  const ctx=cvs.getContext('2d');
+  const filled=s.data.filter(d=>d.blows!=null&&d.blows>=0);
+  const maxDepth=filled.length>0?filled[filled.length-1].depth:8;
+  const maxBlows=Math.max(50,10*Math.ceil((Math.max(...filled.map(d=>d.blows||0),10))/10));
+  // Calculer qd pour chaque point
+  const qdData=filled.map(d=>({depth:d.depth,qd:calcQd(d.blows,d.depth),blows:d.blows}));
+  const maxQd=Math.max(5,Math.ceil(Math.max(...qdData.map(d=>d.qd||0),1)));
+  const hasTn=s.tnAltitude!=null;
+  const ml=65,mr=hasTn?70:55,mt=70,mb=35;
+  const rows=Math.round(maxDepth/0.20);
+  const rowH=14;
+  // Largeur : zone barres N + zone courbe qd
+  const halfW=200;
+  const cw=ml+halfW+halfW+mr,ch=mt+mb+rows*rowH;
+  cvs.width=cw;cvs.height=ch;
+  const ph=ch-mt-mb;
+  // Fond blanc
+  ctx.fillStyle='#FFFFFF';ctx.fillRect(0,0,cw,ch);
+  // Titre
+  const ref=document.getElementById('project-ref')?.value||'';
+  ctx.fillStyle='#1A1A1A';ctx.font='bold 14px Arial';ctx.textAlign='center';
+  ctx.fillText('PÉNÉTROGRAMME DYNAMIQUE'+(s.name?' — '+s.name:''),cw/2,22);
+  ctx.font='11px Arial';ctx.fillStyle='#7A7A7A';
+  ctx.fillText((ref?'Projet: '+ref+'  ':'')+'Date: '+(s.date||''),cw/2,40);
+  if(hasTn){ctx.fillText('Altitude TN : '+s.tnAltitude.toFixed(2)+' m NGF',cw/2,53);}
+  // Zone gauche : barres N (coups)
+  const nLeft=ml,nRight=ml+halfW;
+  // Zone droite : courbe qd
+  const qLeft=ml+halfW,qRight=ml+halfW+halfW;
+  // ── Axe X labels ──
+  ctx.font='bold 10px Arial';ctx.fillStyle='#D9A004';ctx.textAlign='center';
+  ctx.fillText('N (coups / 20 cm)',nLeft+halfW/2,mt-8);
+  ctx.fillStyle='#3D7AB5';
+  ctx.fillText('qd (MPa) — Formule des Hollandais',qLeft+halfW/2,mt-8);
+  // ── Cadre complet ──
+  ctx.strokeStyle='#1A1A1A';ctx.lineWidth=1.5;
+  ctx.strokeRect(ml,mt,halfW*2,ph);
+  // Ligne séparatrice centrale
+  ctx.beginPath();ctx.moveTo(ml+halfW,mt);ctx.lineTo(ml+halfW,mt+ph);
+  ctx.strokeStyle='#1A1A1A';ctx.lineWidth=1;ctx.stroke();
+  // ── Grille verticale zone N (gauche) ──
+  const xStepN=10;
+  for(let n=0;n<=maxBlows;n+=xStepN){
+    const x=nLeft+(n/maxBlows)*halfW;
+    ctx.beginPath();ctx.moveTo(x,mt);ctx.lineTo(x,mt+ph);
+    ctx.strokeStyle=n%50===0?'#C0C0C0':'#E8E8E8';ctx.lineWidth=n%50===0?0.8:0.4;ctx.stroke();
+    ctx.fillStyle='#999';ctx.font='8px Arial';ctx.textAlign='center';
+    ctx.fillText(n,x,mt-1);
+  }
+  // ── Grille verticale zone qd (droite) ──
+  const qdStep=maxQd<=10?1:maxQd<=30?5:10;
+  for(let q=0;q<=maxQd;q+=qdStep){
+    const x=qLeft+(q/maxQd)*halfW;
+    ctx.beginPath();ctx.moveTo(x,mt);ctx.lineTo(x,mt+ph);
+    ctx.strokeStyle=q%(qdStep*5)===0?'#C0C0C0':'#E8E8E8';ctx.lineWidth=0.4;ctx.stroke();
+    ctx.fillStyle='#999';ctx.font='8px Arial';ctx.textAlign='center';
+    ctx.fillText(q,x,mt-1);
+  }
+  // ── Grille horizontale + labels profondeur ──
+  for(let i=0;i<=rows;i++){
+    const depth=+(i*0.20).toFixed(2);
+    const y=mt+i*rowH;
+    ctx.beginPath();ctx.moveTo(ml,y);ctx.lineTo(ml+halfW*2,y);
+    if(depth%1===0){ctx.strokeStyle='#B0B0B0';ctx.lineWidth=0.8;}
+    else{ctx.strokeStyle='#ECECEC';ctx.lineWidth=0.3;}
+    ctx.stroke();
+    if(depth%1===0||i===0){
+      ctx.fillStyle='#1A1A1A';ctx.font='bold 9px Arial';ctx.textAlign='right';
+      ctx.fillText(depth.toFixed(2),ml-5,y+3);
+    }
+  }
+  // Label Y gauche : Profondeur
+  ctx.save();ctx.translate(12,mt+ph/2);ctx.rotate(-Math.PI/2);
+  ctx.font='bold 10px Arial';ctx.fillStyle='#1A1A1A';ctx.textAlign='center';
+  ctx.fillText('Profondeur (m)',0,0);ctx.restore();
+  // ── Axe altimétrique TN (droite) ──
+  if(hasTn){
+    const tnX=ml+halfW*2+8;
+    ctx.save();ctx.translate(tnX+28,mt+ph/2);ctx.rotate(-Math.PI/2);
+    ctx.font='bold 9px Arial';ctx.fillStyle='#666';ctx.textAlign='center';
+    ctx.fillText('Altitude (m NGF)',0,0);ctx.restore();
+    for(let i=0;i<=rows;i++){
+      const depth=+(i*0.20).toFixed(2);
+      const y=mt+i*rowH;
+      if(depth%1===0||i===0){
+        const alt=(s.tnAltitude-depth).toFixed(2);
+        ctx.fillStyle='#444';ctx.font='bold 8px Arial';ctx.textAlign='left';
+        ctx.fillText(alt,tnX,y+3);
+      }
+    }
+    // Marquer TN
+    ctx.fillStyle='#4CAF50';ctx.font='bold 9px Arial';ctx.textAlign='left';
+    ctx.fillText('TN',tnX,mt+3);
+  }
+  // ── Barres N (zone gauche) ──
+  filled.forEach(d=>{
+    const idx=Math.round(d.depth/0.20)-1;
+    const y=mt+idx*rowH+1;
+    const bw=(d.blows/maxBlows)*halfW;
+    const isRefus=s.refusal&&d.blows>=100;
+    ctx.fillStyle=isRefus?'#D94040':'#F2B705';
+    ctx.fillRect(nLeft+1,y,Math.max(1,bw),rowH-2);
+    ctx.strokeStyle=isRefus?'#A33030':'#D9A004';ctx.lineWidth=0.5;
+    ctx.strokeRect(nLeft+1,y,Math.max(1,bw),rowH-2);
+    if(isRefus){
+      ctx.fillStyle='#D94040';ctx.font='bold 8px Arial';ctx.textAlign='left';
+      ctx.fillText('REFUS',nLeft+bw+3,y+rowH/2+3);
+    }
+  });
+  // ── Courbe qd (zone droite) ──
+  const qdFilled=qdData.filter(d=>d.qd!=null&&d.qd>0);
+  if(qdFilled.length>0){
+    // Remplissage sous la courbe
+    ctx.beginPath();
+    ctx.moveTo(qLeft,mt+(Math.round(qdFilled[0].depth/0.20)-1)*rowH+rowH/2);
+    qdFilled.forEach(d=>{
+      const idx=Math.round(d.depth/0.20)-1;
+      const y=mt+idx*rowH+rowH/2;
+      const x=qLeft+(d.qd/maxQd)*halfW;
+      ctx.lineTo(x,y);
+    });
+    const lastY=mt+(Math.round(qdFilled[qdFilled.length-1].depth/0.20)-1)*rowH+rowH/2;
+    ctx.lineTo(qLeft,lastY);
+    ctx.closePath();
+    ctx.fillStyle='rgba(61,122,181,0.15)';ctx.fill();
+    // Ligne courbe
+    ctx.beginPath();
+    qdFilled.forEach((d,i)=>{
+      const idx=Math.round(d.depth/0.20)-1;
+      const y=mt+idx*rowH+rowH/2;
+      const x=qLeft+(d.qd/maxQd)*halfW;
+      if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);
+    });
+    ctx.strokeStyle='#3D7AB5';ctx.lineWidth=2;ctx.stroke();
+    // Points
+    qdFilled.forEach(d=>{
+      const idx=Math.round(d.depth/0.20)-1;
+      const y=mt+idx*rowH+rowH/2;
+      const x=qLeft+(d.qd/maxQd)*halfW;
+      ctx.beginPath();ctx.arc(x,y,2.5,0,Math.PI*2);ctx.fillStyle='#3D7AB5';ctx.fill();
+    });
+  }
+  // ── Cadre final ──
+  ctx.strokeStyle='#1A1A1A';ctx.lineWidth=1.5;ctx.strokeRect(ml,mt,halfW*2,ph);
+  ctx.beginPath();ctx.moveTo(ml+halfW,mt);ctx.lineTo(ml+halfW,mt+ph);ctx.strokeStyle='#1A1A1A';ctx.lineWidth=1;ctx.stroke();
+  // ── Légende formule ──
+  ctx.font='8px Arial';ctx.fillStyle='#999';ctx.textAlign='center';
+  ctx.fillText('qd = M²·g·H / (A·e·(M+P)) — NF P 94-115 — PDA: M=64kg, H=0.75m, A=16cm²',cw/2,ch-5);
+}
+
+// ─── PÉNÉTROMÈTRE STATIQUE ───
+function renderPenetroStatTable(s,$wrap){
+  let html=`<table class="sondage-table"><thead><tr><th>Prof. (m)</th><th>qc (MPa)</th><th>fs (kPa)</th></tr></thead><tbody>`;
+  s.data.forEach((d,i)=>{
+    html+=`<tr><td class="depth-cell">${d.depth.toFixed(2)}</td>
+    <td><input type="number" min="0" max="100" step="0.1" value="${d.qc!=null?d.qc:''}" placeholder="—" oninput="sondageStatInput(${i},'qc',this.value)"></td>
+    <td><input type="number" min="0" max="1000" step="1" value="${d.fs!=null?d.fs:''}" placeholder="—" oninput="sondageStatInput(${i},'fs',this.value)"></td></tr>`;
+  });
+  html+=`</tbody></table>`;
+  html+=`<div class="sondage-add-row"><button onclick="addStatRow()">+ Ajouter une ligne</button></div>`;
+  html+=`<textarea class="sondage-notes" placeholder="Observations...">${s.notes||''}</textarea>`;
+  $wrap.innerHTML=html;
+}
+
+function sondageStatInput(idx,field,val){
+  const s=getCurrentSondage();if(!s)return;
+  s.data[idx][field]=val===''?null:parseFloat(val)||0;
+  renderPenetroStatGraph(s);
+}
+
+function addStatRow(){
+  const s=getCurrentSondage();if(!s)return;
+  const last=s.data.length>0?s.data[s.data.length-1].depth:0;
+  s.data.push({depth:+(last+0.20).toFixed(2),qc:null,fs:null});
+  renderSondageContent(s);
+}
+
+function renderPenetroStatGraph(s){
+  const cvs=document.getElementById('sondage-canvas');
+  const ctx=cvs.getContext('2d');
+  const filled=s.data.filter(d=>d.qc!=null||d.fs!=null);
+  if(filled.length===0){cvs.width=500;cvs.height=300;ctx.fillStyle='#F5F5F5';ctx.fillRect(0,0,500,300);ctx.fillStyle='#7A7A7A';ctx.font='13px Arial';ctx.textAlign='center';ctx.fillText('Saisir des valeurs pour voir le graphe',250,150);return;}
+  const maxDepth=Math.max(...filled.map(d=>d.depth));
+  const maxQc=Math.max(10,Math.ceil(Math.max(...filled.map(d=>d.qc||0))));
+  const maxFs=Math.max(100,Math.ceil(Math.max(...filled.map(d=>d.fs||0))/50)*50);
+  const ml=55,mr=20,mt=65,mb=30,gap=30;
+  const halfW=200;
+  const cw=ml+halfW+gap+halfW+mr;
+  const depthPx=Math.max(200,filled.length*12);
+  const ch=mt+mb+depthPx;
+  cvs.width=cw;cvs.height=ch;
+  const ph=ch-mt-mb;
+  ctx.fillStyle='#FFFFFF';ctx.fillRect(0,0,cw,ch);
+  // Titre
+  const ref=document.getElementById('project-ref')?.value||'';
+  ctx.fillStyle='#1A1A1A';ctx.font='bold 14px Arial';ctx.textAlign='center';
+  ctx.fillText('PÉNÉTROMÈTRE STATIQUE'+(s.name?' — '+s.name:''),cw/2,22);
+  ctx.font='11px Arial';ctx.fillStyle='#7A7A7A';
+  ctx.fillText((ref?'Projet: '+ref+'  ':'')+'Date: '+(s.date||''),cw/2,40);
+  // Graphe qc (gauche)
+  const qcL=ml,qcR=ml+halfW;
+  ctx.strokeStyle='#1A1A1A';ctx.lineWidth=1;ctx.strokeRect(qcL,mt,halfW,ph);
+  ctx.font='bold 10px Arial';ctx.fillStyle='#1A1A1A';ctx.textAlign='center';
+  ctx.fillText('qc (MPa)',qcL+halfW/2,mt-8);
+  // Grille qc
+  for(let v=0;v<=maxQc;v+=Math.max(1,Math.ceil(maxQc/5))){
+    const x=qcL+(v/maxQc)*halfW;
+    ctx.beginPath();ctx.moveTo(x,mt);ctx.lineTo(x,mt+ph);ctx.strokeStyle='#ECECEC';ctx.lineWidth=0.5;ctx.stroke();
+    ctx.fillStyle='#7A7A7A';ctx.font='8px Arial';ctx.textAlign='center';ctx.fillText(v,x,mt-1);
+  }
+  // Courbe qc
+  ctx.beginPath();ctx.strokeStyle='#3D7AB5';ctx.lineWidth=2;
+  filled.forEach((d,i)=>{
+    if(d.qc==null)return;
+    const x=qcL+(d.qc/maxQc)*halfW;
+    const y=mt+(d.depth/maxDepth)*ph;
+    if(i===0||filled[i-1].qc==null)ctx.moveTo(x,y);else ctx.lineTo(x,y);
+  });ctx.stroke();
+  // Graphe fs (droite)
+  const fsL=qcR+gap,fsR=fsL+halfW;
+  ctx.strokeStyle='#1A1A1A';ctx.lineWidth=1;ctx.strokeRect(fsL,mt,halfW,ph);
+  ctx.font='bold 10px Arial';ctx.fillStyle='#1A1A1A';ctx.textAlign='center';
+  ctx.fillText('fs (kPa)',fsL+halfW/2,mt-8);
+  for(let v=0;v<=maxFs;v+=Math.max(10,Math.ceil(maxFs/5/10)*10)){
+    const x=fsL+(v/maxFs)*halfW;
+    ctx.beginPath();ctx.moveTo(x,mt);ctx.lineTo(x,mt+ph);ctx.strokeStyle='#ECECEC';ctx.lineWidth=0.5;ctx.stroke();
+    ctx.fillStyle='#7A7A7A';ctx.font='8px Arial';ctx.textAlign='center';ctx.fillText(v,x,mt-1);
+  }
+  ctx.beginPath();ctx.strokeStyle='#E67E22';ctx.lineWidth=2;
+  filled.forEach((d,i)=>{
+    if(d.fs==null)return;
+    const x=fsL+(d.fs/maxFs)*halfW;
+    const y=mt+(d.depth/maxDepth)*ph;
+    if(i===0||filled[i-1].fs==null)ctx.moveTo(x,y);else ctx.lineTo(x,y);
+  });ctx.stroke();
+  // Labels profondeur (à gauche)
+  filled.forEach(d=>{
+    const y=mt+(d.depth/maxDepth)*ph;
+    ctx.fillStyle='#1A1A1A';ctx.font='8px Arial';ctx.textAlign='right';
+    ctx.fillText(d.depth.toFixed(2),ml-5,y+3);
+    ctx.beginPath();ctx.moveTo(qcL,y);ctx.lineTo(qcR,y);ctx.strokeStyle='#ECECEC';ctx.lineWidth=0.3;ctx.stroke();
+    ctx.beginPath();ctx.moveTo(fsL,y);ctx.lineTo(fsR,y);ctx.stroke();
+  });
+  ctx.save();ctx.translate(12,mt+ph/2);ctx.rotate(-Math.PI/2);
+  ctx.font='bold 10px Arial';ctx.fillStyle='#1A1A1A';ctx.textAlign='center';ctx.fillText('Profondeur (m)',0,0);ctx.restore();
+}
+
+// ─── TARIÈRE / PELLE MÉCANIQUE ───
+function renderStratiTable(s,$wrap){
+  const isPelle=s.type==='pelle_meca';
+  let html='';
+  if(isPelle){
+    html+=`<div style="margin-bottom:8px"><label style="font-size:11px;font-weight:800">Niveau d'eau (m) :</label>
+    <input type="number" step="0.01" min="0" value="${s.waterLevel!=null?s.waterLevel:''}" placeholder="Non rencontré"
+    style="width:100px;padding:4px 6px;border:1px solid var(--gray-200);border-radius:4px;font-size:12px;font-weight:700;margin-left:6px"
+    oninput="const ss=getCurrentSondage();if(ss)ss.waterLevel=this.value===''?null:parseFloat(this.value);renderStratiGraph(ss)"></div>`;
+  }
+  html+=`<table class="sondage-table"><thead><tr><th>De (m)</th><th>À (m)</th><th>Nature</th><th>Description</th></tr></thead><tbody>`;
+  s.data.forEach((d,i)=>{
+    const opts=Object.keys(SOIL_TYPES).map(k=>`<option value="${k}"${d.nature===k?' selected':''}>${SOIL_TYPES[k].label}</option>`).join('');
+    html+=`<tr>
+    <td><input type="number" step="0.01" min="0" value="${d.from}" oninput="stratiInput(${i},'from',this.value)" style="width:55px"></td>
+    <td><input type="number" step="0.01" min="0" value="${d.to}" oninput="stratiInput(${i},'to',this.value)" style="width:55px"></td>
+    <td><select onchange="stratiInput(${i},'nature',this.value)">${opts}</select></td>
+    <td><input type="text" value="${d.description||''}" oninput="stratiInput(${i},'description',this.value)"></td></tr>`;
+  });
+  html+=`</tbody></table>`;
+  html+=`<div class="sondage-add-row"><button onclick="addStratiRow()">+ Ajouter une couche</button><button onclick="removeStratiRow()">− Supprimer dernière</button></div>`;
+  html+=`<textarea class="sondage-notes" placeholder="Observations...">${s.notes||''}</textarea>`;
+  $wrap.innerHTML=html;
+}
+
+function stratiInput(idx,field,val){
+  const s=getCurrentSondage();if(!s)return;
+  if(field==='from'||field==='to')s.data[idx][field]=parseFloat(val)||0;
+  else s.data[idx][field]=val;
+  renderStratiGraph(s);
+}
+
+function addStratiRow(){
+  const s=getCurrentSondage();if(!s)return;
+  const last=s.data.length>0?s.data[s.data.length-1].to:0;
+  s.data.push({from:last,to:+(last+0.50).toFixed(2),nature:'argile',description:''});
+  renderSondageContent(s);
+}
+
+function removeStratiRow(){
+  const s=getCurrentSondage();if(!s||s.data.length<=1)return;
+  s.data.pop();
+  renderSondageContent(s);
+}
+
+function renderStratiGraph(s){
+  const cvs=document.getElementById('sondage-canvas');
+  const ctx=cvs.getContext('2d');
+  if(!s.data||s.data.length===0){cvs.width=400;cvs.height=200;ctx.fillStyle='#F5F5F5';ctx.fillRect(0,0,400,200);return;}
+  const maxDepth=Math.max(...s.data.map(d=>d.to||0),1);
+  const ml=60,mr=180,mt=65,mb=30;
+  const colW=80;
+  const depthScale=Math.max(40,Math.min(80,400/maxDepth));
+  const ph=maxDepth*depthScale;
+  const cw=ml+colW+mr;
+  const ch=mt+ph+mb;
+  cvs.width=cw;cvs.height=ch;
+  ctx.fillStyle='#FFFFFF';ctx.fillRect(0,0,cw,ch);
+  // Titre
+  const ref=document.getElementById('project-ref')?.value||'';
+  const title=s.type==='pelle_meca'?'COUPE PELLE MÉCANIQUE':'COUPE SONDAGE TARIÈRE';
+  ctx.fillStyle='#1A1A1A';ctx.font='bold 14px Arial';ctx.textAlign='center';
+  ctx.fillText(title+(s.name?' — '+s.name:''),cw/2,22);
+  ctx.font='11px Arial';ctx.fillStyle='#7A7A7A';
+  ctx.fillText((ref?'Projet: '+ref+'  ':'')+'Date: '+(s.date||''),cw/2,40);
+  // Colonne stratigraphique
+  s.data.forEach(d=>{
+    const y1=mt+(d.from/maxDepth)*ph;
+    const y2=mt+(d.to/maxDepth)*ph;
+    const h=y2-y1;
+    const soil=SOIL_TYPES[d.nature]||{color:'#CCC'};
+    ctx.fillStyle=soil.color;ctx.fillRect(ml,y1,colW,h);
+    ctx.strokeStyle='#1A1A1A';ctx.lineWidth=1;ctx.strokeRect(ml,y1,colW,h);
+    // Hachures pour certains sols
+    if(d.nature==='roche'||d.nature==='calcaire'||d.nature==='gres'){
+      ctx.save();ctx.beginPath();ctx.rect(ml,y1,colW,h);ctx.clip();
+      ctx.strokeStyle='rgba(0,0,0,0.3)';ctx.lineWidth=0.5;
+      for(let hy=y1;hy<y2;hy+=6){ctx.beginPath();ctx.moveTo(ml,hy);ctx.lineTo(ml+colW,hy);ctx.stroke();}
+      ctx.restore();
+    }
+    // Profondeur à gauche
+    ctx.fillStyle='#1A1A1A';ctx.font='bold 9px Arial';ctx.textAlign='right';
+    ctx.fillText(d.from.toFixed(2),ml-5,y1+10);
+    ctx.fillText(d.to.toFixed(2),ml-5,y2-2);
+    // Description à droite
+    ctx.fillStyle='#1A1A1A';ctx.font='11px Arial';ctx.textAlign='left';
+    const midY=(y1+y2)/2+4;
+    ctx.fillText((soil.label||'')+(d.description?' - '+d.description:''),ml+colW+8,midY);
+  });
+  // Niveau d'eau
+  if(s.waterLevel!=null&&s.waterLevel>0){
+    const wy=mt+(s.waterLevel/maxDepth)*ph;
+    ctx.strokeStyle='#3D7AB5';ctx.lineWidth=2;ctx.setLineDash([6,3]);
+    ctx.beginPath();ctx.moveTo(ml-10,wy);ctx.lineTo(ml+colW+10,wy);ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle='#3D7AB5';ctx.font='bold 9px Arial';ctx.textAlign='left';
+    ctx.fillText('💧 '+s.waterLevel.toFixed(2)+' m',ml+colW+12,wy+3);
+  }
+  // Axe Y label
+  ctx.save();ctx.translate(12,mt+ph/2);ctx.rotate(-Math.PI/2);
+  ctx.font='bold 10px Arial';ctx.fillStyle='#1A1A1A';ctx.textAlign='center';ctx.fillText('Profondeur (m)',0,0);ctx.restore();
+}
+
+// ─── RECONNAISSANCE DE FONDATION ───
+function renderFondationForm(s,$wrap){
+  const d=s.data||{};
+  const typeOpts=FONDATION_TYPES.map(t=>`<option value="${t.v}"${d.fondationType===t.v?' selected':''}>${t.l}</option>`).join('');
+  const stateOpts=FONDATION_STATES.map(t=>`<option value="${t.v}"${d.state===t.v?' selected':''}>${t.l}</option>`).join('');
+  $wrap.innerHTML=`<div class="fondation-form">
+    <label>Type de fondation<select onchange="fondationInput('fondationType',this.value)">${typeOpts}</select></label>
+    <label>Profondeur (m)<input type="number" step="0.01" min="0" value="${d.depth||''}" oninput="fondationInput('depth',this.value)"></label>
+    <label>Dimensions (L × l × h)<input type="text" value="${d.dimensions||''}" placeholder="Ex: 0.60 × 0.30 × 0.20" oninput="fondationInput('dimensions',this.value)"></label>
+    <label>État<select onchange="fondationInput('state',this.value)">${stateOpts}</select></label>
+    <label>Description<textarea rows="4" oninput="fondationInput('description',this.value)" style="resize:vertical">${d.description||''}</textarea></label>
+  </div>
+  <textarea class="sondage-notes" placeholder="Observations générales...">${s.notes||''}</textarea>`;
+}
+
+function fondationInput(field,val){
+  const s=getCurrentSondage();if(!s)return;
+  if(field==='depth')s.data[field]=parseFloat(val)||0;
+  else s.data[field]=val;
+  renderFondationSummary(s);
+}
+
+function renderFondationSummary(s){
+  const cvs=document.getElementById('sondage-canvas');
+  const ctx=cvs.getContext('2d');
+  const d=s.data||{};
+  const cw=420,ch=320;
+  cvs.width=cw;cvs.height=ch;
+  ctx.fillStyle='#FFFFFF';ctx.fillRect(0,0,cw,ch);
+  // Titre
+  const ref=document.getElementById('project-ref')?.value||'';
+  ctx.fillStyle='#1A1A1A';ctx.font='bold 14px Arial';ctx.textAlign='center';
+  ctx.fillText('RECONNAISSANCE DE FONDATION'+(s.name?' — '+s.name:''),cw/2,25);
+  ctx.font='11px Arial';ctx.fillStyle='#7A7A7A';
+  ctx.fillText((ref?'Projet: '+ref+'  ':'')+'Date: '+(s.date||''),cw/2,43);
+  // Tableau récapitulatif
+  const rows=[
+    ['Type',FONDATION_TYPES.find(t=>t.v===d.fondationType)?.l||d.fondationType||'—'],
+    ['Profondeur',d.depth?d.depth+' m':'—'],
+    ['Dimensions',d.dimensions||'—'],
+    ['État',FONDATION_STATES.find(t=>t.v===d.state)?.l||d.state||'—'],
+    ['Description',d.description||'—']
+  ];
+  const sx=30,sy=65,rw=cw-60,rh=36;
+  rows.forEach((r,i)=>{
+    const y=sy+i*rh;
+    ctx.fillStyle=i%2===0?'#F5F5F5':'#FFFFFF';
+    ctx.fillRect(sx,y,rw,rh);
+    ctx.strokeStyle='#D4D4D4';ctx.lineWidth=0.5;ctx.strokeRect(sx,y,rw,rh);
+    ctx.fillStyle='#1A1A1A';ctx.font='bold 11px Arial';ctx.textAlign='left';
+    ctx.fillText(r[0],sx+10,y+22);
+    ctx.font='11px Arial';ctx.fillStyle='#4A4A4A';
+    // Tronquer la description si trop longue
+    let txt=r[1];
+    if(ctx.measureText(txt).width>rw-140)txt=txt.substring(0,40)+'...';
+    ctx.fillText(txt,sx+130,y+22);
+  });
+  // Cadre
+  ctx.strokeStyle='#1A1A1A';ctx.lineWidth=1.5;
+  ctx.strokeRect(sx,sy,rw,rows.length*rh);
+  // État couleur
+  const stateColors={'bon':'#4CAF50','moyen':'#F2B705','degrade':'#E67E22','tres_degrade':'#D94040'};
+  const sc=stateColors[d.state]||'#7A7A7A';
+  ctx.fillStyle=sc;ctx.beginPath();ctx.arc(cw-50,sy+3*rh+rh/2,8,0,Math.PI*2);ctx.fill();
+}
+
+// ─── EXPORT GRAPHE SUR LE PLAN ───
+function exportSondageGraph(){
+  saveSondageFromUI();
+  const cvs=document.getElementById('sondage-canvas');
+  const dataUrl=cvs.toDataURL('image/png');
+  const img=new Image();
+  img.onload=()=>{
+    const maxDim=300;
+    let w=img.naturalWidth,h=img.naturalHeight;
+    if(w>maxDim||h>maxDim){const r=Math.min(maxDim/w,maxDim/h);w=Math.round(w*r);h=Math.round(h*r);}
+    const cx=(planW||1200)/2,cy=(planH||800)/2;
+    elements.push({id:Date.now(),type:'image',x:cx,y:cy,imgSrc:dataUrl,w,h});
+    renderElements();
+    closeSondageEdit();
+    alert('Graphe collé sur le plan !');
+  };
+  img.src=dataUrl;
+}
+
+// ─── LIAISON SONDAGE ↔ PHOTO ───
+let sondagePhotoCallback=null;
+
+function linkSondagePhoto(){
+  const s=getCurrentSondage();if(!s)return;
+  if(photos.length===0){
+    // Pas de photos → ouvrir la caméra, on liera après capture
+    sondagePhotoCallback=s.id;
+    closeSondageEdit();
+    openCamera();
+    return;
+  }
+  // Montrer le picker de photos
+  const grid=document.getElementById('photo-picker-grid');
+  grid.innerHTML=photos.map((p,i)=>`<div class="photo-pick-card" onclick="pickPhotoForSondage(${i})"><img src="${p.dataUrl}" alt="${escXml(p.name||'Photo '+(i+1))}"><div class="photo-pick-name">${escXml(p.name||'Photo '+(i+1))}</div></div>`).join('');
+  document.getElementById('photo-picker-modal').classList.add('open');
+}
+
+function pickPhotoForSondage(idx){
+  closePhotoPickerModal();
+  const s=getCurrentSondage();if(!s)return;
+  if(idx>=0&&idx<photos.length){
+    s.photoIndex=idx;
+    photos[idx].name=s.name; // Synchroniser le nom
+    renderPhotos();
+    renderSondageContent(s);
+    alert('Photo "'+photos[idx].name+'" associée au sondage '+s.name);
+  }
+}
 
 // ═══ INSERT IMAGE ON PLAN ═══
 function insertImageMenu(){

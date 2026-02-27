@@ -17,7 +17,11 @@
       "Bash(git remote set-url origin https://github.com/VincentSLD/03_GEOTER.git)",
       "Bash(git push -u origin main)",
       "WebFetch(domain:discourse.threejs.org)",
-      "Bash(python -c \":*)"
+      "Bash(python -c \":*)",
+      "Bash(python3 -c \":*)",
+      "Bash(node -e \":*)",
+      "Bash(where node)",
+      "Bash(\"/c/Program Files/nodejs/node.exe\" -e \":*)"
     ]
   }
 }
