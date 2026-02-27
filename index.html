@@ -39,8 +39,11 @@
   .btn-load{background:var(--black-mid);color:#fff;border:1px solid rgba(255,255,255,0.15)}.btn-load:hover{background:var(--gray-700)}
   .btn-capture{background:var(--yellow);color:var(--black);font-weight:800;box-shadow:0 2px 10px var(--yellow-glow)}.btn-capture:hover{background:var(--yellow-light)}
 
-  #toolbar{background:var(--white);border-bottom:none;padding:5px 8px;display:flex;align-items:center;gap:3px;overflow-x:auto;flex-shrink:0;z-index:100}
+  #toolbar{background:var(--white);border-bottom:none;padding:5px 8px;display:none;align-items:center;gap:3px;overflow-x:auto;flex-shrink:0;z-index:100}
+  #toolbar.toolbar-active{display:flex}
   #toolbar-options{background:var(--white);border-bottom:1px solid var(--gray-200);padding:0 8px;display:flex;align-items:center;gap:3px;flex-shrink:0;z-index:100;box-shadow:var(--shadow-sm);min-height:0}
+  #toolbar-options{display:none}
+  #toolbar.toolbar-active~#toolbar-options{display:flex}
   .tool-btn{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;padding:6px 10px;border:none;border-radius:var(--radius);background:transparent;color:var(--gray-500);font-size:11px;font-weight:700;min-width:50px;transition:all .2s}
   .tool-btn .icon{font-size:17px}.tool-btn .label{font-size:8px;letter-spacing:.02em;white-space:nowrap}
   .tool-btn:hover{background:var(--gray-100);color:var(--black)}
@@ -87,8 +90,13 @@
   .btn-load-center{border:none;border-radius:var(--radius);padding:14px 32px;font-size:15px;font-weight:800;font-family:inherit;background:var(--yellow);color:var(--black);cursor:pointer;box-shadow:0 4px 16px var(--yellow-glow);transition:all .2s;display:flex;align-items:center;gap:8px}
   .btn-load-center:hover{background:var(--yellow-light);transform:translateY(-1px);box-shadow:0 6px 20px var(--yellow-glow)}
   #empty-state .hint{font-size:10px;color:var(--gray-500);font-weight:600;margin-top:-4px}
+  .welcome-title{font-size:32px;font-weight:900;color:var(--black);font-family:'Space Grotesk',sans-serif;letter-spacing:-0.02em}
+  .welcome-title .highlight{color:var(--yellow)}
+  .welcome-btns{display:flex;gap:14px;margin-top:8px}
+  .btn-open-project{background:var(--black)!important;color:var(--yellow)!important;box-shadow:0 4px 16px rgba(0,0,0,0.3)!important}
+  .btn-open-project:hover{background:var(--black-soft)!important}
 
-  .plan-element{position:absolute;user-select:none;touch-action:none;z-index:10;transform:translate(-50%,-50%)}
+  .plan-element{position:absolute;user-select:none;touch-action:none;z-index:10}
   .plan-element.dragging{z-index:1000}
   .sticker-wrap{display:flex;flex-direction:column;align-items:center}
   .sticker-icon{line-height:1;background:none;border-radius:var(--radius);padding:4px;border:2px solid transparent;box-shadow:none;transition:all .15s;display:flex;align-items:center;justify-content:center}
@@ -291,6 +299,24 @@
   #ngf-input-modal{position:absolute;inset:0;background:rgba(0,0,0,0.6);display:none;align-items:center;justify-content:center;z-index:10;backdrop-filter:blur(2px)}
   #ngf-input-modal.open{display:flex}
   #ngf-input-inner{background:var(--white);border-radius:var(--radius-lg);padding:20px;width:300px;max-width:90vw;box-shadow:var(--shadow-lg);border-top:4px solid var(--yellow)}
+  /* ═══ MODAL NOUVEAU PROJET ═══ */
+  #new-study-modal{position:fixed;inset:0;background:rgba(0,0,0,0.7);display:none;align-items:center;justify-content:center;z-index:950;backdrop-filter:blur(4px)}
+  #new-study-modal.open{display:flex}
+  #new-study-inner{background:var(--white);border-radius:var(--radius-lg);padding:28px;width:380px;max-width:92vw;box-shadow:var(--shadow-lg);border-top:4px solid var(--yellow)}
+  #new-study-inner h2{font-size:18px;font-weight:900;color:var(--black);margin:0 0 6px}
+  #new-study-inner p{font-size:12px;color:var(--gray-500);margin:0 0 18px}
+  #new-study-inner label{font-size:11px;font-weight:800;color:var(--black);display:block;margin-bottom:5px}
+  #new-study-ref{width:100%;padding:10px 12px;border:2px solid var(--gray-200);border-radius:var(--radius);font-size:14px;font-weight:700;font-family:inherit;outline:none;transition:border-color .2s;box-sizing:border-box}
+  #new-study-ref:focus{border-color:var(--yellow)}
+  #new-study-ref.error{border-color:var(--red);animation:shake .3s}
+  @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}50%{transform:translateX(6px)}75%{transform:translateX(-4px)}}
+  .new-study-error{font-size:11px;color:var(--red);font-weight:700;margin-top:5px;min-height:16px}
+  .new-study-actions{display:flex;gap:10px;margin-top:18px;justify-content:flex-end}
+  .new-study-actions button{padding:10px 22px;border:none;border-radius:var(--radius);font-size:13px;font-weight:800;font-family:inherit;cursor:pointer;transition:all .2s}
+  .btn-create-study{background:var(--yellow);color:var(--black);box-shadow:0 3px 12px var(--yellow-glow)}
+  .btn-create-study:hover{background:var(--yellow-light);transform:translateY(-1px)}
+  .btn-cancel-study{background:var(--gray-100);color:var(--gray-500)}
+  .btn-cancel-study:hover{background:var(--gray-200);color:var(--black)}
   /* ═══ MISE EN PAGE ═══ */
   #main-body{display:flex;flex:1;overflow:hidden}
   #mep-panel{width:270px;min-width:220px;max-width:60vw;display:none;flex-direction:column;flex-shrink:0;background:var(--white);border-right:2px solid var(--yellow);overflow-y:auto;position:relative}
@@ -367,7 +393,8 @@
     <button class="tool-btn" onclick="exportProject()"><span class="icon">💾</span><span class="label">Enregistrer</span></button>
     <button class="tool-btn" onclick="document.getElementById('projectInput').click()"><span class="icon">📂</span><span class="label">Ouvrir</span></button>
     <input type="file" id="projectInput" accept=".geoter" style="display:none" onchange="importProject(event)">
-    <button class="tool-btn" onclick="document.getElementById('fileInput').click()"><span class="icon">🏢</span><span class="label">Fond de plan</span></button>
+    <button class="tool-btn" onclick="closeProject()"><span class="icon">🚪</span><span class="label">Fermer</span></button>
+    <button class="tool-btn" onclick="openPlanPicker()"><span class="icon">🏢</span><span class="label">Fond de plan</span></button>
     <div style="flex:1"></div>
     <div class="tool-sep"></div>
     <button class="tool-btn" onclick="togglePhotoSection()"><span class="icon">📸</span><span class="label">Photos</span></button>
@@ -442,7 +469,10 @@
     <div id="elements-layer"></div>
     <div id="eraser-cursor"></div>
     <div id="mrpropre-cursor"></div>
-    <div id="empty-state"><div class="big-icon">📐</div><p>Chargez un plan PDF ou une image<br>pour commencer à annoter</p><button class="btn-load-center" onclick="document.getElementById('fileInput').click()">📄 Charger un plan</button><div class="hint">PDF, JPG, PNG</div></div>
+    <div id="empty-state">
+      <div id="welcome-screen"><div class="big-icon">📐</div><div class="welcome-title">Géo<span class="highlight">Ter'</span></div><p>Application de relevé terrain</p><div class="welcome-btns"><button class="btn-load-center" onclick="openNewStudyModal()">📝 Nouveau Projet</button><button class="btn-load-center btn-open-project" onclick="document.getElementById('projectInput').click()">📂 Ouvrir un projet</button></div></div>
+      <div id="load-plan-screen" style="display:none"><div class="big-icon">📐</div><p>Chargez un plan PDF ou une image<br>pour commencer à annoter</p><button class="btn-load-center" onclick="openPlanPicker()">📄 Charger un plan</button><div class="hint">PDF, JPG, PNG</div></div>
+    </div>
     <button id="btn-recadrer" onclick="resetView()" title="Recadrer">🎯</button>
   </div>
   </div><!-- /main-body -->
@@ -454,6 +484,19 @@
     <div id="legend-inner" onclick="event.stopPropagation()">
       <div id="legend-header"><span>📋 Légende</span><div style="display:flex;gap:6px;align-items:center"><button onclick="placeLegendOnPlan()" style="background:var(--yellow);color:var(--black);border:none;border-radius:6px;padding:4px 10px;font-size:11px;font-weight:800;cursor:pointer">📌 Coller sur le plan</button><button class="catalog-close" onclick="closeLegend()">✕</button></div></div>
       <div id="legend-content"></div>
+    </div>
+  </div>
+  <div id="new-study-modal">
+    <div id="new-study-inner">
+      <h2>Nouveau Projet</h2>
+      <p>Créez un nouveau projet en saisissant la référence.</p>
+      <label for="new-study-ref">Référence du projet *</label>
+      <input type="text" id="new-study-ref" placeholder="Ex: 2024-PRJ-001" spellcheck="false" autocomplete="off" onkeydown="if(event.key==='Enter')createNewStudy()">
+      <div class="new-study-error" id="new-study-error"></div>
+      <div class="new-study-actions">
+        <button class="btn-cancel-study" onclick="closeNewStudyModal()">Annuler</button>
+        <button class="btn-create-study" onclick="createNewStudy()">Créer l'étude</button>
+      </div>
     </div>
   </div>
   <div id="snapshot-modal" onclick="closeSnapshot()">
@@ -693,6 +736,7 @@ let isPanning=false,panStartX=0,panStartY=0,panOX=0,panOY=0;
 let elements=[],selectedId=null,selectedStickerId=null;
 let drawColor='#1A1A1A',brushSize=4,drawOpacity=1,eraserSize=20,mrPropreSize=30,textColor='#1A1A1A';
 let drawPaths=[],cleanPaths=[],currentPathPts=[],isDrawing=false,photos=[],cameraStream=null;
+let savedFileHandle=null,autoSaveInterval=null;
 let czPoints=[],czPreview=null;
 let teEditingId=null,teOriginX=0,teOriginY=0;
 let arrowStartPt=null,arrowPreviewEnd=null,arrowDoubleHead=false;
@@ -764,19 +808,40 @@ function openCatalog(){document.getElementById('catalog-overlay').classList.add(
 function closeCatalog(){document.getElementById('catalog-overlay').classList.remove('open');}
 
 let pendingPdf=null;
+async function openPlanPicker(){
+  if(window.showOpenFilePicker){
+    try{
+      const opts={types:[{description:'Plan (PDF, Image)',accept:{'application/pdf':['.pdf'],'image/*':['.jpg','.jpeg','.png','.bmp','.webp']}}],multiple:false};
+      if(savedFileHandle) opts.startIn=savedFileHandle;
+      else opts.startIn='desktop';
+      const [handle]=await window.showOpenFilePicker(opts);
+      const file=await handle.getFile();
+      await loadPlanFromFile(file);
+    }catch(e){if(e.name!=='AbortError')console.error(e);}
+  }else{
+    document.getElementById('fileInput').click();
+  }
+}
+
 async function loadPlan(e){
   const file=e.target.files[0];if(!file)return;
+  await loadPlanFromFile(file);
+  e.target.value='';
+}
+
+async function loadPlanFromFile(file){
+  if(!file)return;
   if(file.type==='application/pdf'){
     const buf=await file.arrayBuffer();
     const pdf=await pdfjsLib.getDocument({data:buf}).promise;
-    if(pdf.numPages===1){await loadPdfPage(pdf,1);}
+    if(pdf.numPages===1){await loadPdfPage(pdf,1);openCropTool();}
     else{pendingPdf=pdf;showPdfPageModal(pdf);}
   }else{
     const dataUrl=await new Promise(r=>{const fr=new FileReader();fr.onload=()=>r(fr.result);fr.readAsDataURL(file);});
     planImgSrc=dataUrl;const img=new Image();await new Promise(r=>{img.onload=r;img.src=planImgSrc;});planW=img.naturalWidth;planH=img.naturalHeight;
     $planImg.src=planImgSrc;$planImg.style.display='block';$empty.style.display='none';resetView();
+    openCropTool();
   }
-  e.target.value='';
 }
 async function loadPdfPage(pdf,num){
   const page=await pdf.getPage(num);const vp=page.getViewport({scale:2});
@@ -924,6 +989,7 @@ function renderElements(){
   elements.forEach(el=>{
     const div=document.createElement('div');div.className='plan-element'+(selectedId===el.id?' selected':'');
     div.style.left=(el.x*scale+offX)+'px';div.style.top=(el.y*scale+offY)+'px';
+    div.style.transform='translate(-50%,-50%) scale('+scale+')';
     if(el.type==='sticker'){
       const ss=el.sScale||1;const sz=Math.round(28*ss);const rot=el.rotation||0;
       if(el.isShape){
@@ -956,10 +1022,11 @@ function renderElements(){
       const bStyle=el.bordered?`;border:2px solid ${el.color};border-radius:4px`:'';
       div.innerHTML=`<div class="text-box ${selectedId===el.id?'selected':''}" style="color:${el.color}${bStyle}">${el.html||el.text||''}</div><button class="del-btn" data-action="del" data-eid="${el.id}">×</button><button class="edit-btn" data-action="edit" data-eid="${el.id}">✏️</button><button class="edit-btn" data-action="duplicate" data-eid="${el.id}" style="top:38px" title="Dupliquer">📋</button>`;
     }else if(el.type==='arrow'){
+      div.style.transform='translate(-50%,-50%)';
       const sx1=el.x*scale+offX,sy1=el.y*scale+offY,sx2=el.x2*scale+offX,sy2=el.y2*scale+offY;
       const mx=(sx1+sx2)/2,my=(sy1+sy2)/2;
       div.style.left=mx+'px';div.style.top=my+'px';
-      const sw=el.strokeWidth||2;const op=el.opacity!=null?el.opacity:1;const lo=el.lineOnly||false;const dashed=el.dashed||false;
+      const sw=(el.strokeWidth||2)*scale;const op=el.opacity!=null?el.opacity:1;const lo=el.lineOnly||false;const dashed=el.dashed||false;
       const sel=selectedId===el.id;const dsw=sel?sw+2:sw;
       const pad=Math.max(40,sw*3);
       const w=Math.abs(sx2-sx1)+pad*2,h=Math.abs(sy2-sy1)+pad*2;
@@ -980,7 +1047,7 @@ function renderElements(){
       <button class="del-btn" data-action="del" data-eid="${el.id}" style="left:${ox+lx2+18}px;top:${oy+ly2-18}px">×</button>
       <div class="arrow-edit-panel" data-arrowedit="${el.id}">
         <div class="color-dots-row">${COLORS.map(c=>`<button class="cdot${el.color===c?' active':''}" style="background:${c}${c==='#FFFFFF'?';border:2px solid #D4D4D4':''}" data-aedit="color" data-acolor="${c}"></button>`).join('')}</div>
-        <div class="ae-controls"><label>Épais.</label><input type="number" value="${sw}" min="1" max="24" step="1" data-aedit="width"><label>Opac.%</label><input type="number" value="${Math.round(op*100)}" min="10" max="100" step="5" data-aedit="opacity"></div>
+        <div class="ae-controls"><label>Épais.</label><input type="number" value="${el.strokeWidth||2}" min="1" max="24" step="1" data-aedit="width"><label>Opac.%</label><input type="number" value="${Math.round(op*100)}" min="10" max="100" step="5" data-aedit="opacity"></div>
       </div>`;
     }else if(el.type==='legend'){
       div.innerHTML=`<img src="${el.imgSrc}" style="width:${el.w}px;height:${el.h}px;pointer-events:none;display:block"><button class="del-btn" data-action="del" data-eid="${el.id}">×</button>`;
@@ -1025,7 +1092,7 @@ function renderElements(){
         const origW=el.shapeW||40,origH=el.shapeH||40;
         const ss=el.sScale||1;
         const sdMove=ev=>{
-          const dx=(ev.clientX-startX)/ss,dy=(ev.clientY-startY)/ss;
+          const dx=(ev.clientX-startX)/(ss*scale),dy=(ev.clientY-startY)/(ss*scale);
           if(dir==='r'||dir==='br')el.shapeW=Math.max(10,Math.round(origW+dx));
           if(dir==='b'||dir==='br')el.shapeH=Math.max(10,Math.round(origH+dy));
           renderElements();
@@ -1042,7 +1109,7 @@ function renderElements(){
         const sMove=ev=>{
           const dx=ev.clientX-cx,dy=ev.clientY-cy;
           const dist=Math.sqrt(dx*dx+dy*dy);
-          el.sScale=Math.max(0.15,dist/40);
+          el.sScale=Math.max(0.15,dist/(40*scale));
           renderElements();
         };
         const sUp=()=>{document.removeEventListener('pointermove',sMove);document.removeEventListener('pointerup',sUp);};
@@ -1384,12 +1451,60 @@ function placeLegendOnPlan(){
   selectedId=null;renderElements();
 }
 
-// ═══ ENREGISTRER / OUVRIR PROJET ═══
+// ═══ NOUVEAU PROJET / ENREGISTRER / OUVRIR PROJET ═══
 
-async function exportProject(){
-  if(!planImgSrc){alert('Aucun plan chargé.');return;}
+function openNewStudyModal(){
+  document.getElementById('new-study-ref').value='';
+  document.getElementById('new-study-error').textContent='';
+  document.getElementById('new-study-ref').classList.remove('error');
+  document.getElementById('new-study-modal').classList.add('open');
+  setTimeout(()=>document.getElementById('new-study-ref').focus(),100);
+}
+function closeNewStudyModal(){
+  document.getElementById('new-study-modal').classList.remove('open');
+}
+
+async function createNewStudy(){
+  const refInput=document.getElementById('new-study-ref');
+  const errDiv=document.getElementById('new-study-error');
+  const ref=refInput.value.trim();
+  if(!ref){
+    refInput.classList.add('error');
+    errDiv.textContent='La référence est obligatoire.';
+    refInput.focus();
+    setTimeout(()=>refInput.classList.remove('error'),400);
+    return;
+  }
+  // Remplir la référence projet
+  document.getElementById('project-ref').value=ref;
+  const fileName='VISIO_'+ref+'.geoter';
+  if(window.showSaveFilePicker){
+    try{
+      const handle=await window.showSaveFilePicker({suggestedName:fileName,startIn:'desktop',types:[{description:'Projet GéoTer',accept:{'application/json':['.geoter']}}]});
+      savedFileHandle=handle;
+      // Écrire un projet initial vide
+      const initProject=buildProjectJSON();
+      const writable=await handle.createWritable();
+      await writable.write(new Blob([JSON.stringify(initProject)],{type:'application/json'}));
+      await writable.close();
+    }catch(e){
+      if(e.name==='AbortError'){closeNewStudyModal();return;}
+      console.error(e);
+    }
+  }
+  closeNewStudyModal();
+  activateApp();
+}
+
+function activateApp(){
+  document.getElementById('toolbar').classList.add('toolbar-active');
+  document.getElementById('welcome-screen').style.display='none';
+  document.getElementById('load-plan-screen').style.display='';
+  startAutoSave();
+}
+
+function buildProjectJSON(){
   const refVal=document.getElementById('project-ref').value.trim();
-  const fileName='VISIO_'+(refVal||'projet-geoter')+'.geoter';
   const project={
     version:2,
     projectRef:refVal,
@@ -1407,15 +1522,44 @@ async function exportProject(){
     cleanPaths:cleanPaths,
     photos:photos.map(p=>({dataUrl:p.dataUrl,timestamp:p.timestamp||'',name:p.name||'',checked:!!p.checked}))
   };
-  // ── Inclure les données Scan 3D si présentes ──
   if(window.getScan3DExportData){
     const s3d=window.getScan3DExportData();
     if(s3d) project.scan3d=s3d;
   }
+  return project;
+}
+
+async function silentSave(){
+  if(!savedFileHandle)return;
+  try{
+    const project=buildProjectJSON();
+    const writable=await savedFileHandle.createWritable();
+    await writable.write(new Blob([JSON.stringify(project)],{type:'application/json'}));
+    await writable.close();
+  }catch(e){console.warn('Auto-save échoué:',e);}
+}
+
+function startAutoSave(){
+  if(autoSaveInterval)clearInterval(autoSaveInterval);
+  autoSaveInterval=setInterval(silentSave,120000); // 2 minutes
+}
+
+async function exportProject(){
+  const refVal=document.getElementById('project-ref').value.trim();
+  const fileName='VISIO_'+(refVal||'projet-geoter')+'.geoter';
+  const project=buildProjectJSON();
   const blob=new Blob([JSON.stringify(project)],{type:'application/json'});
-  if(window.showSaveFilePicker){
+  if(savedFileHandle){
+    // Réutiliser le handle existant (pas de dialogue)
+    try{
+      const writable=await savedFileHandle.createWritable();
+      await writable.write(blob);
+      await writable.close();
+    }catch(e){console.error(e);}
+  }else if(window.showSaveFilePicker){
     try{
       const handle=await window.showSaveFilePicker({suggestedName:fileName,types:[{description:'Projet GéoTer',accept:{'application/json':['.geoter']}}]});
+      savedFileHandle=handle;
       const writable=await handle.createWritable();
       await writable.write(blob);
       await writable.close();
@@ -1425,15 +1569,54 @@ async function exportProject(){
   }
 }
 
+async function closeProject(){
+  if(!confirm('Voulez-vous enregistrer avant de fermer ?')){}
+  else{await exportProject();}
+  // Arrêter l'auto-save
+  if(autoSaveInterval){clearInterval(autoSaveInterval);autoSaveInterval=null;}
+  savedFileHandle=null;
+  // Réinitialiser toutes les données
+  elements=[];selectedId=null;selectedStickerId=null;
+  drawPaths=[];cleanPaths=[];currentPathPts=[];
+  photos=[];
+  planImgSrc='';planW=1200;planH=800;
+  document.getElementById('project-ref').value='';
+  // Masquer le plan
+  const $img=document.getElementById('plan-img');
+  $img.style.display='none';$img.src='';
+  // Réinitialiser les canvas
+  const $dc=document.getElementById('draw-canvas');
+  const dcCtx=$dc.getContext('2d');dcCtx.clearRect(0,0,$dc.width,$dc.height);
+  const $cc=document.getElementById('clean-canvas');
+  const ccCtx=$cc.getContext('2d');ccCtx.clearRect(0,0,$cc.width,$cc.height);
+  document.getElementById('elements-layer').innerHTML='';
+  // Masquer toolbar, afficher écran d'accueil
+  document.getElementById('toolbar').classList.remove('toolbar-active');
+  document.getElementById('empty-state').style.display='';
+  document.getElementById('welcome-screen').style.display='';
+  document.getElementById('load-plan-screen').style.display='none';
+  // Fermer panels ouverts
+  const st=document.getElementById('shape-toolbar');if(st)st.classList.remove('open');
+  // Réinitialiser scan 3D
+  if(window.importScan3DFromProject) window.importScan3DFromProject(null);
+}
+
 function importProject(e){
   const file=e.target.files[0];if(!file)return;
   const reader=new FileReader();
   reader.onload=function(ev){
     let project;
     try{project=JSON.parse(ev.target.result);}catch(err){alert('Fichier projet invalide.');return;}
-    if(!project.planImgSrc){alert('Pas de plan dans ce fichier.');return;}
+    // Activer l'interface
+    activateApp();
+    savedFileHandle=null; // Pas de handle en lecture, le 1er "Enregistrer" demandera l'emplacement
     // Restore project ref
     document.getElementById('project-ref').value=project.projectRef||'';
+    // Projet sans plan (nouveau projet vide)
+    if(!project.planImgSrc){
+      if(window.importScan3DFromProject) window.importScan3DFromProject(project.scan3d||null);
+      return;
+    }
     // Restore plan image
     planImgSrc=project.planImgSrc;
     planW=project.planW||1200;
@@ -1876,7 +2059,7 @@ function mepDownload(){
 
 async function openCamera(){try{cameraStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment',width:{ideal:1920},height:{ideal:1080}}});document.getElementById('camera-video').srcObject=cameraStream;document.getElementById('camera-overlay').classList.add('open');}catch(err){alert("Impossible d'accéder à la caméra.");}}
 function closeCamera(){if(cameraStream){cameraStream.getTracks().forEach(t=>t.stop());cameraStream=null;}document.getElementById('camera-overlay').classList.remove('open');}
-function takePhoto(){const v=document.getElementById('camera-video');const c=document.createElement('canvas');c.width=v.videoWidth;c.height=v.videoHeight;c.getContext('2d').drawImage(v,0,0);const ref=document.getElementById('project-ref').value||'Photo';photos.push({dataUrl:c.toDataURL('image/jpeg',0.85),timestamp:new Date().toLocaleString('fr-FR'),name:`${ref}_${photos.length+1}`,checked:true});closeCamera();renderPhotos();}
+function takePhoto(){const v=document.getElementById('camera-video');const c=document.createElement('canvas');c.width=v.videoWidth;c.height=v.videoHeight;c.getContext('2d').drawImage(v,0,0);const dataUrl=c.toDataURL('image/jpeg',0.85);closeCamera();const ref=document.getElementById('project-ref').value||'Photo';const defName=`${ref}_${photos.length+1}`;const name=prompt('Nom de la photo :',defName);if(name===null)return;photos.push({dataUrl,timestamp:new Date().toLocaleString('fr-FR'),name:name.trim()||defName,checked:true});renderPhotos();}
 function deletePhoto(i){photos.splice(i,1);renderPhotos();}
 function togglePhotoCheck(i,v){photos[i].checked=v;renderPhotos();}
 function renamePhoto(i,name){photos[i].name=name.trim()||('Photo_'+(i+1));}
