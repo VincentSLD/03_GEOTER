@@ -98,7 +98,7 @@
 
   .plan-element{position:absolute;user-select:none;touch-action:none;z-index:10}
   .plan-element.dragging{z-index:1000}
-  .sticker-wrap{display:flex;flex-direction:column;align-items:center}
+  .sticker-wrap,.image-wrap{display:flex;flex-direction:column;align-items:center}
   .sticker-icon{line-height:1;background:none;border-radius:var(--radius);padding:4px;border:2px solid transparent;box-shadow:none;transition:all .15s;display:flex;align-items:center;justify-content:center}
   .sticker-icon svg{display:block}
   .sticker-icon.selected{border-color:var(--yellow);box-shadow:0 0 0 3px var(--yellow-glow),var(--shadow-md)}
@@ -429,6 +429,29 @@
   .photo-panel-body{touch-action:pan-y;-webkit-overflow-scrolling:touch}
   .mep-panel-body{touch-action:pan-y;-webkit-overflow-scrolling:touch}
 
+  /* ═══ INSERT IMAGE MODAL ═══ */
+  #insert-image-modal{position:fixed;inset:0;background:rgba(0,0,0,0.7);display:none;align-items:center;justify-content:center;z-index:950;backdrop-filter:blur(4px)}
+  #insert-image-modal.open{display:flex}
+  #insert-image-inner{background:var(--white);border-radius:var(--radius-lg);padding:28px;width:420px;max-width:92vw;box-shadow:var(--shadow-lg);border-top:4px solid var(--yellow)}
+  #insert-image-inner h2{font-size:18px;font-weight:900;color:var(--black);margin:0 0 16px}
+  .img-choice-btn{width:100%;padding:14px 16px;border:2px solid var(--gray-200);border-radius:var(--radius);background:var(--white);font-size:13px;font-weight:800;font-family:inherit;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:10px;margin-bottom:8px;color:var(--black)}
+  .img-choice-btn:hover,.img-choice-btn:active{border-color:var(--yellow);background:var(--yellow-pale)}
+  .img-choice-btn .img-choice-icon{font-size:20px}
+  .img-choice-cancel{width:100%;padding:10px;border:none;border-radius:var(--radius);background:var(--gray-100);color:var(--gray-500);font-size:13px;font-weight:800;font-family:inherit;cursor:pointer;transition:all .2s;margin-top:6px}
+  .img-choice-cancel:hover,.img-choice-cancel:active{background:var(--gray-200);color:var(--black)}
+  /* Photo picker grid */
+  #photo-picker-modal{position:fixed;inset:0;background:rgba(0,0,0,0.7);display:none;align-items:center;justify-content:center;z-index:960;backdrop-filter:blur(4px)}
+  #photo-picker-modal.open{display:flex}
+  #photo-picker-inner{background:var(--white);border-radius:var(--radius-lg);padding:28px;width:520px;max-width:92vw;max-height:80vh;box-shadow:var(--shadow-lg);border-top:4px solid var(--yellow);display:flex;flex-direction:column}
+  #photo-picker-inner h2{font-size:18px;font-weight:900;color:var(--black);margin:0 0 14px}
+  #photo-picker-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px;overflow-y:auto;flex:1}
+  .photo-pick-card{position:relative;border-radius:var(--radius);overflow:hidden;cursor:pointer;border:3px solid transparent;transition:all .2s;aspect-ratio:4/3}
+  .photo-pick-card:hover,.photo-pick-card:active{border-color:var(--yellow);box-shadow:0 0 0 2px var(--yellow-glow)}
+  .photo-pick-card img{width:100%;height:100%;object-fit:cover;display:block}
+  .photo-pick-card .photo-pick-name{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,0.8));padding:14px 6px 4px;color:#fff;font-size:10px;font-weight:700;text-align:center}
+  .photo-picker-cancel{width:100%;padding:10px;border:none;border-radius:var(--radius);background:var(--gray-100);color:var(--gray-500);font-size:13px;font-weight:800;font-family:inherit;cursor:pointer;transition:all .2s;margin-top:12px;flex-shrink:0}
+  .photo-picker-cancel:hover,.photo-picker-cancel:active{background:var(--gray-200);color:var(--black)}
+
   /* ═══ TABLET MEDIA QUERIES ═══ */
   @media(max-width:1024px){
     .tool-btn{padding:6px 8px;min-width:42px}
@@ -628,6 +651,8 @@
       <div id="crop-header">
         <span>✂️ Rogner le plan</span>
         <div class="crop-actions">
+          <button class="btn-crop btn-crop-reset" onclick="rotateCropImage(-90)" title="Rotation gauche">⟲ 90°</button>
+          <button class="btn-crop btn-crop-reset" onclick="rotateCropImage(90)" title="Rotation droite">⟳ 90°</button>
           <button class="btn-crop btn-crop-reset" onclick="resetCrop()">Tout sélectionner</button>
           <button class="btn-crop btn-crop-cancel" onclick="closeCropModal()">Annuler</button>
           <button class="btn-crop btn-crop-apply" onclick="applyCrop()">Valider</button>
@@ -673,6 +698,8 @@
       <label>Nom :</label>
       <input type="text" id="photo-name-input" placeholder="Nom de la photo..." onkeydown="if(event.key==='Enter')confirmPhotoName()">
       <div class="photo-name-actions">
+        <button class="btn-photo-reset" onclick="rotatePhotoImage(-90)" title="Rotation gauche">⟲</button>
+        <button class="btn-photo-reset" onclick="rotatePhotoImage(90)" title="Rotation droite">⟳</button>
         <button class="btn-photo-reset" onclick="resetPhotoCrop()" title="Réinitialiser le cadrage">↺</button>
         <button class="btn-photo-cancel" onclick="cancelPhotoName()">Annuler</button>
         <button class="btn-photo-save" onclick="confirmPhotoName()">Valider</button>
@@ -680,6 +707,21 @@
     </div>
   </div>
   <div id="shape-toolbar"></div>
+  <div id="insert-image-modal">
+    <div id="insert-image-inner">
+      <h2>🖼️ Insérer une image</h2>
+      <button class="img-choice-btn" onclick="closeInsertImageModal();insertImageFromPhotos()"><span class="img-choice-icon">📸</span> Depuis les photos du projet</button>
+      <button class="img-choice-btn" onclick="closeInsertImageModal();insertImageFromFile()"><span class="img-choice-icon">📂</span> Depuis un fichier (local / réseau)</button>
+      <button class="img-choice-cancel" onclick="closeInsertImageModal()">Annuler</button>
+    </div>
+  </div>
+  <div id="photo-picker-modal">
+    <div id="photo-picker-inner">
+      <h2>📸 Choisir une photo</h2>
+      <div id="photo-picker-grid"></div>
+      <button class="photo-picker-cancel" onclick="closePhotoPickerModal()">Annuler</button>
+    </div>
+  </div>
   <div id="photo-lightbox"><button class="lb-close" onclick="closeLightbox()">✕</button><img id="lb-img" src=""><div class="lb-name" id="lb-name"></div></div>
   <div id="camera-overlay">
     <video id="camera-video" autoplay playsinline></video>
@@ -1201,8 +1243,8 @@ function renderElements(){
     }else if(el.type==='legend'){
       div.innerHTML=`<img src="${el.imgSrc}" style="width:${el.w}px;height:${el.h}px;pointer-events:none;display:block"><button class="del-btn" data-action="del" data-eid="${el.id}">×</button>`;
     }else if(el.type==='image'){
-      const iw=el.w||150,ih=el.h||100;
-      div.innerHTML=`<img src="${el.imgSrc}" style="width:${iw}px;height:${ih}px;pointer-events:none;display:block;border-radius:4px;box-shadow:0 2px 8px rgba(0,0,0,0.3)"><button class="del-btn" data-action="del" data-eid="${el.id}">×</button><div class="resize-handle" data-resize="1"></div>`;
+      const iw=el.w||150,ih=el.h||100;const irot=el.rotation||0;
+      div.innerHTML=`<div class="image-wrap" style="transform:rotate(${irot}deg)"><img src="${el.imgSrc}" style="width:${iw}px;height:${ih}px;pointer-events:none;display:block;border-radius:4px;box-shadow:0 2px 8px rgba(0,0,0,0.3)"></div><button class="del-btn" data-action="del" data-eid="${el.id}">×</button><button class="edit-btn" data-action="editImage" data-eid="${el.id}">✏️</button><button class="rotate-btn" data-action="rotate" data-eid="${el.id}">↻</button><div class="resize-handle" data-resize="1"></div>`;
     }
     div.addEventListener('pointerdown',e=>{
       if(e.target.closest('[data-aedit]')){e.stopPropagation();return;}
@@ -1216,6 +1258,7 @@ function renderElements(){
         else if(action==='editLabel') editLabel(eid);
         else if(action==='duplicate') duplicateElement(eid);
         else if(action==='toggleLock') toggleGroupLock(eid);
+        else if(action==='editImage') editImageOnPlan(eid);
         else if(action==='rotate'){
           const rel=elements.find(x=>x.id===eid);if(!rel)return;
           const idx2=elements.indexOf(rel);
@@ -1224,7 +1267,7 @@ function renderElements(){
           const cx=rect.left+rect.width/2,cy=rect.top+rect.height/2;
           const startAngle=Math.atan2(e.clientY-cy,e.clientX-cx)*180/Math.PI;
           const startRot=rel.rotation||0;
-          const wrap=nd2.querySelector('.sticker-wrap');
+          const wrap=nd2.querySelector('.sticker-wrap')||nd2.querySelector('.image-wrap');
           const rMove=ev=>{
             const angle=Math.atan2(ev.clientY-cy,ev.clientX-cx)*180/Math.PI;
             rel.rotation=Math.round(startRot+(angle-startAngle));
@@ -1688,7 +1731,7 @@ function buildProjectJSON(){
       if(el.type==='text'){const o={type:'text',x:el.x,y:el.y,html:el.html||'',text:el.text||'',color:el.color};if(el.bordered)o.bordered=true;return o;}
       if(el.type==='arrow')return{type:'arrow',x:el.x,y:el.y,x2:el.x2,y2:el.y2,color:el.color,doubleHead:el.doubleHead||false,lineOnly:el.lineOnly||false,dashed:el.dashed||false,opacity:el.opacity!=null?el.opacity:1,strokeWidth:el.strokeWidth||2};
       if(el.type==='legend')return{type:'legend',x:el.x,y:el.y,imgSrc:el.imgSrc,w:el.w,h:el.h};
-      if(el.type==='image')return{type:'image',x:el.x,y:el.y,imgSrc:el.imgSrc,w:el.w,h:el.h};
+      if(el.type==='image')return{type:'image',x:el.x,y:el.y,imgSrc:el.imgSrc,w:el.w,h:el.h,rotation:el.rotation||0};
       return el;
     }),
     drawPaths:drawPaths,
@@ -1761,8 +1804,8 @@ async function exportProjectAs(){
 }
 
 async function closeProject(){
-  if(!confirm('Voulez-vous enregistrer avant de fermer ?')){}
-  else{await exportProject();}
+  if(savedFileHandle){await silentSave();}
+  else if(confirm('Voulez-vous enregistrer avant de fermer ?')){await exportProject();}
   // Arrêter l'auto-save
   if(autoSaveInterval){clearInterval(autoSaveInterval);autoSaveInterval=null;}
   savedFileHandle=null;
@@ -2014,7 +2057,8 @@ function renderPlanToCanvas(cb){
     imageEls.forEach(el=>{
       const img=new Image();
       const iw=el.w||150,ih=el.h||100;
-      img.onload=()=>{ctx.drawImage(img,toX(el.x)-iw/2,toY(el.y)-ih/2,iw,ih);check();};
+      const irot=(el.rotation||0)*Math.PI/180;
+      img.onload=()=>{const dx=toX(el.x),dy=toY(el.y);if(irot){ctx.save();ctx.translate(dx,dy);ctx.rotate(irot);ctx.drawImage(img,-iw/2,-ih/2,iw,ih);ctx.restore();}else{ctx.drawImage(img,dx-iw/2,dy-ih/2,iw,ih);}check();};
       img.onerror=()=>{check();};
       img.src=el.imgSrc;
     });
@@ -2296,12 +2340,20 @@ async function openCamera(){try{cameraStream=await navigator.mediaDevices.getUse
 function closeCamera(){if(cameraStream){cameraStream.getTracks().forEach(t=>t.stop());cameraStream=null;}document.getElementById('camera-overlay').classList.remove('open');}
 let pendingPhotoDataUrl=null,pendingPhotoImg=null;
 let pcropRect={x:0,y:0,w:0,h:0},pcropScale=1,pcropFullW=0,pcropFullH=0;
+let editingImageId=null;
 
 function takePhoto(){const v=document.getElementById('camera-video');const c=document.createElement('canvas');c.width=v.videoWidth;c.height=v.videoHeight;c.getContext('2d').drawImage(v,0,0);pendingPhotoDataUrl=c.toDataURL('image/jpeg',0.85);closeCamera();openPhotoNameModal();}
 
 function openPhotoNameModal(){
-  const ref=document.getElementById('project-ref').value||'Photo';
-  document.getElementById('photo-name-input').value=`${ref}_${photos.length+1}`;
+  const nameLabel=document.querySelector('#photo-bottom-bar label');
+  const nameInput=document.getElementById('photo-name-input');
+  if(editingImageId){
+    nameLabel.style.display='none';nameInput.style.display='none';
+  }else{
+    nameLabel.style.display='';nameInput.style.display='';
+    const ref=document.getElementById('project-ref').value||'Photo';
+    nameInput.value=`${ref}_${photos.length+1}`;
+  }
   const modal=document.getElementById('photo-name-modal');
   const cvs=document.getElementById('photo-crop-canvas');
   const ctx=cvs.getContext('2d');
@@ -2315,7 +2367,36 @@ function openPhotoNameModal(){
     pcropRect={x:0,y:0,w:cvs.width,h:cvs.height};
     modal.classList.add('open');
     renderPhotoCropSelection();
-    setTimeout(()=>document.getElementById('photo-name-input').select(),100);
+    if(!editingImageId)setTimeout(()=>nameInput.select(),100);
+  };
+  img.src=pendingPhotoDataUrl;
+}
+
+function rotatePhotoImage(deg){
+  const img=new Image();
+  img.onload=()=>{
+    const c=document.createElement('canvas');
+    if(Math.abs(deg)===90){c.width=img.naturalHeight;c.height=img.naturalWidth;}
+    else{c.width=img.naturalWidth;c.height=img.naturalHeight;}
+    const ctx=c.getContext('2d');
+    ctx.translate(c.width/2,c.height/2);
+    ctx.rotate(deg*Math.PI/180);
+    ctx.drawImage(img,-img.naturalWidth/2,-img.naturalHeight/2);
+    pendingPhotoDataUrl=c.toDataURL('image/jpeg',0.85);
+    // Redraw crop canvas with rotated image
+    const cvs=document.getElementById('photo-crop-canvas');
+    const cctx=cvs.getContext('2d');
+    const ri=new Image();
+    ri.onload=()=>{
+      pendingPhotoImg=ri;pcropFullW=ri.naturalWidth;pcropFullH=ri.naturalHeight;
+      const maxW=window.innerWidth*0.85,maxH=window.innerHeight*0.60;
+      pcropScale=Math.min(maxW/pcropFullW,maxH/pcropFullH,1);
+      cvs.width=Math.round(pcropFullW*pcropScale);cvs.height=Math.round(pcropFullH*pcropScale);
+      cctx.drawImage(ri,0,0,cvs.width,cvs.height);
+      pcropRect={x:0,y:0,w:cvs.width,h:cvs.height};
+      renderPhotoCropSelection();
+    };
+    ri.src=pendingPhotoDataUrl;
   };
   img.src=pendingPhotoDataUrl;
 }
@@ -2389,23 +2470,37 @@ function resetPhotoCrop(){
   renderPhotoCropSelection();
 }
 
+function editImageOnPlan(eid){
+  const el=elements.find(e=>e.id===eid);if(!el||el.type!=='image')return;
+  editingImageId=eid;
+  pendingPhotoDataUrl=el.imgSrc;
+  openPhotoNameModal();
+}
+
 function confirmPhotoName(){
-  const name=document.getElementById('photo-name-input').value.trim();
-  const ref=document.getElementById('project-ref').value||'Photo';
-  const defName=`${ref}_${photos.length+1}`;
   const sx=Math.round(pcropRect.x/pcropScale),sy=Math.round(pcropRect.y/pcropScale);
   const sw=Math.round(pcropRect.w/pcropScale),sh=Math.round(pcropRect.h/pcropScale);
   if(sw<10||sh<10){alert('Sélection trop petite.');return;}
   const c=document.createElement('canvas');c.width=sw;c.height=sh;
   c.getContext('2d').drawImage(pendingPhotoImg,sx,sy,sw,sh,0,0,sw,sh);
   const dataUrl=c.toDataURL('image/jpeg',0.85);
+  if(editingImageId){
+    const el=elements.find(e=>e.id===editingImageId);
+    if(el){el.imgSrc=dataUrl;const img=new Image();img.onload=()=>{const ratio=img.naturalWidth/img.naturalHeight;el.w=el.w||150;el.h=Math.round(el.w/ratio);renderElements();};img.src=dataUrl;}
+    editingImageId=null;pendingPhotoDataUrl=null;pendingPhotoImg=null;
+    document.getElementById('photo-name-modal').classList.remove('open');
+    return;
+  }
+  const name=document.getElementById('photo-name-input').value.trim();
+  const ref=document.getElementById('project-ref').value||'Photo';
+  const defName=`${ref}_${photos.length+1}`;
   photos.push({dataUrl,timestamp:new Date().toLocaleString('fr-FR'),name:name||defName,checked:true});
   pendingPhotoDataUrl=null;pendingPhotoImg=null;
   document.getElementById('photo-name-modal').classList.remove('open');
   renderPhotos();
 }
 
-function cancelPhotoName(){pendingPhotoDataUrl=null;pendingPhotoImg=null;document.getElementById('photo-name-modal').classList.remove('open');}
+function cancelPhotoName(){editingImageId=null;pendingPhotoDataUrl=null;pendingPhotoImg=null;document.getElementById('photo-name-modal').classList.remove('open');}
 function deletePhoto(i){photos.splice(i,1);renderPhotos();}
 function togglePhotoCheck(i,v){photos[i].checked=v;renderPhotos();}
 function renamePhoto(i,name){photos[i].name=name.trim()||('Photo_'+(i+1));}
@@ -2443,19 +2538,24 @@ function togglePhotoSection(){document.getElementById('photo-section').classList
 
 // ═══ INSERT IMAGE ON PLAN ═══
 function insertImageMenu(){
-  const hasPhotos=photos.length>0;
-  const choices=hasPhotos?['Depuis les photos du projet','Depuis un fichier (local/réseau)']:['Depuis un fichier (local/réseau)'];
-  const msg=hasPhotos?'Insérer une image sur le plan :\n\n1 - Depuis les photos du projet\n2 - Depuis un fichier (local/réseau)':'Insérer une image depuis un fichier (local/réseau) ?';
-  if(!hasPhotos){insertImageFromFile();return;}
-  const choice=prompt(msg+'\n\nEntrez 1 ou 2 :','1');
-  if(choice==='1')insertImageFromPhotos();
-  else if(choice==='2')insertImageFromFile();
+  if(photos.length===0){insertImageFromFile();return;}
+  document.getElementById('insert-image-modal').classList.add('open');
 }
+function closeInsertImageModal(){document.getElementById('insert-image-modal').classList.remove('open');}
+
 function insertImageFromPhotos(){
   if(photos.length===0){alert('Aucune photo disponible.');return;}
-  const idx=photos.length===1?0:parseInt(prompt('Choisissez le numéro de la photo (1 à '+photos.length+') :\n\n'+photos.map((p,i)=>(i+1)+' - '+(p.name||'Photo '+(i+1))).join('\n'),'1'),10)-1;
-  if(isNaN(idx)||idx<0||idx>=photos.length)return;
-  const p=photos[idx];
+  if(photos.length===1){placePhotoOnPlan(photos[0]);return;}
+  const grid=document.getElementById('photo-picker-grid');
+  grid.innerHTML=photos.map((p,i)=>`<div class="photo-pick-card" onclick="pickPhoto(${i})"><img src="${p.dataUrl}" alt="${escXml(p.name||'Photo '+(i+1))}"><div class="photo-pick-name">${escXml(p.name||'Photo '+(i+1))}</div></div>`).join('');
+  document.getElementById('photo-picker-modal').classList.add('open');
+}
+function closePhotoPickerModal(){document.getElementById('photo-picker-modal').classList.remove('open');}
+function pickPhoto(idx){
+  closePhotoPickerModal();
+  if(idx>=0&&idx<photos.length)placePhotoOnPlan(photos[idx]);
+}
+function placePhotoOnPlan(p){
   const img=new Image();
   img.onload=()=>{
     const maxDim=200;const ratio=img.naturalWidth/img.naturalHeight;
@@ -2540,8 +2640,13 @@ let cropRect={x:0,y:0,w:0,h:0},cropDragging=false,cropStartX=0,cropStartY=0,crop
 let cropResizing=false,cropResizeHandle='',cropInitRect=null,cropInitMouse=null;
 let cropMoving=false,cropMoveStart=null;
 
+let cropSrcDataUrl=null;
 function openCropTool(){
   if(!planImgSrc){alert('Chargez d\'abord un plan.');return;}
+  cropSrcDataUrl=planImgSrc;
+  drawCropCanvas(cropSrcDataUrl);
+}
+function drawCropCanvas(src){
   const modal=document.getElementById('crop-modal');
   const cvs=document.getElementById('crop-canvas');
   const ctx=cvs.getContext('2d');
@@ -2556,7 +2661,22 @@ function openCropTool(){
     modal.classList.add('open');
     renderCropSelection();
   };
-  img.src=planImgSrc;
+  img.src=src;
+}
+function rotateCropImage(deg){
+  const img=new Image();
+  img.onload=()=>{
+    const c=document.createElement('canvas');
+    if(Math.abs(deg)===90){c.width=img.naturalHeight;c.height=img.naturalWidth;}
+    else{c.width=img.naturalWidth;c.height=img.naturalHeight;}
+    const ctx=c.getContext('2d');
+    ctx.translate(c.width/2,c.height/2);
+    ctx.rotate(deg*Math.PI/180);
+    ctx.drawImage(img,-img.naturalWidth/2,-img.naturalHeight/2);
+    cropSrcDataUrl=c.toDataURL('image/png');
+    drawCropCanvas(cropSrcDataUrl);
+  };
+  img.src=cropSrcDataUrl;
 }
 
 function renderCropSelection(){
@@ -2663,7 +2783,7 @@ function applyCrop(){
     elements=[];drawPaths=[];cleanPaths=[];selectedId=null;redrawCanvas();redrawCleanCanvas();resetView();
     closeCropModal();
   };
-  img.src=planImgSrc;
+  img.src=cropSrcDataUrl||planImgSrc;
 }
 
 function closeCropModal(){document.getElementById('crop-modal').classList.remove('open');}
