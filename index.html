@@ -1787,6 +1787,8 @@ async function closeProject(){
   document.getElementById('welcome-screen').style.display='';
   document.getElementById('load-plan-screen').style.display='none';
   // Fermer panels ouverts
+  document.getElementById('photo-section').classList.remove('open');
+  document.getElementById('mep-panel').classList.remove('open');
   const st=document.getElementById('shape-toolbar');if(st)st.classList.remove('open');
   // Réinitialiser scan 3D
   if(window.importScan3DFromProject) window.importScan3DFromProject(null);
