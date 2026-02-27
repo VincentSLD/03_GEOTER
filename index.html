@@ -480,10 +480,12 @@
     <button class="tool-btn" onclick="undoAction()"><span class="icon" style="font-style:normal;font-size:16px">⟲</span><span class="label">Annuler</span></button>
     <button class="tool-btn" onclick="redoAction()"><span class="icon" style="font-style:normal;font-size:16px">⟳</span><span class="label">Remettre</span></button>
     <button class="tool-btn" onclick="openCropTool()"><span class="icon">✂️</span><span class="label">Rogner</span></button>
+    <button class="tool-btn" onclick="insertImageMenu()"><span class="icon">🖼️</span><span class="label">Image</span></button>
     <div class="tool-sep"></div>
     <button class="tool-btn" onclick="openLegend()"><span class="icon">📋</span><span class="label">Légende</span></button>
     <button class="tool-btn" onclick="openMiseEnPage()"><span class="icon">📐</span><span class="label">Mise en Page</span></button>
     <button class="tool-btn" onclick="exportProject()"><span class="icon">💾</span><span class="label">Enregistrer</span></button>
+    <button class="tool-btn" onclick="exportProjectAs()"><span class="icon">📥</span><span class="label">Enreg. sous...</span></button>
     <button class="tool-btn" onclick="document.getElementById('projectInput').click()"><span class="icon">📂</span><span class="label">Ouvrir</span></button>
     <input type="file" id="projectInput" accept=".geoter" style="display:none" onchange="importProject(event)">
     <button class="tool-btn" onclick="closeProject()"><span class="icon" style="font-style:normal;font-size:18px">✕</span><span class="label">Fermer</span></button>
@@ -1198,6 +1200,9 @@ function renderElements(){
       </div>`;
     }else if(el.type==='legend'){
       div.innerHTML=`<img src="${el.imgSrc}" style="width:${el.w}px;height:${el.h}px;pointer-events:none;display:block"><button class="del-btn" data-action="del" data-eid="${el.id}">×</button>`;
+    }else if(el.type==='image'){
+      const iw=el.w||150,ih=el.h||100;
+      div.innerHTML=`<img src="${el.imgSrc}" style="width:${iw}px;height:${ih}px;pointer-events:none;display:block;border-radius:4px;box-shadow:0 2px 8px rgba(0,0,0,0.3)"><button class="del-btn" data-action="del" data-eid="${el.id}">×</button><div class="resize-handle" data-resize="1"></div>`;
     }
     div.addEventListener('pointerdown',e=>{
       if(e.target.closest('[data-aedit]')){e.stopPropagation();return;}
@@ -1262,6 +1267,22 @@ function renderElements(){
         const sUp=()=>{document.removeEventListener('pointermove',sMove);document.removeEventListener('pointerup',sUp);};
         document.addEventListener('pointermove',sMove);
         document.addEventListener('pointerup',sUp);
+        return;
+      }
+      if(resizeEl&&el.type==='image'){
+        e.stopPropagation();e.preventDefault();selectedId=el.id;
+        const cx=el.x*scale+offX,cy=el.y*scale+offY;
+        const origW=el.w||150,origH=el.h||100,ratio=origW/origH;
+        const iMove=ev=>{
+          const dx=ev.clientX-cx,dy=ev.clientY-cy;
+          const dist=Math.sqrt(dx*dx+dy*dy);
+          const nw=Math.max(30,Math.round(dist*2/scale));
+          el.w=nw;el.h=Math.round(nw/ratio);
+          renderElements();
+        };
+        const iUp=()=>{document.removeEventListener('pointermove',iMove);document.removeEventListener('pointerup',iUp);};
+        document.addEventListener('pointermove',iMove);
+        document.addEventListener('pointerup',iUp);
         return;
       }
       const handleEl=e.target.closest('[data-handle]');
@@ -1667,6 +1688,7 @@ function buildProjectJSON(){
       if(el.type==='text'){const o={type:'text',x:el.x,y:el.y,html:el.html||'',text:el.text||'',color:el.color};if(el.bordered)o.bordered=true;return o;}
       if(el.type==='arrow')return{type:'arrow',x:el.x,y:el.y,x2:el.x2,y2:el.y2,color:el.color,doubleHead:el.doubleHead||false,lineOnly:el.lineOnly||false,dashed:el.dashed||false,opacity:el.opacity!=null?el.opacity:1,strokeWidth:el.strokeWidth||2};
       if(el.type==='legend')return{type:'legend',x:el.x,y:el.y,imgSrc:el.imgSrc,w:el.w,h:el.h};
+      if(el.type==='image')return{type:'image',x:el.x,y:el.y,imgSrc:el.imgSrc,w:el.w,h:el.h};
       return el;
     }),
     drawPaths:drawPaths,
@@ -1710,6 +1732,24 @@ async function exportProject(){
   }else if(window.showSaveFilePicker){
     try{
       const handle=await window.showSaveFilePicker({suggestedName:fileName,types:[{description:'Projet GéoTer',accept:{'application/json':['.geoter']}}]});
+      savedFileHandle=handle;
+      const writable=await handle.createWritable();
+      await writable.write(blob);
+      await writable.close();
+    }catch(e){if(e.name!=='AbortError')console.error(e);}
+  }else{
+    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=fileName;a.click();URL.revokeObjectURL(a.href);
+  }
+}
+
+async function exportProjectAs(){
+  const refVal=document.getElementById('project-ref').value.trim();
+  const fileName='VISIO_'+(refVal||'projet-geoter')+'.geoter';
+  const project=buildProjectJSON();
+  const blob=new Blob([JSON.stringify(project)],{type:'application/json'});
+  if(window.showSaveFilePicker){
+    try{
+      const handle=await window.showSaveFilePicker({suggestedName:fileName,startIn:savedFileHandle||'desktop',types:[{description:'Projet GéoTer',accept:{'application/json':['.geoter']}}]});
       savedFileHandle=handle;
       const writable=await handle.createWritable();
       await writable.write(blob);
@@ -1815,7 +1855,7 @@ function renderPlanToCanvas(cb){
     }else if(el.type==='arrow'){
       const m=Math.max(20,(el.strokeWidth||2)*5);
       minX=Math.min(minX,el.x-m,el.x2-m);minY=Math.min(minY,el.y-m,el.y2-m);maxX=Math.max(maxX,el.x+m,el.x2+m);maxY=Math.max(maxY,el.y+m,el.y2+m);
-    }else if(el.type==='legend'){
+    }else if(el.type==='legend'||el.type==='image'){
       const hw=(el.w||0)/2,hh=(el.h||0)/2;
       minX=Math.min(minX,el.x-hw);minY=Math.min(minY,el.y-hh);maxX=Math.max(maxX,el.x+hw);maxY=Math.max(maxY,el.y+hh);
     }
@@ -1926,10 +1966,11 @@ function renderPlanToCanvas(cb){
       walkNode(wrap,{bold:false,italic:false,underline:false,color:el.color,size:13});
       document.body.removeChild(wrap);
     });
-    // Render stickers + legends
+    // Render stickers + legends + images
     const stickerEls=elements.filter(e=>e.type==='sticker');
     const legendEls=elements.filter(e=>e.type==='legend');
-    const totalAsync=stickerEls.length+legendEls.length;
+    const imageEls=elements.filter(e=>e.type==='image');
+    const totalAsync=stickerEls.length+legendEls.length+imageEls.length;
     if(totalAsync===0){done();return;}
     let pending=totalAsync;
     const check=()=>{pending--;if(pending===0)done();};
@@ -1965,6 +2006,13 @@ function renderPlanToCanvas(cb){
     legendEls.forEach(el=>{
       const img=new Image();
       img.onload=()=>{ctx.drawImage(img,toX(el.x)-el.w/2,toY(el.y)-el.h/2,el.w,el.h);check();};
+      img.onerror=()=>{check();};
+      img.src=el.imgSrc;
+    });
+    imageEls.forEach(el=>{
+      const img=new Image();
+      const iw=el.w||150,ih=el.h||100;
+      img.onload=()=>{ctx.drawImage(img,toX(el.x)-iw/2,toY(el.y)-ih/2,iw,ih);check();};
       img.onerror=()=>{check();};
       img.src=el.imgSrc;
     });
@@ -2390,6 +2438,67 @@ function closeLightbox(){document.getElementById('photo-lightbox').classList.rem
 document.getElementById('photo-lightbox').addEventListener('click',ev=>{if(ev.target.id==='photo-lightbox')closeLightbox();});
 document.addEventListener('keydown',ev=>{if(ev.key==='Escape'&&document.getElementById('photo-lightbox').classList.contains('open'))closeLightbox();});
 function togglePhotoSection(){document.getElementById('photo-section').classList.toggle('open');}
+
+// ═══ INSERT IMAGE ON PLAN ═══
+function insertImageMenu(){
+  const hasPhotos=photos.length>0;
+  const choices=hasPhotos?['Depuis les photos du projet','Depuis un fichier (local/réseau)']:['Depuis un fichier (local/réseau)'];
+  const msg=hasPhotos?'Insérer une image sur le plan :\n\n1 - Depuis les photos du projet\n2 - Depuis un fichier (local/réseau)':'Insérer une image depuis un fichier (local/réseau) ?';
+  if(!hasPhotos){insertImageFromFile();return;}
+  const choice=prompt(msg+'\n\nEntrez 1 ou 2 :','1');
+  if(choice==='1')insertImageFromPhotos();
+  else if(choice==='2')insertImageFromFile();
+}
+function insertImageFromPhotos(){
+  if(photos.length===0){alert('Aucune photo disponible.');return;}
+  const idx=photos.length===1?0:parseInt(prompt('Choisissez le numéro de la photo (1 à '+photos.length+') :\n\n'+photos.map((p,i)=>(i+1)+' - '+(p.name||'Photo '+(i+1))).join('\n'),'1'),10)-1;
+  if(isNaN(idx)||idx<0||idx>=photos.length)return;
+  const p=photos[idx];
+  const img=new Image();
+  img.onload=()=>{
+    const maxDim=200;const ratio=img.naturalWidth/img.naturalHeight;
+    const w=ratio>=1?maxDim:Math.round(maxDim*ratio);
+    const h=ratio>=1?Math.round(maxDim/ratio):maxDim;
+    const r=$area.getBoundingClientRect();
+    const cx=(r.width/2-offX)/scale,cy=(r.height/2-offY)/scale;
+    elements.push({id:Date.now(),type:'image',x:cx,y:cy,imgSrc:p.dataUrl,w,h});
+    renderElements();
+  };
+  img.src=p.dataUrl;
+}
+async function insertImageFromFile(){
+  if(window.showOpenFilePicker){
+    try{
+      const opts={types:[{description:'Image',accept:{'image/*':['.jpg','.jpeg','.png','.bmp','.webp','.gif']}}],multiple:false};
+      if(savedFileHandle)opts.startIn=savedFileHandle;else opts.startIn='desktop';
+      const [handle]=await window.showOpenFilePicker(opts);
+      const file=await handle.getFile();
+      addImageToCanvas(file);
+    }catch(e){if(e.name!=='AbortError')console.error(e);}
+  }else{
+    const input=document.createElement('input');input.type='file';input.accept='image/*';
+    input.onchange=()=>{if(input.files[0])addImageToCanvas(input.files[0]);};
+    input.click();
+  }
+}
+function addImageToCanvas(file){
+  const reader=new FileReader();
+  reader.onload=()=>{
+    const dataUrl=reader.result;
+    const img=new Image();
+    img.onload=()=>{
+      const maxDim=200;const ratio=img.naturalWidth/img.naturalHeight;
+      const w=ratio>=1?maxDim:Math.round(maxDim*ratio);
+      const h=ratio>=1?Math.round(maxDim/ratio):maxDim;
+      const r=$area.getBoundingClientRect();
+      const cx=(r.width/2-offX)/scale,cy=(r.height/2-offY)/scale;
+      elements.push({id:Date.now(),type:'image',x:cx,y:cy,imgSrc:dataUrl,w,h});
+      renderElements();
+    };
+    img.src=dataUrl;
+  };
+  reader.readAsDataURL(file);
+}
 (function(){
   const handle=document.getElementById('photo-resize-handle');
   const panel=document.getElementById('photo-section');
