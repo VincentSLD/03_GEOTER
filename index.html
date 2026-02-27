@@ -983,7 +983,7 @@ let elements=[],selectedId=null,selectedStickerId=null;
 let drawColor='#1A1A1A',brushSize=4,drawOpacity=1,eraserSize=20,mrPropreSize=30,textColor='#1A1A1A';
 let drawPaths=[],cleanPaths=[],currentPathPts=[],isDrawing=false,photos=[],cameraStream=null;
 let savedFileHandle=null,autoSaveInterval=null;
-let sondages=[],editingSondageId=null,editingSondageType=null;
+let sondages=[],editingSondageId=null,editingSondageType=null,sondageSnapshot=null;
 let czPoints=[],czPreview=null;
 let teEditingId=null,teOriginX=0,teOriginY=0;
 let arrowStartPt=null,arrowPreviewEnd=null,arrowDoubleHead=false;
@@ -1293,13 +1293,17 @@ function renderElements(){
         const lockBtn2=el.groupId?`<button class="lock-btn${gLocked2?'':' unlocked'}" data-action="toggleLock" data-eid="${el.id}" title="${gLocked2?'Déverrouiller':'Verrouiller'} le groupe">${gLocked2?'🔒':'🔓'}</button>`:'';
         let stickerLabel='';
         const sondageBtn=el.sondageId?`<button class="edit-btn" data-action="openSondage" data-eid="${el.id}" title="Ouvrir la fiche sondage">📋</button>`:'';
+        let stickerDepthLabel='';
         if(el.sondageId&&el.label){
           const sLk=sondages.find(x=>x.id===el.sondageId);
           const altTxt=sLk&&sLk.tnAltitude!=null?' <span style="color:#1A1A1A;font-weight:600">('+sLk.tnAltitude.toFixed(2)+')</span>':'';
           const lfs=Math.max(10,Math.round(10*ss));
           stickerLabel=`<div style="margin-bottom:2px;font-size:${lfs}px;font-weight:700;color:${el.color||'#1A1A1A'};text-align:center;white-space:nowrap;text-shadow:0 0 3px #fff,0 0 3px #fff,0 0 3px #fff">${escXml(el.label)}${altTxt}</div>`;
+          if(sLk&&sLk.sondageDepth!=null){
+            stickerDepthLabel=`<div style="margin-top:1px;font-size:${lfs}px;font-weight:600;color:#A0724A;text-align:center;white-space:nowrap;text-decoration:underline;text-shadow:0 0 3px #fff,0 0 3px #fff,0 0 3px #fff">${sLk.sondageDepth.toFixed(2)} m</div>`;
+          }
         }
-        div.innerHTML=`<div class="sticker-wrap" style="transform:rotate(${rot}deg)">${stickerLabel}<div class="sticker-icon ${selectedId===el.id?'selected':''}" style="padding:${Math.round(4*ss)}px${noBg?';background:none;box-shadow:none':''}"><svg viewBox="${vb}" width="${sz}" height="${svgH}" xmlns="http://www.w3.org/2000/svg">${svgInner}</svg></div></div><button class="del-btn" data-action="del" data-eid="${el.id}">×</button>${sondageBtn}${lockBtn2}<button class="rotate-btn" data-action="rotate" data-eid="${el.id}">↻</button><div class="resize-handle" data-resize="1"></div>`;
+        div.innerHTML=`<div class="sticker-wrap" style="transform:rotate(${rot}deg)">${stickerLabel}<div class="sticker-icon ${selectedId===el.id?'selected':''}" style="padding:${Math.round(4*ss)}px${noBg?';background:none;box-shadow:none':''}"><svg viewBox="${vb}" width="${sz}" height="${svgH}" xmlns="http://www.w3.org/2000/svg">${svgInner}</svg></div>${stickerDepthLabel}</div><button class="del-btn" data-action="del" data-eid="${el.id}">×</button>${sondageBtn}${lockBtn2}<button class="rotate-btn" data-action="rotate" data-eid="${el.id}">↻</button><div class="resize-handle" data-resize="1"></div>`;
       }
     }else if(el.type==='text'){
       const bStyle=el.bordered?`;border:2px solid ${el.color};border-radius:4px`:'';
@@ -2149,7 +2153,11 @@ function renderPlanToCanvas(cb){
         const url=URL.createObjectURL(blob);
         const img=new Image();
         img.onload=()=>{const dx=toX(el.x),dy=toY(el.y);const rot=(el.rotation||0)*Math.PI/180;const iw=sz,ih=Math.round(sz*(img.naturalHeight||img.height)/(img.naturalWidth||img.width))||sz;
-        const drawSondageLabel=(cx,cy)=>{if(!el.sondageId||!el.label)return;const sLk=sondages.find(x=>x.id===el.sondageId);const altTxt=sLk&&sLk.tnAltitude!=null?' ('+sLk.tnAltitude.toFixed(2)+')':'';const fullTxt=el.label+altTxt;const lfs=Math.max(10,Math.round(10*ss));ctx.font=`700 ${lfs}px Arial,sans-serif`;ctx.textAlign='center';ctx.textBaseline='bottom';ctx.strokeStyle='#fff';ctx.lineWidth=3;ctx.strokeText(el.label,cx,cy-ih/2-2);ctx.fillStyle=el.color||'#1A1A1A';ctx.fillText(el.label,cx,cy-ih/2-2);if(altTxt){const nameW=ctx.measureText(el.label).width;ctx.font=`600 ${lfs}px Arial,sans-serif`;ctx.fillStyle='#1A1A1A';const altX=cx+nameW/2+2;ctx.textAlign='left';ctx.strokeStyle='#fff';ctx.lineWidth=3;ctx.strokeText(altTxt,altX,cy-ih/2-2);ctx.fillStyle='#1A1A1A';ctx.fillText(altTxt,altX,cy-ih/2-2);}};
+        const drawSondageLabel=(cx,cy)=>{if(!el.sondageId||!el.label)return;const sLk=sondages.find(x=>x.id===el.sondageId);const altTxt=sLk&&sLk.tnAltitude!=null?' ('+sLk.tnAltitude.toFixed(2)+')':'';const lfs=Math.max(10,Math.round(10*ss));
+        // Nom + altimétrie AU-DESSUS
+        ctx.font=`700 ${lfs}px Arial,sans-serif`;ctx.textAlign='center';ctx.textBaseline='bottom';ctx.strokeStyle='#fff';ctx.lineWidth=3;ctx.strokeText(el.label,cx,cy-ih/2-2);ctx.fillStyle=el.color||'#1A1A1A';ctx.fillText(el.label,cx,cy-ih/2-2);if(altTxt){const nameW=ctx.measureText(el.label).width;ctx.font=`600 ${lfs}px Arial,sans-serif`;const altX=cx+nameW/2+2;ctx.textAlign='left';ctx.strokeStyle='#fff';ctx.lineWidth=3;ctx.strokeText(altTxt,altX,cy-ih/2-2);ctx.fillStyle='#1A1A1A';ctx.fillText(altTxt,altX,cy-ih/2-2);}
+        // Profondeur EN-DESSOUS en marron clair souligné
+        if(sLk&&sLk.sondageDepth!=null){const dpTxt=sLk.sondageDepth.toFixed(2)+' m';ctx.font=`600 ${lfs}px Arial,sans-serif`;ctx.textAlign='center';ctx.textBaseline='top';ctx.strokeStyle='#fff';ctx.lineWidth=3;ctx.strokeText(dpTxt,cx,cy+ih/2+2);ctx.fillStyle='#A0724A';ctx.fillText(dpTxt,cx,cy+ih/2+2);const tw=ctx.measureText(dpTxt).width;ctx.beginPath();ctx.moveTo(cx-tw/2,cy+ih/2+2+lfs+1);ctx.lineTo(cx+tw/2,cy+ih/2+2+lfs+1);ctx.strokeStyle='#A0724A';ctx.lineWidth=1;ctx.stroke();}};
         if(rot){ctx.save();ctx.translate(dx,dy);ctx.rotate(rot);ctx.drawImage(img,-iw/2,-ih/2,iw,ih);drawSondageLabel(0,0);ctx.restore();}else{ctx.drawImage(img,dx-iw/2,dy-ih/2,iw,ih);drawSondageLabel(dx,dy);}URL.revokeObjectURL(url);check();};
         img.src=url;
       }
@@ -2749,6 +2757,7 @@ function deleteSondage(id){
 }
 
 function openSondageEdit(s){
+  sondageSnapshot=JSON.stringify(s);
   document.getElementById('sondage-edit-title').textContent=(SONDAGE_ICONS[s.type]||'🔬')+' '+SONDAGE_LABELS[s.type];
   document.getElementById('sondage-name').value=s.name||'';
   document.getElementById('sondage-edit-modal').classList.add('open');
@@ -2756,7 +2765,17 @@ function openSondageEdit(s){
 }
 
 function closeSondageEdit(){
-  saveSondageFromUI();
+  const s=getCurrentSondage();
+  const nameChanged=s&&document.getElementById('sondage-name').value.trim()!==s.name;
+  const notesEl=document.querySelector('.sondage-notes');
+  const notesChanged=s&&notesEl&&notesEl.value!==(s.notes||'');
+  const dataChanged=s&&JSON.stringify(s)!==sondageSnapshot;
+  if(nameChanged||notesChanged||dataChanged){
+    if(confirm('Voulez-vous enregistrer le sondage avant de fermer ?')){
+      saveSondageFromUI();
+    }
+  }
+  sondageSnapshot=null;
   document.getElementById('sondage-edit-modal').classList.remove('open');
   editingSondageId=null;editingSondageType=null;
 }
@@ -2818,9 +2837,12 @@ function calcQd(blows,depth){
 
 function renderPenetroDynTable(s,$wrap){
   const tnVal=s.tnAltitude!=null?s.tnAltitude:'';
-  let html=`<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;padding:4px 8px;background:#F5F5F5;border-radius:6px">
+  const dpVal=s.sondageDepth!=null?s.sondageDepth:'';
+  let html=`<div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:8px;padding:4px 8px;background:#F5F5F5;border-radius:6px">
     <label style="font-weight:600;font-size:12px;white-space:nowrap">Altitude TN (m NGF) :</label>
     <input type="number" step="0.01" value="${tnVal}" placeholder="Ex: 125.30" style="width:110px;padding:4px 6px;border:1px solid #ccc;border-radius:4px;font-size:12px" oninput="sondageTnInput(this.value)">
+    <label style="font-weight:600;font-size:12px;white-space:nowrap;color:#A0724A;margin-left:12px">Profondeur (m) :</label>
+    <input type="number" step="0.01" min="0" value="${dpVal}" placeholder="Ex: 4.60" style="width:100px;padding:4px 6px;border:1px solid #ccc;border-radius:4px;font-size:12px;color:#A0724A" oninput="sondageDepthInput(this.value)">
   </div>`;
   html+=`<table class="sondage-table"><thead><tr><th>Prof. (m)</th><th>N (coups)</th><th>qd (MPa)</th></tr></thead><tbody>`;
   s.data.forEach((d,i)=>{
@@ -2842,6 +2864,12 @@ function sondageTnInput(val){
   const s=getCurrentSondage();if(!s)return;
   s.tnAltitude=val===''?null:parseFloat(val);
   renderPenetroDynGraph(s);
+  renderElements();
+}
+
+function sondageDepthInput(val){
+  const s=getCurrentSondage();if(!s)return;
+  s.sondageDepth=val===''?null:parseFloat(val);
   renderElements();
 }
 
@@ -2867,32 +2895,43 @@ function renderPenetroDynGraph(s){
   const qdData=filled.map(d=>({depth:d.depth,qd:calcQd(d.blows,d.depth),blows:d.blows}));
   const maxQd=Math.max(5,Math.ceil(Math.max(...qdData.map(d=>d.qd||0),1)));
   const hasTn=s.tnAltitude!=null;
-  const ml=65,mr=hasTn?70:55,mt=70,mb=35;
+  const ml=70,mr=hasTn?75:30,mt=100,mb=45;
   const rows=Math.round(maxDepth/0.20);
-  const rowH=14;
-  // Largeur : zone barres N + zone courbe qd
-  const halfW=200;
+  const rowH=15;
+  const halfW=220;
   const cw=ml+halfW+halfW+mr,ch=mt+mb+rows*rowH;
   cvs.width=cw;cvs.height=ch;
   const ph=ch-mt-mb;
   // Fond blanc
   ctx.fillStyle='#FFFFFF';ctx.fillRect(0,0,cw,ch);
-  // Titre
+  // ── Titre (bien espacé) ──
   const ref=document.getElementById('project-ref')?.value||'';
-  ctx.fillStyle='#1A1A1A';ctx.font='bold 14px Arial';ctx.textAlign='center';
-  ctx.fillText('PÉNÉTROGRAMME DYNAMIQUE'+(s.name?' — '+s.name:''),cw/2,22);
+  ctx.fillStyle='#1A1A1A';ctx.font='bold 15px Arial';ctx.textAlign='center';
+  ctx.fillText('PÉNÉTROGRAMME DYNAMIQUE'+(s.name?' — '+s.name:''),cw/2,24);
   ctx.font='11px Arial';ctx.fillStyle='#7A7A7A';
-  ctx.fillText((ref?'Projet: '+ref+'  ':'')+'Date: '+(s.date||''),cw/2,40);
-  if(hasTn){ctx.fillText('Altitude TN : '+s.tnAltitude.toFixed(2)+' m NGF',cw/2,53);}
-  // Zone gauche : barres N (coups)
-  const nLeft=ml,nRight=ml+halfW;
-  // Zone droite : courbe qd
-  const qLeft=ml+halfW,qRight=ml+halfW+halfW;
-  // ── Axe X labels ──
+  ctx.fillText((ref?'Projet: '+ref+'  ':'')+'Date: '+(s.date||''),cw/2,42);
+  if(hasTn){ctx.fillText('Altitude TN : '+s.tnAltitude.toFixed(2)+' m NGF',cw/2,57);}
+  // ── Labels d'axes X (bien au-dessus des graduations) ──
+  const nLeft=ml;
+  const qLeft=ml+halfW;
   ctx.font='bold 10px Arial';ctx.fillStyle='#D9A004';ctx.textAlign='center';
-  ctx.fillText('N (coups / 20 cm)',nLeft+halfW/2,mt-8);
+  ctx.fillText('N (coups / 20 cm)',nLeft+halfW/2,mt-22);
   ctx.fillStyle='#3D7AB5';
-  ctx.fillText('qd (MPa) — Formule des Hollandais',qLeft+halfW/2,mt-8);
+  ctx.fillText('qd (MPa) — Formule des Hollandais',qLeft+halfW/2,mt-22);
+  // ── Graduations axe X zone N (sous les labels, au-dessus du cadre) ──
+  const xStepN=10;
+  for(let n=0;n<=maxBlows;n+=xStepN){
+    const x=nLeft+(n/maxBlows)*halfW;
+    ctx.fillStyle='#777';ctx.font='8px Arial';ctx.textAlign='center';
+    ctx.fillText(n,x,mt-4);
+  }
+  // ── Graduations axe X zone qd ──
+  const qdStep=maxQd<=10?1:maxQd<=30?5:10;
+  for(let q=0;q<=maxQd;q+=qdStep){
+    const x=qLeft+(q/maxQd)*halfW;
+    ctx.fillStyle='#777';ctx.font='8px Arial';ctx.textAlign='center';
+    ctx.fillText(q,x,mt-4);
+  }
   // ── Cadre complet ──
   ctx.strokeStyle='#1A1A1A';ctx.lineWidth=1.5;
   ctx.strokeRect(ml,mt,halfW*2,ph);
@@ -2900,44 +2939,39 @@ function renderPenetroDynGraph(s){
   ctx.beginPath();ctx.moveTo(ml+halfW,mt);ctx.lineTo(ml+halfW,mt+ph);
   ctx.strokeStyle='#1A1A1A';ctx.lineWidth=1;ctx.stroke();
   // ── Grille verticale zone N (gauche) ──
-  const xStepN=10;
   for(let n=0;n<=maxBlows;n+=xStepN){
     const x=nLeft+(n/maxBlows)*halfW;
     ctx.beginPath();ctx.moveTo(x,mt);ctx.lineTo(x,mt+ph);
-    ctx.strokeStyle=n%50===0?'#C0C0C0':'#E8E8E8';ctx.lineWidth=n%50===0?0.8:0.4;ctx.stroke();
-    ctx.fillStyle='#999';ctx.font='8px Arial';ctx.textAlign='center';
-    ctx.fillText(n,x,mt-1);
+    ctx.strokeStyle=n%50===0?'#C0C0C0':'#EBEBEB';ctx.lineWidth=n%50===0?0.8:0.4;ctx.stroke();
   }
   // ── Grille verticale zone qd (droite) ──
-  const qdStep=maxQd<=10?1:maxQd<=30?5:10;
   for(let q=0;q<=maxQd;q+=qdStep){
     const x=qLeft+(q/maxQd)*halfW;
     ctx.beginPath();ctx.moveTo(x,mt);ctx.lineTo(x,mt+ph);
-    ctx.strokeStyle=q%(qdStep*5)===0?'#C0C0C0':'#E8E8E8';ctx.lineWidth=0.4;ctx.stroke();
-    ctx.fillStyle='#999';ctx.font='8px Arial';ctx.textAlign='center';
-    ctx.fillText(q,x,mt-1);
+    ctx.strokeStyle=q%(qdStep*5)===0?'#C0C0C0':'#EBEBEB';ctx.lineWidth=0.4;ctx.stroke();
   }
-  // ── Grille horizontale + labels profondeur ──
+  // ── Grille horizontale + labels profondeur (tous les 0.50m au lieu de 1m) ──
   for(let i=0;i<=rows;i++){
     const depth=+(i*0.20).toFixed(2);
     const y=mt+i*rowH;
     ctx.beginPath();ctx.moveTo(ml,y);ctx.lineTo(ml+halfW*2,y);
     if(depth%1===0){ctx.strokeStyle='#B0B0B0';ctx.lineWidth=0.8;}
-    else{ctx.strokeStyle='#ECECEC';ctx.lineWidth=0.3;}
+    else if(Math.abs(depth%0.5)<0.01){ctx.strokeStyle='#D0D0D0';ctx.lineWidth=0.5;}
+    else{ctx.strokeStyle='#F0F0F0';ctx.lineWidth=0.3;}
     ctx.stroke();
-    if(depth%1===0||i===0){
-      ctx.fillStyle='#1A1A1A';ctx.font='bold 9px Arial';ctx.textAlign='right';
-      ctx.fillText(depth.toFixed(2),ml-5,y+3);
+    if(depth%0.5<0.01&&(depth%1===0||rows<=30)){
+      ctx.fillStyle='#1A1A1A';ctx.font=depth%1===0?'bold 9px Arial':'9px Arial';ctx.textAlign='right';
+      ctx.fillText(depth.toFixed(2),ml-6,y+3);
     }
   }
   // Label Y gauche : Profondeur
-  ctx.save();ctx.translate(12,mt+ph/2);ctx.rotate(-Math.PI/2);
+  ctx.save();ctx.translate(14,mt+ph/2);ctx.rotate(-Math.PI/2);
   ctx.font='bold 10px Arial';ctx.fillStyle='#1A1A1A';ctx.textAlign='center';
   ctx.fillText('Profondeur (m)',0,0);ctx.restore();
   // ── Axe altimétrique TN (droite) ──
   if(hasTn){
-    const tnX=ml+halfW*2+8;
-    ctx.save();ctx.translate(tnX+28,mt+ph/2);ctx.rotate(-Math.PI/2);
+    const tnX=ml+halfW*2+10;
+    ctx.save();ctx.translate(tnX+35,mt+ph/2);ctx.rotate(-Math.PI/2);
     ctx.font='bold 9px Arial';ctx.fillStyle='#666';ctx.textAlign='center';
     ctx.fillText('Altitude (m NGF)',0,0);ctx.restore();
     for(let i=0;i<=rows;i++){
@@ -2951,7 +2985,7 @@ function renderPenetroDynGraph(s){
     }
     // Marquer TN
     ctx.fillStyle='#4CAF50';ctx.font='bold 9px Arial';ctx.textAlign='left';
-    ctx.fillText('TN',tnX,mt+3);
+    ctx.fillText('TN',tnX+20,mt+3);
   }
   // ── Barres N (zone gauche) ──
   filled.forEach(d=>{
@@ -2965,7 +2999,7 @@ function renderPenetroDynGraph(s){
     ctx.strokeRect(nLeft+1,y,Math.max(1,bw),rowH-2);
     if(isRefus){
       ctx.fillStyle='#D94040';ctx.font='bold 8px Arial';ctx.textAlign='left';
-      ctx.fillText('REFUS',nLeft+bw+3,y+rowH/2+3);
+      ctx.fillText('REFUS',nLeft+bw+4,y+rowH/2+3);
     }
   });
   // ── Courbe qd (zone droite) ──
@@ -3004,9 +3038,9 @@ function renderPenetroDynGraph(s){
   // ── Cadre final ──
   ctx.strokeStyle='#1A1A1A';ctx.lineWidth=1.5;ctx.strokeRect(ml,mt,halfW*2,ph);
   ctx.beginPath();ctx.moveTo(ml+halfW,mt);ctx.lineTo(ml+halfW,mt+ph);ctx.strokeStyle='#1A1A1A';ctx.lineWidth=1;ctx.stroke();
-  // ── Légende formule ──
+  // ── Légende formule (bien en bas avec espace) ──
   ctx.font='8px Arial';ctx.fillStyle='#999';ctx.textAlign='center';
-  ctx.fillText('qd = M²·g·H / (A·e·(M+P)) — NF P 94-115 — PDA: M=64kg, H=0.75m, A=16cm²',cw/2,ch-5);
+  ctx.fillText('qd = M²·g·H / (A·e·(M+P)) — NF P 94-115 — PDA: M=64kg, H=0.75m, A=16cm²',cw/2,ch-12);
 }
 
 // ─── PÉNÉTROMÈTRE STATIQUE ───
