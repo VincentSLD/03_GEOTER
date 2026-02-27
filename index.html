@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>GéoTer' — Annotateur de plans terrain</title>
 <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,opsz,wght@0,6..12,400;0,6..12,600;0,6..12,700;0,6..12,800;0,6..12,900;1,6..12,400&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
@@ -178,14 +178,20 @@
   .legend-item .legend-count{background:var(--gray-100);color:var(--gray-700);border-radius:10px;padding:1px 8px;font-size:10px;font-weight:800;margin-left:auto;flex-shrink:0}
   .legend-item .legend-label{font-size:12px;font-weight:700}
 
-  #photo-section{position:fixed;bottom:0;left:0;right:0;background:var(--white);border-top:3px solid var(--yellow);max-height:45vh;overflow-y:auto;padding:14px 16px;z-index:200;box-shadow:0 -4px 20px rgba(0,0,0,0.2);transform:translateY(100%);transition:transform .3s cubic-bezier(.4,0,.2,1)}
-  #photo-section.open{transform:translateY(0)}
-  #photo-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
-  #photo-header h3{font-size:13px;font-weight:800;color:var(--black);display:flex;align-items:center;gap:6px}
-  .btn-photo{background:var(--black);color:var(--yellow);border:none;border-radius:var(--radius);padding:8px 14px;font-size:11px;font-weight:800;box-shadow:0 2px 8px rgba(0,0,0,0.2);transition:all .2s}
+  #photo-section{width:270px;min-width:200px;max-width:50vw;display:none;flex-direction:column;flex-shrink:0;background:var(--white);border-left:2px solid var(--yellow);overflow-y:auto;position:relative}
+  #photo-section.open{display:flex}
+  .photo-resize-handle{position:absolute;top:0;left:-5px;width:10px;height:100%;cursor:col-resize;z-index:20}
+  .photo-resize-handle:hover,.photo-resize-handle.active{background:var(--yellow);opacity:0.3;border-radius:3px}
+  .photo-panel-header{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--black);border-bottom:2px solid var(--yellow);flex-shrink:0}
+  .photo-panel-header>span{font-weight:800;font-size:13px;color:var(--yellow);display:flex;align-items:center;gap:6px}
+  .photo-panel-close{background:none;border:none;color:#fff;font-size:18px;cursor:pointer;padding:2px 6px;border-radius:4px}
+  .photo-panel-close:hover{background:rgba(255,255,255,0.15)}
+  .photo-panel-body{padding:14px;display:flex;flex-direction:column;gap:10px;flex:1;overflow-y:auto}
+  .photo-panel-actions{display:flex;gap:6px;flex-shrink:0}
+  .btn-photo{background:var(--black);color:var(--yellow);border:none;border-radius:var(--radius);padding:8px 14px;font-size:11px;font-weight:800;box-shadow:0 2px 8px rgba(0,0,0,0.2);transition:all .2s;flex:1;text-align:center}
   .btn-photo:hover{background:var(--black-soft)}
   #photo-empty{background:var(--yellow-pale);border:2px dashed var(--yellow);border-radius:12px;padding:24px 14px;text-align:center;color:var(--gray-500);font-size:12px;line-height:1.6;font-weight:600}
-  #photo-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px}
+  #photo-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px}
   .photo-card{position:relative;border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow-md);aspect-ratio:4/3}
   .photo-card img{width:100%;height:100%;object-fit:cover}
   .photo-card .photo-time{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,0.85));padding:16px 8px 6px;color:var(--yellow);font-size:9px;font-weight:700}
@@ -317,6 +323,26 @@
   .btn-create-study:hover{background:var(--yellow-light);transform:translateY(-1px)}
   .btn-cancel-study{background:var(--gray-100);color:var(--gray-500)}
   .btn-cancel-study:hover{background:var(--gray-200);color:var(--black)}
+  /* ═══ PHOTO NAME + CROP MODAL ═══ */
+  #photo-name-modal{position:fixed;inset:0;background:rgba(0,0,0,0.85);display:none;align-items:center;justify-content:center;z-index:960;backdrop-filter:blur(4px);flex-direction:column;gap:14px;padding:16px}
+  #photo-name-modal.open{display:flex}
+  #photo-crop-container{position:relative;display:inline-block;cursor:crosshair}
+  #photo-crop-canvas{display:block;border-radius:6px}
+  #photo-crop-selection{position:absolute;border:2px dashed var(--yellow);box-shadow:0 0 0 2px rgba(0,0,0,0.4);pointer-events:none;display:none;z-index:2}
+  .photo-crop-mask{position:absolute;background:rgba(0,0,0,0.55);pointer-events:none;z-index:1}
+  .photo-crop-handle{position:absolute;width:14px;height:14px;background:var(--yellow);border:2px solid var(--black);border-radius:3px;z-index:3;transform:translate(-50%,-50%);box-shadow:0 1px 4px rgba(0,0,0,0.4)}
+  #photo-bottom-bar{background:var(--white);border-radius:var(--radius-lg);padding:16px 22px;display:flex;align-items:center;gap:14px;box-shadow:var(--shadow-lg);border-top:3px solid var(--yellow);max-width:92vw;width:600px}
+  #photo-bottom-bar label{font-size:11px;font-weight:800;color:var(--black);white-space:nowrap}
+  #photo-name-input{flex:1;padding:8px 12px;border:2px solid var(--gray-200);border-radius:var(--radius);font-size:14px;font-weight:700;font-family:inherit;outline:none;transition:border-color .2s;min-width:0}
+  #photo-name-input:focus{border-color:var(--yellow)}
+  .photo-name-actions{display:flex;gap:8px;flex-shrink:0}
+  .photo-name-actions button{padding:8px 18px;border:none;border-radius:var(--radius);font-size:13px;font-weight:800;font-family:inherit;cursor:pointer;transition:all .2s}
+  .btn-photo-save{background:var(--yellow);color:var(--black);box-shadow:0 3px 12px var(--yellow-glow)}
+  .btn-photo-save:hover{background:var(--yellow-light);transform:translateY(-1px)}
+  .btn-photo-reset{background:var(--gray-100);color:var(--gray-500)}
+  .btn-photo-reset:hover{background:var(--gray-200);color:var(--black)}
+  .btn-photo-cancel{background:var(--gray-100);color:var(--gray-500)}
+  .btn-photo-cancel:hover{background:var(--gray-200);color:var(--black)}
   /* ═══ MISE EN PAGE ═══ */
   #main-body{display:flex;flex:1;overflow:hidden}
   #mep-panel{width:270px;min-width:220px;max-width:60vw;display:none;flex-direction:column;flex-shrink:0;background:var(--white);border-right:2px solid var(--yellow);overflow-y:auto;position:relative}
@@ -360,6 +386,73 @@
   .mep-legend-empty{color:var(--gray-500);font-size:12px;text-align:center;padding:20px 0}
   .mep-download-btn{width:100%;padding:10px;border:none;border-radius:8px;background:var(--yellow);color:var(--black);font-size:13px;font-weight:800;cursor:pointer;transition:all .2s;margin-top:auto;flex-shrink:0}
   .mep-download-btn:hover{background:#e0a800;transform:scale(1.02)}
+
+  /* ═══ TOUCH / TABLET IMPROVEMENTS ═══ */
+  /* :active states for all interactive elements */
+  .tool-btn:active{background:var(--gray-200);color:var(--black)}
+  .tool-btn.active:active{background:var(--black);color:var(--yellow)}
+  .btn-load-center:active{background:var(--yellow-light);transform:translateY(-1px)}
+  .btn-open-project:active{background:var(--black-soft)!important}
+  .arr-mode-btn:active{background:var(--gray-300)}
+  .color-dot:active{transform:scale(1.15)}
+  .color-dots-row .cdot:active{transform:scale(1.2)}
+  .mep-preset-btn:active{border-color:var(--yellow);color:var(--black)}
+  .mep-pos-btn:active{border-color:var(--yellow)}
+  .mep-download-btn:active{background:#e0a800;transform:scale(0.98)}
+  .btn-photo:active{background:var(--black-soft)}
+  .btn-download-photos:active{filter:brightness(0.9)}
+  .btn-photo-save:active{background:var(--yellow-light);transform:translateY(0)}
+  .btn-create-study:active{background:var(--yellow-light);transform:translateY(0)}
+  #btn-recadrer:active{transform:scale(0.95)}
+  .photo-card .photo-del:active{background:var(--red)}
+  .photo-card .photo-zoom:active{background:var(--yellow);color:var(--black)}
+
+  /* Larger touch targets for element buttons */
+  .del-btn{width:28px;height:28px;font-size:15px;line-height:28px;top:-12px;right:-12px}
+  .edit-btn{width:28px;height:28px;font-size:13px;line-height:28px;top:-12px;left:-12px}
+  .lock-btn{width:28px;height:28px;font-size:14px;line-height:28px;top:52px;left:-12px}
+  .rotate-btn{width:28px;height:28px;font-size:14px;line-height:28px;top:-12px}
+  .resize-handle{width:22px;height:22px;bottom:-10px;right:-10px}
+  .arrow-handle{width:22px;height:22px}
+  .crop-handle,.photo-crop-handle{width:20px;height:20px}
+  .photo-card .photo-del,.photo-card .photo-zoom{width:30px;height:30px;font-size:14px;line-height:30px}
+  .photo-card .photo-zoom{right:38px}
+  .photo-card .photo-check{width:22px;height:22px}
+
+  /* Larger resize handles for panels */
+  .photo-resize-handle,.mep-resize-handle{width:14px}
+  .arr-input{height:32px;font-size:12px}
+  .arr-mode-btn{width:36px;height:36px}
+  .arr-mode-btn svg{width:22px;height:22px}
+
+  /* Scroll isolation for panels */
+  .photo-panel-body{touch-action:pan-y;-webkit-overflow-scrolling:touch}
+  .mep-panel-body{touch-action:pan-y;-webkit-overflow-scrolling:touch}
+
+  /* ═══ TABLET MEDIA QUERIES ═══ */
+  @media(max-width:1024px){
+    .tool-btn{padding:6px 8px;min-width:42px}
+    .tool-btn .icon{font-size:20px}
+    .tool-btn .label{font-size:7px}
+    .tool-sep{margin:0 2px;height:26px}
+    #mep-panel{width:240px;min-width:200px}
+    #photo-section{width:240px;min-width:180px}
+  }
+  @media(max-width:768px){
+    .tool-btn{padding:5px 6px;min-width:36px}
+    .tool-btn .icon{font-size:18px}
+    .tool-btn .label{display:none}
+    .tool-sep{margin:0 1px;height:22px}
+    #mep-panel{width:220px;min-width:180px;max-width:70vw}
+    #photo-section{width:220px;min-width:160px;max-width:70vw}
+    .welcome-btns{flex-direction:column;gap:10px}
+    .welcome-title{font-size:24px}
+    #empty-state .big-icon{font-size:40px}
+    .btn-load-center{padding:12px 24px;font-size:13px}
+    #arrow-options{flex-wrap:wrap;gap:4px}
+    .arr-opt-group{gap:2px}
+    .arr-opt-group label{font-size:8px}
+  }
 </style>
 </head>
 <body>
@@ -384,8 +477,8 @@
     <button class="tool-btn" data-tool="mrpropre" onclick="selectTool('mrpropre')"><span class="icon">🧽</span><span class="label">Mr Propre</span></button>
     <button class="tool-btn" data-tool="cleanzone" onclick="selectTool('cleanzone')"><span class="icon" style="position:relative;display:inline-block"><span style="position:relative;z-index:1">🧽</span><span style="position:absolute;inset:-1px;border:2px dashed #1A1A1A;border-radius:4px;z-index:0"></span></span><span class="label">Mr Propre++</span></button>
     <div class="tool-sep"></div>
-    <button class="tool-btn" onclick="undoAction()"><span class="icon">↩️</span><span class="label">Annuler</span></button>
-    <button class="tool-btn" onclick="redoAction()"><span class="icon">↪️</span><span class="label">Remettre</span></button>
+    <button class="tool-btn" onclick="undoAction()"><span class="icon" style="font-style:normal;font-size:16px">⟲</span><span class="label">Annuler</span></button>
+    <button class="tool-btn" onclick="redoAction()"><span class="icon" style="font-style:normal;font-size:16px">⟳</span><span class="label">Remettre</span></button>
     <button class="tool-btn" onclick="openCropTool()"><span class="icon">✂️</span><span class="label">Rogner</span></button>
     <div class="tool-sep"></div>
     <button class="tool-btn" onclick="openLegend()"><span class="icon">📋</span><span class="label">Légende</span></button>
@@ -393,7 +486,7 @@
     <button class="tool-btn" onclick="exportProject()"><span class="icon">💾</span><span class="label">Enregistrer</span></button>
     <button class="tool-btn" onclick="document.getElementById('projectInput').click()"><span class="icon">📂</span><span class="label">Ouvrir</span></button>
     <input type="file" id="projectInput" accept=".geoter" style="display:none" onchange="importProject(event)">
-    <button class="tool-btn" onclick="closeProject()"><span class="icon">🚪</span><span class="label">Fermer</span></button>
+    <button class="tool-btn" onclick="closeProject()"><span class="icon" style="font-style:normal;font-size:18px">✕</span><span class="label">Fermer</span></button>
     <button class="tool-btn" onclick="openPlanPicker()"><span class="icon">🏢</span><span class="label">Fond de plan</span></button>
     <div style="flex:1"></div>
     <div class="tool-sep"></div>
@@ -419,6 +512,7 @@
         <button class="arr-mode-btn" data-arrmode="line" onclick="setArrowMode('line')" title="Trait simple"><svg viewBox="0 0 24 24"><line x1="4" y1="20" x2="20" y2="4" stroke="#1A1A1A" stroke-width="2" stroke-linecap="round"/></svg></button>
         <button class="arr-mode-btn" data-arrmode="dashed" onclick="setArrowMode('dashed')" title="Trait pointillé"><svg viewBox="0 0 24 24"><line x1="4" y1="20" x2="20" y2="4" stroke="#1A1A1A" stroke-width="2" stroke-linecap="round" stroke-dasharray="3,3"/></svg></button>
       </div>
+      <div class="arr-opt-group"><button class="arr-mode-btn" id="btn-constraint" onclick="constraintMode=!constraintMode;this.classList.toggle('active',constraintMode)" title="Contrainte angle (remplace Shift)">📐</button></div>
       <div class="arr-opt-group"><label>Couleur</label><div id="arr-color-dots" class="color-dots-row"></div></div>
       <div class="arr-opt-group"><label>Opacité %</label><input type="number" class="arr-input" id="arr-opacity" min="10" max="100" step="5" value="100" onchange="arrowOpacity=Math.min(100,Math.max(10,+this.value))/100;this.value=Math.round(arrowOpacity*100)"></div>
       <div class="arr-opt-group"><label>Épaisseur</label><input type="number" class="arr-input" id="arr-width" min="1" max="24" step="1" value="2" onchange="arrowWidth=Math.min(24,Math.max(1,+this.value));this.value=arrowWidth"></div>
@@ -460,7 +554,7 @@
       </div>
       <div id="mep-legend-items"></div>
       <div id="mep-preview-wrap"><canvas id="mep-canvas"></canvas></div>
-      <button class="mep-download-btn" onclick="mepDownload()">💾 Télécharger</button>
+      <button class="mep-download-btn" onclick="mepDownload()">💾 Enregistrer</button>
     </div>
   </div>
   <div id="canvas-area">
@@ -474,6 +568,21 @@
       <div id="load-plan-screen" style="display:none"><div class="big-icon">📐</div><p>Chargez un plan PDF ou une image<br>pour commencer à annoter</p><button class="btn-load-center" onclick="openPlanPicker()">📄 Charger un plan</button><div class="hint">PDF, JPG, PNG</div></div>
     </div>
     <button id="btn-recadrer" onclick="resetView()" title="Recadrer">🎯</button>
+  </div>
+  <div id="photo-section">
+    <div class="photo-resize-handle" id="photo-resize-handle"></div>
+    <div class="photo-panel-header">
+      <span>📸 Photos du terrain</span>
+      <button class="photo-panel-close" onclick="togglePhotoSection()">✕</button>
+    </div>
+    <div class="photo-panel-body">
+      <div class="photo-panel-actions">
+        <button class="btn-photo" onclick="openCamera()">+ Prendre une photo</button>
+        <button class="btn-download-photos" id="btn-dl-photos" onclick="downloadSelectedPhotos()" disabled>Enregistrer</button>
+      </div>
+      <div id="photo-empty">Aucune photo pour l'instant.<br>Appuyez sur le bouton ci-dessus pour capturer.</div>
+      <div id="photo-grid"></div>
+    </div>
   </div>
   </div><!-- /main-body -->
   <div id="catalog-overlay">
@@ -489,13 +598,13 @@
   <div id="new-study-modal">
     <div id="new-study-inner">
       <h2>Nouveau Projet</h2>
-      <p>Créez un nouveau projet en saisissant la référence.</p>
-      <label for="new-study-ref">Référence du projet *</label>
-      <input type="text" id="new-study-ref" placeholder="Ex: 2024-PRJ-001" spellcheck="false" autocomplete="off" onkeydown="if(event.key==='Enter')createNewStudy()">
+      <p>Créez un nouveau projet en saisissant le Numéro de Dossier.</p>
+      <label for="new-study-ref">Numéro de Dossier *</label>
+      <input type="text" id="new-study-ref" placeholder="Ex : 2607011" spellcheck="false" autocomplete="off" onkeydown="if(event.key==='Enter')createNewStudy()">
       <div class="new-study-error" id="new-study-error"></div>
       <div class="new-study-actions">
         <button class="btn-cancel-study" onclick="closeNewStudyModal()">Annuler</button>
-        <button class="btn-create-study" onclick="createNewStudy()">Créer l'étude</button>
+        <button class="btn-create-study" onclick="createNewStudy()">Valider</button>
       </div>
     </div>
   </div>
@@ -504,11 +613,6 @@
       <div id="snapshot-header"><span>📸 Aperçu du plan annoté</span><div style="display:flex;gap:8px;align-items:center"><a id="snapshot-download" class="btn-download" download="geoter-plan-annote.png">💾 Télécharger</a><button class="catalog-close" onclick="closeSnapshot()">✕</button></div></div>
       <img id="snapshot-img" alt="Snapshot">
     </div>
-  </div>
-  <div id="photo-section">
-    <div id="photo-header"><h3><span>📸</span> Photos du terrain</h3><div style="display:flex;gap:6px"><button class="btn-download-photos" id="btn-dl-photos" onclick="downloadSelectedPhotos()" disabled>Télécharger</button><button class="btn-photo" onclick="openCamera()">+ Prendre une photo</button></div></div>
-    <div id="photo-empty">Aucune photo pour l'instant.<br>Appuyez sur le bouton ci-dessus pour capturer.</div>
-    <div id="photo-grid"></div>
   </div>
   <div id="pdf-page-modal" onclick="closePdfPageModal()">
     <div id="pdf-page-inner" onclick="event.stopPropagation()">
@@ -555,6 +659,21 @@
       <div id="text-editor-actions">
         <button class="te-cancel" onclick="closeTextEditor()">Annuler</button>
         <button class="te-validate" onclick="applyTextEdit()">Valider</button>
+      </div>
+    </div>
+  </div>
+  <div id="photo-name-modal">
+    <div id="photo-crop-container">
+      <canvas id="photo-crop-canvas"></canvas>
+      <div id="photo-crop-selection"></div>
+    </div>
+    <div id="photo-bottom-bar">
+      <label>Nom :</label>
+      <input type="text" id="photo-name-input" placeholder="Nom de la photo..." onkeydown="if(event.key==='Enter')confirmPhotoName()">
+      <div class="photo-name-actions">
+        <button class="btn-photo-reset" onclick="resetPhotoCrop()" title="Réinitialiser le cadrage">↺</button>
+        <button class="btn-photo-cancel" onclick="cancelPhotoName()">Annuler</button>
+        <button class="btn-photo-save" onclick="confirmPhotoName()">Valider</button>
       </div>
     </div>
   </div>
@@ -741,6 +860,7 @@ let czPoints=[],czPreview=null;
 let teEditingId=null,teOriginX=0,teOriginY=0;
 let arrowStartPt=null,arrowPreviewEnd=null,arrowDoubleHead=false;
 let arrowMode='single',arrowColor='#1A1A1A',arrowOpacity=1,arrowWidth=2;
+let constraintMode=false; // alternative tactile au Shift pour lignes droites
 const COLORS=['#1A1A1A','#555555','#D94040','#E88D00','#F2B705','#4CAF50','#2E7D32','#3D7AB5','#1565C0','#9B59B6','#E91E8C','#FFFFFF'];
 
 const $area=document.getElementById('canvas-area'),$planImg=document.getElementById('plan-img');
@@ -751,6 +871,7 @@ const drawCtx=$drawCanvas.getContext('2d');
 
 buildCatalog();buildColorOptions();resizeDrawCanvas();
 window.addEventListener('resize',resizeDrawCanvas);
+window.addEventListener('orientationchange',()=>{setTimeout(resizeDrawCanvas,200);});
 function resizeDrawCanvas(){const r=$area.getBoundingClientRect();$drawCanvas.width=r.width;$drawCanvas.height=r.height;$cleanCanvas.width=r.width;$cleanCanvas.height=r.height;redrawCanvas();redrawCleanCanvas();}
 
 function selectTool(t){
@@ -809,6 +930,7 @@ function closeCatalog(){document.getElementById('catalog-overlay').classList.rem
 
 let pendingPdf=null;
 async function openPlanPicker(){
+  if(planImgSrc&&!confirm('Voulez-vous changer de fond de plan ?'))return;
   if(window.showOpenFilePicker){
     try{
       const opts={types:[{description:'Plan (PDF, Image)',accept:{'application/pdf':['.pdf'],'image/*':['.jpg','.jpeg','.png','.bmp','.webp']}}],multiple:false};
@@ -931,9 +1053,34 @@ function redrawCleanCanvas(){
     }
   }
 }
-$area.addEventListener('mousemove',function(e){const r=$area.getBoundingClientRect();const x=e.clientX-r.left,y=e.clientY-r.top;if(currentTool==='erase'){const el=document.getElementById('eraser-cursor');el.style.left=x+'px';el.style.top=y+'px';}if(currentTool==='mrpropre'){const el=document.getElementById('mrpropre-cursor');el.style.left=x+'px';el.style.top=y+'px';}});
+$area.addEventListener('pointermove',function(e){const r=$area.getBoundingClientRect();const x=e.clientX-r.left,y=e.clientY-r.top;if(currentTool==='erase'){const el=document.getElementById('eraser-cursor');el.style.left=x+'px';el.style.top=y+'px';}if(currentTool==='mrpropre'){const el=document.getElementById('mrpropre-cursor');el.style.left=x+'px';el.style.top=y+'px';}});
 
 $area.addEventListener('pointerdown',onPD);$area.addEventListener('pointermove',onPM);$area.addEventListener('pointerup',onPU);$area.addEventListener('wheel',onW,{passive:false});
+// Pinch-to-zoom for touch
+let pinchStartDist=0,pinchStartScale=1,pinchMidX=0,pinchMidY=0;
+$area.addEventListener('touchstart',function(e){
+  if(e.touches.length===2){
+    e.preventDefault();
+    const t1=e.touches[0],t2=e.touches[1];
+    pinchStartDist=Math.hypot(t2.clientX-t1.clientX,t2.clientY-t1.clientY);
+    pinchStartScale=scale;
+    const r=$area.getBoundingClientRect();
+    pinchMidX=(t1.clientX+t2.clientX)/2-r.left;
+    pinchMidY=(t1.clientY+t2.clientY)/2-r.top;
+  }
+},{passive:false});
+$area.addEventListener('touchmove',function(e){
+  if(e.touches.length===2){
+    e.preventDefault();
+    const t1=e.touches[0],t2=e.touches[1];
+    const dist=Math.hypot(t2.clientX-t1.clientX,t2.clientY-t1.clientY);
+    const ns=Math.max(0.08,Math.min(6,pinchStartScale*(dist/pinchStartDist)));
+    offX=pinchMidX-(pinchMidX-offX)*(ns/scale);
+    offY=pinchMidY-(pinchMidY-offY)*(ns/scale);
+    scale=ns;
+    updatePlanTransform();redrawCanvas();redrawCleanCanvas();renderElements();
+  }
+},{passive:false});
 function gP(e){const r=$area.getBoundingClientRect();const cx=(e.clientX||0)-r.left,cy=(e.clientY||0)-r.top;return{sx:cx,sy:cy,px:(cx-offX)/scale,py:(cy-offY)/scale};}
 function onPD(e){
   if(e.target.closest('#empty-state'))return;
@@ -950,16 +1097,16 @@ function onPD(e){
   if(currentTool==='mrpropre'){isDrawing=true;currentPathPts=[{x:pt.px,y:pt.py}];$area.setPointerCapture(e.pointerId);}
   if(currentTool==='cleanzone'){
     let nx=pt.px,ny=pt.py;
-    if(e.shiftKey&&czPoints.length>0){const lp=czPoints[czPoints.length-1];const adx=pt.px-lp.x,ady=pt.py-lp.y;const dist=Math.sqrt(adx*adx+ady*ady);const ang=Math.round(Math.atan2(ady,adx)/(Math.PI/12))*(Math.PI/12);nx=lp.x+dist*Math.cos(ang);ny=lp.y+dist*Math.sin(ang);}
+    if((e.shiftKey||constraintMode)&&czPoints.length>0){const lp=czPoints[czPoints.length-1];const adx=pt.px-lp.x,ady=pt.py-lp.y;const dist=Math.sqrt(adx*adx+ady*ady);const ang=Math.round(Math.atan2(ady,adx)/(Math.PI/12))*(Math.PI/12);nx=lp.x+dist*Math.cos(ang);ny=lp.y+dist*Math.sin(ang);}
     if(czPoints.length>2){const dx=(nx-czPoints[0].x)*scale,dy=(ny-czPoints[0].y)*scale;if(Math.sqrt(dx*dx+dy*dy)<15){cleanPaths.push({type:'zone',points:[...czPoints]});czPoints=[];czPreview=null;redrawCleanCanvas();return;}}
     czPoints.push({x:nx,y:ny});redrawCleanCanvas();return;
   }
 }
 function onPM(e){
   if(isPanning){offX=panOX+(e.clientX-panStartX);offY=panOY+(e.clientY-panStartY);updatePlanTransform();redrawCanvas();redrawCleanCanvas();renderElements();return;}
-  if(arrowStartPt){const pt=gP(e);if(e.shiftKey){const adx=pt.px-arrowStartPt.x,ady=pt.py-arrowStartPt.y;const dist=Math.sqrt(adx*adx+ady*ady);const ang=Math.round(Math.atan2(ady,adx)/(Math.PI/12))*(Math.PI/12);arrowPreviewEnd={x:arrowStartPt.x+dist*Math.cos(ang),y:arrowStartPt.y+dist*Math.sin(ang)};}else{arrowPreviewEnd={x:pt.px,y:pt.py};}renderElements();return;}
+  if(arrowStartPt){const pt=gP(e);if((e.shiftKey||constraintMode)){const adx=pt.px-arrowStartPt.x,ady=pt.py-arrowStartPt.y;const dist=Math.sqrt(adx*adx+ady*ady);const ang=Math.round(Math.atan2(ady,adx)/(Math.PI/12))*(Math.PI/12);arrowPreviewEnd={x:arrowStartPt.x+dist*Math.cos(ang),y:arrowStartPt.y+dist*Math.sin(ang)};}else{arrowPreviewEnd={x:pt.px,y:pt.py};}renderElements();return;}
   if(isDrawing&&currentTool==='mrpropre'){const pt=gP(e);currentPathPts.push({x:pt.px,y:pt.py});redrawCleanCanvas();return;}
-  if(czPoints.length>0&&currentTool==='cleanzone'){const pt=gP(e);const lp=czPoints[czPoints.length-1];if(e.shiftKey){const adx=pt.px-lp.x,ady=pt.py-lp.y;const dist=Math.sqrt(adx*adx+ady*ady);const ang=Math.round(Math.atan2(ady,adx)/(Math.PI/12))*(Math.PI/12);czPreview={x:lp.x+dist*Math.cos(ang),y:lp.y+dist*Math.sin(ang)};}else{czPreview={x:pt.px,y:pt.py};}redrawCleanCanvas();return;}
+  if(czPoints.length>0&&currentTool==='cleanzone'){const pt=gP(e);const lp=czPoints[czPoints.length-1];if((e.shiftKey||constraintMode)){const adx=pt.px-lp.x,ady=pt.py-lp.y;const dist=Math.sqrt(adx*adx+ady*ady);const ang=Math.round(Math.atan2(ady,adx)/(Math.PI/12))*(Math.PI/12);czPreview={x:lp.x+dist*Math.cos(ang),y:lp.y+dist*Math.sin(ang)};}else{czPreview={x:pt.px,y:pt.py};}redrawCleanCanvas();return;}
   if(isDrawing){const pt=gP(e);currentPathPts.push({x:pt.px,y:pt.py});redrawCanvas();}
 }
 function onPU(){
@@ -1470,7 +1617,7 @@ async function createNewStudy(){
   const ref=refInput.value.trim();
   if(!ref){
     refInput.classList.add('error');
-    errDiv.textContent='La référence est obligatoire.';
+    errDiv.textContent='Le Numéro de Dossier est obligatoire.';
     refInput.focus();
     setTimeout(()=>refInput.classList.remove('error'),400);
     return;
@@ -1482,7 +1629,6 @@ async function createNewStudy(){
     try{
       const handle=await window.showSaveFilePicker({suggestedName:fileName,startIn:'desktop',types:[{description:'Projet GéoTer',accept:{'application/json':['.geoter']}}]});
       savedFileHandle=handle;
-      // Écrire un projet initial vide
       const initProject=buildProjectJSON();
       const writable=await handle.createWritable();
       await writable.write(new Blob([JSON.stringify(initProject)],{type:'application/json'}));
@@ -1491,6 +1637,11 @@ async function createNewStudy(){
       if(e.name==='AbortError'){closeNewStudyModal();return;}
       console.error(e);
     }
+  }else{
+    // Fallback tablette/iPad : téléchargement classique
+    const initProject=buildProjectJSON();
+    const blob=new Blob([JSON.stringify(initProject)],{type:'application/json'});
+    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=fileName;a.click();URL.revokeObjectURL(a.href);
   }
   closeNewStudyModal();
   activateApp();
@@ -1650,10 +1801,33 @@ function importProject(e){
 }
 
 function renderPlanToCanvas(cb){
-  const cw=Math.round(planW*scale),ch=Math.round(planH*scale);
+  // Calculate bounding box including elements outside the plan
+  let minX=0,minY=0,maxX=planW,maxY=planH;
+  elements.forEach(el=>{
+    if(el.type==='sticker'){
+      const ss=el.sScale||1;let hw,hh;
+      if(el.isShape){hw=(el.shapeW||40)*ss/2;hh=(el.shapeH||40)*ss/2;}
+      else if(el.isText){hw=80*ss;hh=20*ss;}
+      else{hw=20*ss;hh=20*ss;}
+      minX=Math.min(minX,el.x-hw);minY=Math.min(minY,el.y-hh);maxX=Math.max(maxX,el.x+hw);maxY=Math.max(maxY,el.y+hh);
+    }else if(el.type==='text'){
+      minX=Math.min(minX,el.x-140);minY=Math.min(minY,el.y-60);maxX=Math.max(maxX,el.x+140);maxY=Math.max(maxY,el.y+60);
+    }else if(el.type==='arrow'){
+      const m=Math.max(20,(el.strokeWidth||2)*5);
+      minX=Math.min(minX,el.x-m,el.x2-m);minY=Math.min(minY,el.y-m,el.y2-m);maxX=Math.max(maxX,el.x+m,el.x2+m);maxY=Math.max(maxY,el.y+m,el.y2+m);
+    }else if(el.type==='legend'){
+      const hw=(el.w||0)/2,hh=(el.h||0)/2;
+      minX=Math.min(minX,el.x-hw);minY=Math.min(minY,el.y-hh);maxX=Math.max(maxX,el.x+hw);maxY=Math.max(maxY,el.y+hh);
+    }
+  });
+  drawPaths.concat(cleanPaths).forEach(p=>{const m=p.size||5;p.points.forEach(pt=>{minX=Math.min(minX,pt.x-m);minY=Math.min(minY,pt.y-m);maxX=Math.max(maxX,pt.x+m);maxY=Math.max(maxY,pt.y+m);});});
+  const padL=-Math.min(0,minX),padT=-Math.min(0,minY);
+  const totalW=maxX+padL,totalH=maxY+padT;
+  const cw=Math.round(totalW*scale),ch=Math.round(totalH*scale);
   const c=document.createElement('canvas');c.width=cw;c.height=ch;const ctx=c.getContext('2d');
-  const toX=px=>px*scale;
-  const toY=py=>py*scale;
+  ctx.fillStyle='#FFFFFF';ctx.fillRect(0,0,cw,ch);
+  const toX=px=>(px+padL)*scale;
+  const toY=py=>(py+padT)*scale;
   const finish=()=>{
     // Mr Propre (white strokes + zone inverse on plan)
     for(const p of cleanPaths){
@@ -1795,7 +1969,7 @@ function renderPlanToCanvas(cb){
       img.src=el.imgSrc;
     });
   };
-  if(planImgSrc){const img=new Image();img.crossOrigin='anonymous';img.onload=()=>{ctx.drawImage(img,0,0,cw,ch);finish();};img.src=planImgSrc;}else{ctx.fillStyle='#FFFFFF';ctx.fillRect(0,0,cw,ch);finish();}
+  if(planImgSrc){const img=new Image();img.crossOrigin='anonymous';img.onload=()=>{ctx.drawImage(img,toX(0),toY(0),Math.round(planW*scale),Math.round(planH*scale));finish();};img.src=planImgSrc;}else{finish();}
 }
 function captureSnapshot(){
   renderPlanToCanvas(c=>{
@@ -1837,14 +2011,14 @@ function openMiseEnPage(){
     svgContent:SVG[item.svgKey]?.replace(/<svg[^>]*>|<\/svg>/g,'')||''
   }));
   mepPageWmm=297;mepPageHmm=210;
-  mepLegendPos='bottom';
+  mepLegendPos='right';
   mepShowTitle=false;
   mepTitleText='';
   mepShowLegend=true;
   document.getElementById('mep-dim-w').value=297;
   document.getElementById('mep-dim-h').value=210;
   mepHighlightPreset();
-  document.querySelectorAll('.mep-pos-btn').forEach(b=>b.classList.toggle('active',b.dataset.pos==='bottom'));
+  document.querySelectorAll('.mep-pos-btn').forEach(b=>b.classList.toggle('active',b.dataset.pos==='right'));
   document.getElementById('mep-legend-check').checked=true;
   document.getElementById('mep-title-check').checked=false;
   document.getElementById('mep-title-input').value='';
@@ -2048,30 +2222,163 @@ function mepDownload(){
       const legW=info.pageW-info.margin*2;
       legendReady=mepDrawLegend(info.ctx,info.margin,legY,legW,info.legendBot,info.activeLegend,true);
     }
-    legendReady.then(()=>{
+    legendReady.then(async()=>{
       const refVal=document.getElementById('project-ref').value.trim();
-      const fileName='MEP_'+(refVal||'plan-geoter')+'_'+mepPageWmm+'x'+mepPageHmm+'mm.png';
-      const url=canvas.toDataURL('image/png');
-      const a=document.createElement('a');a.href=url;a.download=fileName;document.body.appendChild(a);a.click();document.body.removeChild(a);
+      const fileName='PLAN DE SONDAGE_'+(refVal||'projet')+'.png';
+      canvas.toBlob(async blob=>{
+        if(window.showSaveFilePicker){
+          try{
+            const handle=await window.showSaveFilePicker({suggestedName:fileName,startIn:savedFileHandle||'desktop',types:[{description:'Image PNG',accept:{'image/png':['.png']}}]});
+            const writable=await handle.createWritable();
+            await writable.write(blob);
+            await writable.close();
+          }catch(e){if(e.name!=='AbortError')console.error(e);}
+        }else{
+          const url=URL.createObjectURL(blob);
+          const a=document.createElement('a');a.href=url;a.download=fileName;document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);
+        }
+      },'image/png');
     });
   });
 }
 
 async function openCamera(){try{cameraStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment',width:{ideal:1920},height:{ideal:1080}}});document.getElementById('camera-video').srcObject=cameraStream;document.getElementById('camera-overlay').classList.add('open');}catch(err){alert("Impossible d'accéder à la caméra.");}}
 function closeCamera(){if(cameraStream){cameraStream.getTracks().forEach(t=>t.stop());cameraStream=null;}document.getElementById('camera-overlay').classList.remove('open');}
-function takePhoto(){const v=document.getElementById('camera-video');const c=document.createElement('canvas');c.width=v.videoWidth;c.height=v.videoHeight;c.getContext('2d').drawImage(v,0,0);const dataUrl=c.toDataURL('image/jpeg',0.85);closeCamera();const ref=document.getElementById('project-ref').value||'Photo';const defName=`${ref}_${photos.length+1}`;const name=prompt('Nom de la photo :',defName);if(name===null)return;photos.push({dataUrl,timestamp:new Date().toLocaleString('fr-FR'),name:name.trim()||defName,checked:true});renderPhotos();}
+let pendingPhotoDataUrl=null,pendingPhotoImg=null;
+let pcropRect={x:0,y:0,w:0,h:0},pcropScale=1,pcropFullW=0,pcropFullH=0;
+
+function takePhoto(){const v=document.getElementById('camera-video');const c=document.createElement('canvas');c.width=v.videoWidth;c.height=v.videoHeight;c.getContext('2d').drawImage(v,0,0);pendingPhotoDataUrl=c.toDataURL('image/jpeg',0.85);closeCamera();openPhotoNameModal();}
+
+function openPhotoNameModal(){
+  const ref=document.getElementById('project-ref').value||'Photo';
+  document.getElementById('photo-name-input').value=`${ref}_${photos.length+1}`;
+  const modal=document.getElementById('photo-name-modal');
+  const cvs=document.getElementById('photo-crop-canvas');
+  const ctx=cvs.getContext('2d');
+  const img=new Image();
+  img.onload=()=>{
+    pendingPhotoImg=img;pcropFullW=img.naturalWidth;pcropFullH=img.naturalHeight;
+    const maxW=window.innerWidth*0.85,maxH=window.innerHeight*0.60;
+    pcropScale=Math.min(maxW/pcropFullW,maxH/pcropFullH,1);
+    cvs.width=Math.round(pcropFullW*pcropScale);cvs.height=Math.round(pcropFullH*pcropScale);
+    ctx.drawImage(img,0,0,cvs.width,cvs.height);
+    pcropRect={x:0,y:0,w:cvs.width,h:cvs.height};
+    modal.classList.add('open');
+    renderPhotoCropSelection();
+    setTimeout(()=>document.getElementById('photo-name-input').select(),100);
+  };
+  img.src=pendingPhotoDataUrl;
+}
+
+function renderPhotoCropSelection(){
+  const sel=document.getElementById('photo-crop-selection');
+  const container=document.getElementById('photo-crop-container');
+  const cvs=document.getElementById('photo-crop-canvas');
+  pcropRect.x=Math.max(0,Math.min(pcropRect.x,cvs.width-20));
+  pcropRect.y=Math.max(0,Math.min(pcropRect.y,cvs.height-20));
+  pcropRect.w=Math.max(20,Math.min(pcropRect.w,cvs.width-pcropRect.x));
+  pcropRect.h=Math.max(20,Math.min(pcropRect.h,cvs.height-pcropRect.y));
+  sel.style.display='block';sel.style.left=pcropRect.x+'px';sel.style.top=pcropRect.y+'px';
+  sel.style.width=pcropRect.w+'px';sel.style.height=pcropRect.h+'px';
+  container.querySelectorAll('.photo-crop-mask,.photo-crop-handle').forEach(e=>e.remove());
+  const cw=cvs.width,ch=cvs.height,r=pcropRect;
+  [{l:0,t:0,w:cw,h:r.y},{l:0,t:r.y,w:r.x,h:r.h},{l:r.x+r.w,t:r.y,w:cw-r.x-r.w,h:r.h},{l:0,t:r.y+r.h,w:cw,h:ch-r.y-r.h}].forEach(m=>{
+    const d=document.createElement('div');d.className='photo-crop-mask';d.style.cssText=`left:${m.l}px;top:${m.t}px;width:${m.w}px;height:${m.h}px`;container.appendChild(d);
+  });
+  [{id:'tl',x:r.x,y:r.y},{id:'tr',x:r.x+r.w,y:r.y},{id:'bl',x:r.x,y:r.y+r.h},{id:'br',x:r.x+r.w,y:r.y+r.h}].forEach(h=>{
+    const d=document.createElement('div');d.className='photo-crop-handle';
+    d.style.left=h.x+'px';d.style.top=h.y+'px';
+    d.style.cursor={tl:'nwse-resize',tr:'nesw-resize',bl:'nesw-resize',br:'nwse-resize'}[h.id];
+    d.addEventListener('pointerdown',e=>{e.stopPropagation();e.preventDefault();startPhotoCropResize(e,h.id);});
+    container.appendChild(d);
+  });
+}
+
+function startPhotoCropResize(e,handle){
+  const ir={...pcropRect},mx=e.clientX,my=e.clientY;
+  const onMove=ev=>{
+    const dx=ev.clientX-mx,dy=ev.clientY-my;
+    if(handle==='br'){pcropRect.w=ir.w+dx;pcropRect.h=ir.h+dy;}
+    else if(handle==='bl'){pcropRect.x=ir.x+dx;pcropRect.w=ir.w-dx;pcropRect.h=ir.h+dy;}
+    else if(handle==='tr'){pcropRect.w=ir.w+dx;pcropRect.y=ir.y+dy;pcropRect.h=ir.h-dy;}
+    else if(handle==='tl'){pcropRect.x=ir.x+dx;pcropRect.y=ir.y+dy;pcropRect.w=ir.w-dx;pcropRect.h=ir.h-dy;}
+    renderPhotoCropSelection();
+  };
+  const onUp=()=>{document.removeEventListener('pointermove',onMove);document.removeEventListener('pointerup',onUp);};
+  document.addEventListener('pointermove',onMove);document.addEventListener('pointerup',onUp);
+}
+
+(function(){
+  const container=document.getElementById('photo-crop-container');
+  container.addEventListener('pointerdown',e=>{
+    if(e.target.classList.contains('photo-crop-handle'))return;
+    const rect=container.getBoundingClientRect();
+    const x=e.clientX-rect.left,y=e.clientY-rect.top;
+    if(x>=pcropRect.x&&x<=pcropRect.x+pcropRect.w&&y>=pcropRect.y&&y<=pcropRect.y+pcropRect.h){
+      const startMx=e.clientX,startMy=e.clientY,rx=pcropRect.x,ry=pcropRect.y;
+      const onMove=ev=>{pcropRect.x=rx+(ev.clientX-startMx);pcropRect.y=ry+(ev.clientY-startMy);renderPhotoCropSelection();};
+      const onUp=()=>{document.removeEventListener('pointermove',onMove);document.removeEventListener('pointerup',onUp);};
+      document.addEventListener('pointermove',onMove);document.addEventListener('pointerup',onUp);
+      return;
+    }
+    let sx=x,sy=y;pcropRect={x,y,w:0,h:0};
+    const onMove=ev=>{
+      const cx=ev.clientX-rect.left,cy=ev.clientY-rect.top;
+      pcropRect.x=Math.min(sx,cx);pcropRect.y=Math.min(sy,cy);
+      pcropRect.w=Math.abs(cx-sx);pcropRect.h=Math.abs(cy-sy);
+      renderPhotoCropSelection();
+    };
+    const onUp=()=>{document.removeEventListener('pointermove',onMove);document.removeEventListener('pointerup',onUp);};
+    document.addEventListener('pointermove',onMove);document.addEventListener('pointerup',onUp);
+  });
+})();
+
+function resetPhotoCrop(){
+  const cvs=document.getElementById('photo-crop-canvas');
+  pcropRect={x:0,y:0,w:cvs.width,h:cvs.height};
+  renderPhotoCropSelection();
+}
+
+function confirmPhotoName(){
+  const name=document.getElementById('photo-name-input').value.trim();
+  const ref=document.getElementById('project-ref').value||'Photo';
+  const defName=`${ref}_${photos.length+1}`;
+  const sx=Math.round(pcropRect.x/pcropScale),sy=Math.round(pcropRect.y/pcropScale);
+  const sw=Math.round(pcropRect.w/pcropScale),sh=Math.round(pcropRect.h/pcropScale);
+  if(sw<10||sh<10){alert('Sélection trop petite.');return;}
+  const c=document.createElement('canvas');c.width=sw;c.height=sh;
+  c.getContext('2d').drawImage(pendingPhotoImg,sx,sy,sw,sh,0,0,sw,sh);
+  const dataUrl=c.toDataURL('image/jpeg',0.85);
+  photos.push({dataUrl,timestamp:new Date().toLocaleString('fr-FR'),name:name||defName,checked:true});
+  pendingPhotoDataUrl=null;pendingPhotoImg=null;
+  document.getElementById('photo-name-modal').classList.remove('open');
+  renderPhotos();
+}
+
+function cancelPhotoName(){pendingPhotoDataUrl=null;pendingPhotoImg=null;document.getElementById('photo-name-modal').classList.remove('open');}
 function deletePhoto(i){photos.splice(i,1);renderPhotos();}
 function togglePhotoCheck(i,v){photos[i].checked=v;renderPhotos();}
 function renamePhoto(i,name){photos[i].name=name.trim()||('Photo_'+(i+1));}
-function downloadSelectedPhotos(){
+async function downloadSelectedPhotos(){
   const sel=photos.filter(p=>p.checked);if(sel.length===0)return;
-  sel.forEach((p,i)=>{
-    setTimeout(()=>{
-      const a=document.createElement('a');a.href=p.dataUrl;
-      a.download=(p.name||'Photo_'+(i+1))+'.jpg';
-      a.click();
-    },i*300);
-  });
+  if(window.showDirectoryPicker){
+    try{
+      const dirHandle=await window.showDirectoryPicker({startIn:savedFileHandle||'desktop',mode:'readwrite'});
+      for(let i=0;i<sel.length;i++){
+        const p=sel[i];
+        const fileName=(p.name||'Photo_'+(i+1))+'.jpg';
+        const fileHandle=await dirHandle.getFileHandle(fileName,{create:true});
+        const writable=await fileHandle.createWritable();
+        const resp=await fetch(p.dataUrl);
+        const blob=await resp.blob();
+        await writable.write(blob);
+        await writable.close();
+      }
+      alert(sel.length+' photo(s) enregistrée(s) avec succès.');
+    }catch(e){if(e.name!=='AbortError')console.error(e);}
+  }else{
+    sel.forEach((p,i)=>{setTimeout(()=>{const a=document.createElement('a');a.href=p.dataUrl;a.download=(p.name||'Photo_'+(i+1))+'.jpg';a.click();},i*300);});
+  }
 }
 function openLightbox(i){
   const p=photos[i];if(!p)return;
@@ -2083,6 +2390,23 @@ function closeLightbox(){document.getElementById('photo-lightbox').classList.rem
 document.getElementById('photo-lightbox').addEventListener('click',ev=>{if(ev.target.id==='photo-lightbox')closeLightbox();});
 document.addEventListener('keydown',ev=>{if(ev.key==='Escape'&&document.getElementById('photo-lightbox').classList.contains('open'))closeLightbox();});
 function togglePhotoSection(){document.getElementById('photo-section').classList.toggle('open');}
+(function(){
+  const handle=document.getElementById('photo-resize-handle');
+  const panel=document.getElementById('photo-section');
+  if(!handle||!panel)return;
+  handle.addEventListener('pointerdown',e=>{
+    e.preventDefault();e.stopPropagation();
+    handle.classList.add('active');handle.setPointerCapture(e.pointerId);
+    const startX=e.clientX,startW=panel.offsetWidth;
+    const onMove=ev=>{
+      const nw=Math.max(200,Math.min(window.innerWidth*0.5,startW-(ev.clientX-startX)));
+      panel.style.width=nw+'px';
+    };
+    const onUp=()=>{handle.classList.remove('active');handle.removeEventListener('pointermove',onMove);handle.removeEventListener('pointerup',onUp);};
+    handle.addEventListener('pointermove',onMove);
+    handle.addEventListener('pointerup',onUp);
+  });
+})();
 function renderPhotos(){
   const $e=document.getElementById('photo-empty'),$g=document.getElementById('photo-grid');
   const $dl=document.getElementById('btn-dl-photos');
@@ -2090,7 +2414,7 @@ function renderPhotos(){
   $e.style.display='none';
   const checkedCount=photos.filter(p=>p.checked).length;
   if($dl)$dl.disabled=checkedCount===0;
-  if($dl)$dl.textContent=checkedCount>0?`Télécharger (${checkedCount})`:'Télécharger';
+  if($dl)$dl.textContent=checkedCount>0?`Enregistrer (${checkedCount})`:'Enregistrer';
   $g.innerHTML=photos.map((p,i)=>`<div class="photo-card">
     <input type="checkbox" class="photo-check" ${p.checked?'checked':''} onchange="togglePhotoCheck(${i},this.checked)">
     <img src="${p.dataUrl}" alt="Photo ${i+1}" onclick="openLightbox(${i})" ondblclick="openLightbox(${i})">
