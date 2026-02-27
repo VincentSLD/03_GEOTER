@@ -32,7 +32,7 @@
   #header .logo-text .highlight{color:var(--yellow)}
   #header .logo-sub{font-size:9px;color:rgba(255,255,255,0.5);font-weight:600;letter-spacing:0.06em;text-transform:uppercase;margin-top:-2px}
   #header .actions{display:flex;gap:6px;align-items:center}
-  #project-ref{background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);border-radius:6px;color:#fff;font-size:13px;font-family:'Space Grotesk',sans-serif;padding:5px 10px;width:180px;outline:none;transition:border-color .2s}
+  #project-ref{background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);border-radius:6px;color:#fff;font-size:13px;font-family:'Space Grotesk',sans-serif;padding:5px 10px;min-width:80px;width:auto;outline:none;transition:border-color .2s}
   #project-ref::placeholder{color:rgba(255,255,255,0.35)}
   #project-ref:focus{border-color:var(--yellow)}
   .btn-header{border:none;border-radius:8px;padding:8px 14px;font-size:11px;font-weight:700;display:flex;align-items:center;gap:5px;transition:all .2s}
@@ -89,7 +89,7 @@
   #empty-state p{font-size:14px;color:var(--gray-300);font-weight:700;text-align:center;line-height:1.6}
   .btn-load-center{border:none;border-radius:var(--radius);padding:14px 32px;font-size:15px;font-weight:800;font-family:inherit;background:var(--yellow);color:var(--black);cursor:pointer;box-shadow:0 4px 16px var(--yellow-glow);transition:all .2s;display:flex;align-items:center;gap:8px}
   .btn-load-center:hover{background:var(--yellow-light);transform:translateY(-1px);box-shadow:0 6px 20px var(--yellow-glow)}
-  #empty-state .hint{font-size:10px;color:var(--gray-500);font-weight:600;margin-top:-4px}
+  #empty-state .hint{font-size:10px;color:var(--gray-500);font-weight:600;margin-top:12px}
   .welcome-title{font-size:32px;font-weight:900;color:var(--black);font-family:'Space Grotesk',sans-serif;letter-spacing:-0.02em}
   .welcome-title .highlight{color:var(--yellow)}
   .welcome-btns{display:flex;gap:14px;margin-top:8px}
@@ -103,7 +103,7 @@
   .sticker-icon svg{display:block}
   .sticker-icon.selected{border-color:var(--yellow);box-shadow:0 0 0 3px var(--yellow-glow),var(--shadow-md)}
   .sticker-label{font-size:7px;font-weight:800;color:#fff;padding:2px 5px;border-radius:3px;margin-top:2px;white-space:nowrap;letter-spacing:.03em;text-transform:uppercase}
-  .text-box{background:rgba(255,255,255,0.95);border:1px solid var(--gray-200);border-radius:8px;padding:6px 10px;font-size:13px;max-width:240px;word-break:break-word;box-shadow:var(--shadow-sm);transition:all .15s;text-align:center}
+  .text-box{background:rgba(255,255,255,0.95);border:1px solid var(--gray-200);border-radius:8px;padding:6px 10px;font-size:13px;max-width:240px;word-break:break-word;box-shadow:var(--shadow-sm);transition:all .15s;text-align:justify}
   .text-box b,.text-box strong{font-weight:800}.text-box i,.text-box em{font-style:italic}.text-box u{text-decoration:underline}.text-box font{line-height:1.3}
   .text-box.selected{border:2px solid var(--yellow);box-shadow:0 0 0 3px var(--yellow-glow),var(--shadow-md)}
   .del-btn{position:absolute;top:-9px;right:-9px;background:var(--red);color:#fff;border:none;border-radius:50%;width:20px;height:20px;font-size:12px;line-height:20px;text-align:center;font-weight:800;display:none;box-shadow:0 2px 6px rgba(217,64,64,0.4)}
@@ -145,6 +145,15 @@
   #shape-catalog-overlay.open{transform:translateY(0)}
   #shape-catalog-overlay::after{content:'';display:block;width:36px;height:4px;background:var(--yellow);border-radius:2px;margin:12px auto 0}
   #shape-catalog-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:8px;margin-top:8px}
+  #notes-catalog-overlay{position:fixed;top:0;left:0;right:0;background:var(--white);border-radius:0 0 20px 20px;box-shadow:0 6px 32px rgba(0,0,0,0.2);padding:14px 16px 20px;z-index:150;max-height:50vh;overflow-y:auto;transform:translateY(-100%);transition:transform .3s cubic-bezier(.4,0,.2,1)}
+  #notes-catalog-overlay.open{transform:translateY(0)}
+  #notes-catalog-overlay::after{content:'';display:block;width:36px;height:4px;background:var(--yellow);border-radius:2px;margin:12px auto 0}
+  .notes-cat-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+  .notes-cat-header span{font-weight:800;font-size:14px;color:var(--black)}
+  #notes-catalog-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:7px;margin-top:8px}
+  .note-item{display:flex;align-items:center;padding:8px 12px;border:2px solid var(--gray-100);border-radius:10px;background:var(--gray-50);font-size:12px;font-weight:700;color:var(--black);cursor:pointer;transition:all .2s;text-align:left}
+  .note-item:hover{border-color:var(--yellow);background:var(--yellow-pale)}
+  .note-item.active{border-color:var(--yellow);background:var(--yellow-pale);box-shadow:0 0 0 2px var(--yellow-glow)}
   #catalog-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
   #catalog-header span{font-weight:800;font-size:14px;color:var(--black)}
   .catalog-close{background:var(--gray-100);border:none;border-radius:8px;width:32px;height:32px;font-size:15px;color:var(--gray-500);transition:all .15s}
@@ -547,6 +556,7 @@
   <div id="toolbar">
     <button class="tool-btn active" data-tool="select" onclick="selectTool('select')"><span class="icon">👆</span><span class="label">Sélection</span></button>
     <button class="tool-btn" data-tool="sticker" onclick="selectTool('sticker')"><span class="icon">🏷️</span><span class="label">Vignettes</span></button>
+    <button class="tool-btn" data-tool="note" onclick="selectTool('note')"><span class="icon">📝</span><span class="label">Notes</span></button>
     <button class="tool-btn" data-tool="shape" onclick="selectTool('shape')"><span class="icon">🔷</span><span class="label">Formes</span></button>
     <button class="tool-btn" data-tool="text" onclick="selectTool('text')"><span class="icon">✏️</span><span class="label">Texte</span></button>
     <button class="tool-btn" data-tool="arrow" onclick="selectTool('arrow')"><span class="icon" style="font-size:13px;line-height:1;display:inline-flex;flex-direction:column;align-items:center"><span style="line-height:0.8">➜</span><span style="line-height:0.7">──</span></span><span class="label">Traits</span></button>
@@ -556,6 +566,7 @@
     <button class="tool-btn" onclick="undoAction()"><span class="icon" style="font-style:normal;font-size:16px">⟲</span><span class="label">Annuler</span></button>
     <button class="tool-btn" onclick="redoAction()"><span class="icon" style="font-style:normal;font-size:16px">⟳</span><span class="label">Remettre</span></button>
     <div class="tool-sep"></div>
+    <button class="tool-btn" onclick="duplicateSelected()"><span class="icon">📋</span><span class="label">Dupliquer</span></button>
     <button class="tool-btn" onclick="openCropTool()"><span class="icon" style="display:inline-flex"><svg viewBox="0 0 20 20" width="17" height="17" fill="none" stroke="#1A1A1A" stroke-width="2" stroke-linecap="round"><path d="M5 1v14h14"/><path d="M1 5h14v14"/></svg></span><span class="label">Rogner</span></button>
     <button class="tool-btn" onclick="insertImageMenu()"><span class="icon">🖼️</span><span class="label">Image</span></button>
     <button class="tool-btn" onclick="openPlanPicker()"><span class="icon">🏢</span><span class="label">Fond de plan</span></button>
@@ -690,6 +701,10 @@
     <div id="catalog-header"><span>🔷 Formes géométriques</span><button class="catalog-close" onclick="closeShapeCatalog()">✕</button></div>
     <div id="shape-catalog-grid"></div>
   </div>
+  <div id="notes-catalog-overlay">
+    <div class="notes-cat-header"><span>📝 Notes types</span><button class="catalog-close" onclick="closeNotesCatalog()">✕</button></div>
+    <div id="notes-catalog-grid"></div>
+  </div>
   <div id="legend-modal" onclick="closeLegend()">
     <div id="legend-inner" onclick="event.stopPropagation()">
       <div id="legend-header"><span>📋 Légende</span><div style="display:flex;gap:6px;align-items:center"><button onclick="placeLegendOnPlan()" style="background:var(--yellow);color:var(--black);border:none;border-radius:6px;padding:4px 10px;font-size:11px;font-weight:800;cursor:pointer">📌 Coller sur le plan</button><button class="catalog-close" onclick="closeLegend()">✕</button></div></div>
@@ -711,7 +726,7 @@
   </div>
   <div id="snapshot-modal" onclick="closeSnapshot()">
     <div id="snapshot-inner" onclick="event.stopPropagation()">
-      <div id="snapshot-header"><span>📸 Aperçu du plan annoté</span><div style="display:flex;gap:8px;align-items:center"><a id="snapshot-download" class="btn-download" download="geoter-plan-annote.png">💾 Télécharger</a><button class="catalog-close" onclick="closeSnapshot()">✕</button></div></div>
+      <div id="snapshot-header"><span>📸 Aperçu du plan de sondage seul</span><div style="display:flex;gap:8px;align-items:center"><a id="snapshot-download" class="btn-download" download="geoter-plan-annote.png">💾 Télécharger</a><button class="catalog-close" onclick="closeSnapshot()">✕</button></div></div>
       <img id="snapshot-img" alt="Snapshot">
     </div>
   </div>
@@ -1031,7 +1046,31 @@ const cleanCtx=$cleanCanvas.getContext('2d');
 const $empty=document.getElementById('empty-state');
 const drawCtx=$drawCanvas.getContext('2d');
 
-buildCatalog();buildShapeCatalog();buildColorOptions();resizeDrawCanvas();
+const NOTES_CATALOG=[
+  {title:'Accès difficile',text:'L\'accès au point de sondage s\'avère difficile en raison de la configuration du terrain. La présence de végétation dense, de dénivelés marqués ou d\'obstacles divers limite la progression des engins de forage. Un aménagement préalable de la piste d\'accès pourrait être nécessaire pour permettre l\'acheminement du matériel de reconnaissance. Il est recommandé de prévoir un engin de terrassement pour préparer la plateforme de travail avant toute intervention. Les conditions d\'accès devront être réévaluées en fonction de la météo et de l\'état du terrain au moment des travaux.'},
+  {title:'Zone remblayée',text:'Le terrain investigué présente une zone de remblais d\'épaisseur variable. Ces matériaux de remblai sont constitués de terres rapportées, mélangées à des éléments divers tels que fragments de béton, briques, cailloux et matière organique. La mise en place de ces remblais semble avoir été réalisée sans compactage contrôlé, ce qui se traduit par une hétérogénéité importante tant en nature qu\'en compacité. La portance de ces matériaux est insuffisante pour supporter des fondations superficielles en l\'état. Un traitement ou une substitution de ces remblais devra être envisagé dans le cadre du projet de construction.'},
+  {title:'Présence d\'eau',text:'Des venues d\'eau ont été constatées au cours de la réalisation des sondages. Le niveau d\'eau relevé se situe à une profondeur variable selon les points de reconnaissance. Cette présence d\'eau peut être liée à une nappe phréatique superficielle, à des circulations d\'eau dans les couches perméables ou à des infiltrations d\'eau de ruissellement. Il conviendra de prendre en compte ce paramètre hydrogéologique dans le dimensionnement des fondations et des ouvrages enterrés. Des dispositifs de drainage ou de cuvelage pourront être nécessaires selon la nature des aménagements prévus.'},
+  {title:'Terrain rocheux',text:'Le substratum rocheux a été atteint à faible profondeur lors des investigations. La roche en place se présente sous forme compacte avec un degré d\'altération variable selon les secteurs. Des passages fracturés ou altérés ont été identifiés localement, présentant une résistance mécanique réduite par rapport à la roche saine. L\'ancrage des fondations dans ce substratum rocheux nécessitera l\'emploi de moyens adaptés tels que brise-roche hydraulique ou havage. Les caractéristiques mécaniques de la roche devront être prises en compte pour le dimensionnement des fondations et des terrassements.'},
+  {title:'Refus au pénétromètre',text:'Le pénétromètre dynamique a rencontré le refus à une profondeur donnée, ne permettant pas de poursuivre l\'essai plus en profondeur. Ce refus peut être dû à la présence d\'un bloc isolé, d\'un niveau de grave très compacte, du substratum rocheux ou d\'un ancien ouvrage enterré. La nature exacte de l\'obstacle n\'a pas pu être déterminée par cet essai seul. Un sondage destructif complémentaire serait nécessaire pour identifier précisément la nature du terrain au-delà de la profondeur de refus et confirmer l\'interprétation géologique du site.'},
+  {title:'Sol argileux',text:'Les sondages ont mis en évidence la présence d\'un horizon argileux d\'épaisseur significative. Ces argiles présentent une plasticité moyenne à forte et une consistance variable allant de molle à raide selon la profondeur. Ce type de sol est sensible aux variations de teneur en eau et peut être sujet à des phénomènes de retrait-gonflement. En période sèche, des fissures de dessiccation peuvent apparaître en surface, tandis qu\'en période humide, le gonflement peut générer des désordres sur les ouvrages. Des précautions particulières devront être prises pour les fondations dans ce contexte.'},
+  {title:'Nappe phréatique',text:'Une nappe d\'eau souterraine a été identifiée lors des investigations géotechniques. Le niveau piézométrique relevé se situe à une profondeur qui pourra varier en fonction des saisons et des conditions climatiques. Les fluctuations saisonnières de cette nappe peuvent atteindre plusieurs décimètres, voire plusieurs mètres dans certains contextes. La présence de cette nappe impose des contraintes pour la réalisation des terrassements et des fondations, notamment en termes d\'épuisement, d\'étanchéité et de sous-pressions. Un suivi piézométrique est recommandé pour évaluer les variations du niveau d\'eau dans le temps.'},
+  {title:'Zone instable',text:'Le secteur étudié présente des indices d\'instabilité géotechnique. Des signes de mouvements de terrain ont été observés, tels que des fissures dans le sol, des bourrelets de compression, des arbres inclinés ou des désordres sur les ouvrages existants à proximité. Cette instabilité peut être liée à la nature des terrains en place, à la pente du terrain naturel, à la présence d\'eau ou à des surcharges en tête de talus. Une étude de stabilité approfondie est recommandée avant tout projet d\'aménagement afin de définir les mesures de confortement adaptées.'},
+  {title:'Fondations superficielles',text:'Au regard des résultats des investigations géotechniques, des fondations superficielles de type semelles filantes ou isolées peuvent être envisagées pour le projet. L\'horizon d\'assise recommandé se situe à une profondeur permettant de mobiliser une capacité portante suffisante. L\'encastrement minimal devra respecter la profondeur hors gel réglementaire. Les semelles devront être dimensionnées en tenant compte des charges transmises, de la portance du sol d\'assise et des tassements admissibles pour la structure. Un contrôle de fond de fouille par un géotechnicien est recommandé avant tout coulage de béton.'},
+  {title:'Fondations profondes',text:'Les conditions géotechniques rencontrées sur le site ne permettent pas d\'envisager des fondations superficielles dans des conditions satisfaisantes. Le recours à des fondations profondes de type pieux ou micropieux est préconisé pour reporter les charges de l\'ouvrage sur un horizon porteur situé en profondeur. Le dimensionnement de ces fondations devra prendre en compte les efforts de pointe, le frottement latéral ainsi que les effets de groupe. Une étude complémentaire de type essai pressiométrique ou pénétrométrique est recommandée pour affiner les paramètres de calcul des fondations profondes.'},
+  {title:'Remblai hétérogène',text:'Un remblai de nature hétérogène a été mis en évidence sur l\'ensemble de la zone étudiée. Ce remblai est composé d\'un mélange de matériaux divers incluant des terres végétales, des gravats, des fragments de maçonnerie et localement des déchets. L\'épaisseur de ce remblai varie d\'un point à l\'autre du site. Sa mise en place anarchique, sans compactage contrôlé, lui confère des caractéristiques mécaniques très médiocres et variables. Ce remblai n\'est pas apte à servir de sol d\'assise pour des fondations. Il devra être traversé ou substitué par des matériaux nobles compactés.'},
+  {title:'Risque retrait-gonflement',text:'Le site se trouve dans une zone exposée au phénomène de retrait-gonflement des argiles, classée en aléa moyen à fort selon la cartographie du BRGM. Les sols argileux identifiés lors des sondages sont susceptibles de variations volumiques importantes en fonction des conditions hydriques. En période de sécheresse, le retrait des argiles provoque des tassements différentiels pouvant endommager les structures. En période humide, le gonflement génère des soulèvements. Les dispositions constructives préconisées incluent un encastrement suffisant des fondations, des chaînages renforcés et une gestion des eaux périphériques.'},
+  {title:'Végétation dense',text:'La parcelle étudiée est couverte d\'une végétation dense composée d\'arbres de haute tige, d\'arbustes et de broussailles. Le réseau racinaire, particulièrement développé, perturbe les couches superficielles du sol et peut influencer les résultats des essais réalisés à faible profondeur. Le défrichement préalable de la zone sera nécessaire avant toute opération de terrassement. La présence d\'arbres à proximité des futurs ouvrages devra être prise en compte dans le dimensionnement des fondations pour se prémunir contre les effets de la dessiccation du sol provoquée par l\'absorption racinaire.'},
+  {title:'Réseau enterré',text:'La présence de réseaux enterrés a été signalée ou identifiée dans l\'emprise de la zone d\'étude. Ces réseaux peuvent inclure des canalisations d\'eau potable, d\'assainissement, de gaz, des câbles électriques ou de télécommunication. Leur position exacte et leur profondeur devront être confirmées par une détection de réseaux avant le démarrage des travaux de terrassement et de fondation. Le respect des distances de sécurité par rapport à ces réseaux est impératif. Des DICT devront être réalisées auprès des concessionnaires concernés préalablement à toute intervention mécanique sur le site.'},
+  {title:'Pente forte',text:'Le terrain naturel présente une pente significative sur tout ou partie de la zone étudiée. Cette déclivité influence directement la stabilité des terrains et les conditions de réalisation des terrassements. Les talus créés par les déblais ou les remblais devront être dimensionnés en fonction de la nature des sols et de la hauteur de la pente. Des ouvrages de soutènement pourront être nécessaires pour assurer la stabilité des terres. Un dispositif de drainage adapté devra être mis en place pour limiter l\'accumulation d\'eau dans les terrains en amont et réduire les risques de glissement.'},
+  {title:'Cavité souterraine',text:'Des indices de cavités souterraines ont été détectés ou suspectés dans le secteur d\'étude. Ces cavités peuvent être d\'origine naturelle (dissolution de gypse ou calcaire, karst) ou anthropique (carrières souterraines, galeries, caves). La présence de telles cavités constitue un risque majeur pour la stabilité des terrains de surface et des futurs ouvrages. Des investigations complémentaires par méthodes géophysiques ou par sondages destructifs sont recommandées pour localiser précisément ces vides et évaluer leur extension. Le comblement ou le pontage des cavités pourra être nécessaire selon les résultats.'},
+  {title:'Tassement observé',text:'Des signes de tassement ont été observés sur le terrain ou sur les ouvrages existants à proximité du site. Ces tassements se manifestent par des affaissements localisés du sol, des fissures sur les bâtiments voisins, des déformations de chaussée ou des désalignements d\'ouvrages. Les causes peuvent être multiples : consolidation des sols compressibles, dissolution de matériaux solubles, vibrations, surcharges ou variations du niveau de la nappe. Une analyse des causes et une surveillance des déformations sont recommandées. Le dimensionnement des fondations du projet devra intégrer des critères de tassement admissible stricts.'},
+  {title:'Essai pressiométrique',text:'Des essais pressiométriques ont été réalisés dans les forages afin de caractériser les propriétés mécaniques des sols en place. Les paramètres mesurés, pression limite et module pressiométrique, permettent de dimensionner les fondations selon les règles en vigueur. Les résultats obtenus montrent des valeurs variables selon la profondeur et la nature des terrains traversés. Les couches superficielles présentent généralement des caractéristiques plus faibles que les horizons profonds. L\'interprétation de ces essais, combinée aux observations de sondage, permet de définir les niveaux d\'assise recommandés et les capacités portantes associées.'},
+  {title:'Pollution suspectée',text:'Des indices de pollution des sols ont été relevés lors des investigations. Des odeurs inhabituelles, des colorations anormales ou la présence de matériaux suspects ont été constatés à certaines profondeurs. L\'origine de cette pollution potentielle peut être liée à d\'anciennes activités industrielles, agricoles ou à des dépôts sauvages de déchets. Des analyses chimiques sur échantillons de sol et éventuellement d\'eau sont recommandées pour caractériser la nature et l\'étendue de la contamination. Selon les résultats, un plan de gestion des terres polluées devra être établi conformément à la réglementation en vigueur.'},
+  {title:'Terrassement déconseillé',text:'Les conditions géotechniques et environnementales du site rendent les opérations de terrassement particulièrement délicates. La nature des sols en place, leur état hydrique, la présence de réseaux ou la proximité d\'ouvrages existants imposent des précautions importantes. Les terrassements devront être réalisés par phases avec des talutages adaptés et un suivi géotechnique continu. L\'emploi d\'engins lourds devra être limité pour éviter les vibrations préjudiciables aux constructions voisines. En période pluvieuse, les travaux de terrassement sont déconseillés en raison du risque de déstabilisation des parois de fouille et de remontée du niveau d\'eau.'}
+];
+let selectedNote=null;
+
+buildCatalog();buildShapeCatalog();buildNotesCatalog();buildColorOptions();resizeDrawCanvas();
 window.addEventListener('resize',resizeDrawCanvas);
 window.addEventListener('orientationchange',()=>{setTimeout(resizeDrawCanvas,200);});
 function resizeDrawCanvas(){const r=$area.getBoundingClientRect();$drawCanvas.width=r.width;$drawCanvas.height=r.height;$cleanCanvas.width=r.width;$cleanCanvas.height=r.height;redrawCanvas();redrawCleanCanvas();}
@@ -1056,7 +1095,7 @@ function selectTool(t){
   document.getElementById('text-options').style.display=t==='text'?'flex':'none';
   czPoints=[];czPreview=null;
   document.getElementById('arrow-options').classList.toggle('show',t==='arrow');
-  if(t==='sticker'){openCatalog();closeShapeCatalog();}else if(t==='shape'){openShapeCatalog();closeCatalog();}else{closeCatalog();closeShapeCatalog();}renderElements();
+  if(t==='sticker'){openCatalog();closeShapeCatalog();closeNotesCatalog();}else if(t==='shape'){openShapeCatalog();closeCatalog();closeNotesCatalog();}else if(t==='note'){openNotesCatalog();closeCatalog();closeShapeCatalog();}else{closeCatalog();closeShapeCatalog();closeNotesCatalog();}renderElements();
 }
 document.addEventListener('keydown',function(e){if(e.key==='Escape'&&currentTool!=='select'){selectTool('select');}});
 function buildColorOptions(){const $c=document.getElementById('color-options');COLORS.forEach(c=>{const d=document.createElement('button');d.className='color-dot';d.style.background=c;if(c==='#FFFFFF')d.style.border='2px solid #D4D4D4';d.onclick=()=>{if(currentTool==='draw')drawColor=c;else{textColor=c;const ed=document.getElementById('inline-text-editor');if(ed)ed.style.color=c;}updateColorDots();};$c.appendChild(d);});
@@ -1122,6 +1161,23 @@ function updateShapeCatalogActive(){document.querySelectorAll('#shape-catalog-gr
 function openShapeCatalog(){document.getElementById('shape-catalog-overlay').classList.add('open');updateShapeCatalogActive();}
 function closeShapeCatalog(){document.getElementById('shape-catalog-overlay').classList.remove('open');}
 
+function buildNotesCatalog(){
+  const $grid=document.getElementById('notes-catalog-grid');if(!$grid)return;
+  $grid.innerHTML='';
+  NOTES_CATALOG.forEach((note,i)=>{
+    const btn=document.createElement('button');
+    btn.className='note-item';
+    btn.textContent=note.title;
+    btn.title=note.text.substring(0,120)+'…';
+    btn.dataset.nidx=i;
+    btn.onclick=()=>{selectedNote=note;closeNotesCatalog();updateNotesCatalogActive();};
+    $grid.appendChild(btn);
+  });
+}
+function updateNotesCatalogActive(){document.querySelectorAll('.note-item').forEach(b=>{b.classList.toggle('active',NOTES_CATALOG[+b.dataset.nidx]===selectedNote);});}
+function openNotesCatalog(){document.getElementById('notes-catalog-overlay').classList.add('open');updateNotesCatalogActive();}
+function closeNotesCatalog(){document.getElementById('notes-catalog-overlay').classList.remove('open');}
+
 let pendingPdf=null;
 async function openPlanPicker(){
   if(planImgSrc&&!confirm('Voulez-vous changer de fond de plan ?'))return;
@@ -1147,6 +1203,7 @@ async function loadPlan(e){
 
 async function loadPlanFromFile(file){
   if(!file)return;
+  cleanPaths=[];redrawCleanCanvas();
   if(file.type==='application/pdf'){
     const buf=await file.arrayBuffer();
     const pdf=await pdfjsLib.getDocument({data:buf}).promise;
@@ -1282,9 +1339,10 @@ function onPD(e){
   if(e.target.closest('.plan-element'))return;const pt=gP(e);
   if(currentTool==='select'){selectedId=null;renderElements();isPanning=true;panStartX=e.clientX;panStartY=e.clientY;panOX=offX;panOY=offY;$area.style.cursor='grabbing';$area.setPointerCapture(e.pointerId);return;}
   if(currentTool==='sticker'&&selectedStickerId){const s=ALL_STICKERS.find(x=>x.id===selectedStickerId);
-    if(s.isShape){const nel={id:Date.now(),type:'sticker',isShape:true,shapeType:s.shapeType,filled:!!s.filled,x:pt.px,y:pt.py,color:s.color,fillColor:s.color,sScale:1.8,shapeW:40,shapeH:40,strokeWidth:2,opacity:1,noLegend:true};elements.push(nel);renderElements();return;}
-    if(s.isGroup&&s.groupItems){const t=Date.now();s.groupItems.forEach((gi,i)=>{const nel={id:t+i,type:'sticker',x:pt.px+(gi.dx||0)/scale,y:pt.py+(gi.dy||0)/scale,label:gi.label,color:gi.color,sScale:gi.sScale||1,svgKey:gi.svgKey||s.svg,noLegend:true,groupId:t,groupLocked:true};if(gi.isText)nel.isText=true;if(gi.noBorder)nel.noBorder=true;if(gi.underline)nel.underline=true;elements.push(nel);});renderElements();return;}
-    const defScale=s.id==='boussole'?3.6:s.id==='etiq_150'?0.9:1.8;const nel={id:Date.now(),type:'sticker',x:pt.px,y:pt.py,svgKey:s.svg,label:s.label,color:s.color,sScale:defScale};if(s.isText)nel.isText=true;if(s.noBorder)nel.noBorder=true;if(s.noLegend)nel.noLegend=true;if(s.defaultLabel)nel.showLabel=true;elements.push(nel);renderElements();return;}
+    if(s.isShape){const nel={id:Date.now(),type:'sticker',isShape:true,shapeType:s.shapeType,filled:!!s.filled,x:pt.px,y:pt.py,color:s.color,fillColor:s.color,sScale:1.8,shapeW:40,shapeH:40,strokeWidth:2,opacity:1,noLegend:true};elements.push(nel);selectedId=nel.id;selectTool('select');renderElements();return;}
+    if(s.isGroup&&s.groupItems){const t=Date.now();s.groupItems.forEach((gi,i)=>{const nel={id:t+i,type:'sticker',x:pt.px+(gi.dx||0)/scale,y:pt.py+(gi.dy||0)/scale,label:gi.label,color:gi.color,sScale:gi.sScale||1,svgKey:gi.svgKey||s.svg,noLegend:true,groupId:t,groupLocked:true};if(gi.isText)nel.isText=true;if(gi.noBorder)nel.noBorder=true;if(gi.underline)nel.underline=true;elements.push(nel);});selectedId=t;selectTool('select');renderElements();return;}
+    const defScale=s.id==='boussole'?3.6:s.id==='etiq_150'?0.9:1.8;const nel={id:Date.now(),type:'sticker',x:pt.px,y:pt.py,svgKey:s.svg,label:s.label,color:s.color,sScale:defScale};if(s.isText)nel.isText=true;if(s.noBorder)nel.noBorder=true;if(s.noLegend)nel.noLegend=true;if(s.defaultLabel)nel.showLabel=true;elements.push(nel);selectedId=nel.id;selectTool('select');renderElements();return;}
+  if(currentTool==='note'&&selectedNote){elements.push({id:Date.now(),type:'text',x:pt.px,y:pt.py,html:selectedNote.text,text:selectedNote.text,color:'#1A1A1A',bordered:true});selectedId=elements[elements.length-1].id;selectTool('select');renderElements();return;}
   if(currentTool==='text'){if(e.target.closest('#inline-text-editor'))return;openTextEditor(pt.px,pt.py);return;}
   if(currentTool==='arrow'){arrowStartPt={x:pt.px,y:pt.py};arrowPreviewEnd=null;$area.setPointerCapture(e.pointerId);return;}
   if(currentTool==='draw'||currentTool==='erase'){isDrawing=true;currentPathPts=[{x:pt.px,y:pt.py}];$area.setPointerCapture(e.pointerId);}
@@ -1345,7 +1403,7 @@ function renderElements(){
         const ulSty=el.underline?'text-decoration:underline;':'';
         const gLocked=el.groupId&&el.groupLocked;
         const lockBtn=el.groupId?`<button class="lock-btn${gLocked?'':' unlocked'}" data-action="toggleLock" data-eid="${el.id}" title="${gLocked?'Déverrouiller':'Verrouiller'} le groupe">${gLocked?'🔒':'🔓'}</button>`:'';
-        const editBtns=gLocked?'':`<button class="edit-btn" data-action="editLabel" data-eid="${el.id}">✏️</button><button class="edit-btn" data-action="duplicate" data-eid="${el.id}" style="top:38px" title="Dupliquer">📋</button>`;
+        const editBtns=gLocked?'':`<button class="edit-btn" data-action="editLabel" data-eid="${el.id}">✏️</button>`;
         div.innerHTML=`<div class="sticker-wrap" style="transform:rotate(${rot}deg)"><div class="text-label-sticker ${selectedId===el.id?'selected':''}" style="font-size:${fs}px;padding:${pd}px ${pd*2}px;color:${elC};${ulSty}${noBdr?'border:none;background:none;box-shadow:none':'border-width:'+bw+'px;border-color:'+elC}" data-eid="${el.id}">${escXml(el.label)}</div></div><button class="del-btn" data-action="del" data-eid="${el.id}">×</button>${editBtns}${lockBtn}<button class="rotate-btn" data-action="rotate" data-eid="${el.id}">↻</button><div class="resize-handle" data-resize="1"></div>`;
       }else{
         const svgRaw=SVG[el.svgKey]||'';
@@ -1382,17 +1440,24 @@ function renderElements(){
           const lm=lp==='bottom'?'margin-top:2px':lp==='left'?'margin-right:4px':lp==='right'?'margin-left:4px':'margin-bottom:2px';
           stickerLabel=`<div style="${lm};font-size:${lfs}px;font-weight:700;color:${el.color||'#1A1A1A'};text-align:center;white-space:nowrap;text-shadow:0 0 5px #fff,0 0 5px #fff,0 0 10px #fff,0 0 10px #fff,1px 1px 2px #fff,-1px -1px 2px #fff">${escXml(el.label)}</div>`;
         }
-        const bgBtn=(el.sondageId||el.nivRefId)?`<button class="edit-btn" data-action="toggleSondageBg" data-eid="${el.id}" style="top:38px" title="${hasBg?'Retirer le fond blanc':'Ajouter un fond blanc'}">${hasBg?'◻':'◼'}</button>`:'';
-        const posBtn=(el.nivRefId||el.showLabel)?`<button class="edit-btn" data-action="cycleLabelPos" data-eid="${el.id}" style="top:58px" title="Position du texte">⇄</button>`:'';
+        const leftBtns=[];
+        if(el.sondageId) leftBtns.push(`<button class="edit-btn" data-action="openSondage" data-eid="${el.id}" title="Ouvrir la fiche sondage">📋</button>`);
+        if(el.sondageId||el.nivRefId) leftBtns.push(`<button class="edit-btn" data-action="toggleSondageBg" data-eid="${el.id}" title="${hasBg?'Retirer le fond blanc':'Ajouter un fond blanc'}">${hasBg?'◻':'◼'}</button>`);
+        if(el.nivRefId||el.showLabel) leftBtns.push(`<button class="edit-btn" data-action="cycleLabelPos" data-eid="${el.id}" title="Position du texte">⇄</button>`);
+        if(!el.sondageId&&!el.nivRefId) leftBtns.push(`<button class="edit-btn" data-action="editLabel" data-eid="${el.id}" title="Modifier le texte">✏️</button>`);
+        const leftBtnsHtml=leftBtns.map((b,i)=>b.replace('class="edit-btn"',`class="edit-btn" style="top:${-9+i*30}px"`)).join('');
+        const lockTop=-9+leftBtns.length*30;
+        const lockBtnDyn=el.groupId?`<button class="lock-btn${gLocked2?'':' unlocked'}" data-action="toggleLock" data-eid="${el.id}" style="top:${lockTop}px" title="${gLocked2?'Déverrouiller':'Verrouiller'} le groupe">${gLocked2?'🔒':'🔓'}</button>`:'';
         const iconDiv=`<div class="sticker-icon ${selectedId===el.id?'selected':''}" style="padding:${Math.round(4*ss)}px${noBg?';background:none;box-shadow:none':''}"><svg viewBox="${vb}" width="${sz}" height="${svgH}" xmlns="http://www.w3.org/2000/svg">${svgInner}</svg></div>`;
         let wrapDir='',wrapContent=stickerLabel+iconDiv+stickerDepthLabel;
         if(el.nivRefId||el.showLabel){const lp=el.labelPos||'top';if(lp==='bottom'){wrapContent=iconDiv+stickerLabel;}else if(lp==='left'){wrapDir='flex-direction:row-reverse;';wrapContent=iconDiv+stickerLabel;}else if(lp==='right'){wrapDir='flex-direction:row;';wrapContent=iconDiv+stickerLabel;}}
-        div.innerHTML=`<div class="sticker-wrap" style="transform:rotate(${rot}deg);${wrapDir}${bgStyle}">${wrapContent}</div><button class="del-btn" data-action="del" data-eid="${el.id}">×</button>${sondageBtn}${bgBtn}${posBtn}${lockBtn2}<button class="rotate-btn" data-action="rotate" data-eid="${el.id}">↻</button><div class="resize-handle" data-resize="1"></div>`;
+        div.innerHTML=`<div class="sticker-wrap" style="transform:rotate(${rot}deg);${wrapDir}${bgStyle}">${wrapContent}</div><button class="del-btn" data-action="del" data-eid="${el.id}">×</button>${leftBtnsHtml}${lockBtnDyn}<button class="rotate-btn" data-action="rotate" data-eid="${el.id}">↻</button><div class="resize-handle" data-resize="1"></div>`;
       }
     }else if(el.type==='text'){
       if(el.id===teEditingId){div.style.display='none';}else{
       const bStyle=el.bordered?`;border:2px solid ${el.color};border-radius:4px`:'';
-      div.innerHTML=`<div class="text-box ${selectedId===el.id?'selected':''}" style="color:${el.color}${bStyle}">${el.html||el.text||''}</div><button class="del-btn" data-action="del" data-eid="${el.id}">×</button><button class="edit-btn" data-action="edit" data-eid="${el.id}">✏️</button><button class="edit-btn" data-action="duplicate" data-eid="${el.id}" style="top:38px" title="Dupliquer">📋</button>`;}
+      const twStyle=el.textW?`;width:${el.textW}px;max-width:none`:'';
+      div.innerHTML=`<div class="text-box ${selectedId===el.id?'selected':''}" style="color:${el.color}${bStyle}${twStyle}">${el.html||el.text||''}</div><button class="del-btn" data-action="del" data-eid="${el.id}">×</button><button class="edit-btn" data-action="edit" data-eid="${el.id}">✏️</button><div class="resize-handle" data-resize="text"></div>`;}
     }else if(el.type==='arrow'){
       div.style.transform='translate(-50%,-50%)';
       const sx1=el.x*scale+offX,sy1=el.y*scale+offY,sx2=el.x2*scale+offX,sy2=el.y2*scale+offY;
@@ -1488,11 +1553,13 @@ function renderElements(){
       const resizeEl=e.target.closest('[data-resize]');
       if(resizeEl&&el.type==='sticker'&&!(el.groupId&&el.groupLocked)){
         e.stopPropagation();e.preventDefault();selectedId=el.id;
-        const cx=el.x*scale+offX,cy=el.y*scale+offY;
+        const ar=$area.getBoundingClientRect();
+        const cx=el.x*scale+offX+ar.left,cy=el.y*scale+offY+ar.top;
+        const startDist=Math.sqrt((e.clientX-cx)**2+(e.clientY-cy)**2)||1;
+        const startScale=el.sScale||1;
         const sMove=ev=>{
-          const dx=ev.clientX-cx,dy=ev.clientY-cy;
-          const dist=Math.sqrt(dx*dx+dy*dy);
-          el.sScale=Math.max(0.15,dist/(40*scale));
+          const dist=Math.sqrt((ev.clientX-cx)**2+(ev.clientY-cy)**2);
+          el.sScale=Math.max(0.15,startScale*(dist/startDist));
           renderElements();
         };
         const sUp=()=>{document.removeEventListener('pointermove',sMove);document.removeEventListener('pointerup',sUp);};
@@ -1500,14 +1567,30 @@ function renderElements(){
         document.addEventListener('pointerup',sUp);
         return;
       }
+      if(resizeEl&&resizeEl.dataset.resize==='text'&&el.type==='text'){
+        e.stopPropagation();e.preventDefault();selectedId=el.id;
+        const textBox=div.querySelector('.text-box');
+        const startW=textBox?textBox.offsetWidth/scale:240;
+        const startX2=e.clientX;
+        const tMove=ev=>{
+          const dx=(ev.clientX-startX2)/scale;
+          el.textW=Math.max(80,Math.round(startW+dx));
+          renderElements();
+        };
+        const tUp=()=>{document.removeEventListener('pointermove',tMove);document.removeEventListener('pointerup',tUp);};
+        document.addEventListener('pointermove',tMove);
+        document.addEventListener('pointerup',tUp);
+        return;
+      }
       if(resizeEl&&el.type==='image'){
         e.stopPropagation();e.preventDefault();selectedId=el.id;
-        const cx=el.x*scale+offX,cy=el.y*scale+offY;
+        const ar2=$area.getBoundingClientRect();
+        const cx=el.x*scale+offX+ar2.left,cy=el.y*scale+offY+ar2.top;
         const origW=el.w||150,origH=el.h||100,ratio=origW/origH;
+        const startDist2=Math.sqrt((e.clientX-cx)**2+(e.clientY-cy)**2)||1;
         const iMove=ev=>{
-          const dx=ev.clientX-cx,dy=ev.clientY-cy;
-          const dist=Math.sqrt(dx*dx+dy*dy);
-          const nw=Math.max(30,Math.round(dist*2/scale));
+          const dist=Math.sqrt((ev.clientX-cx)**2+(ev.clientY-cy)**2);
+          const nw=Math.max(30,Math.round(origW*(dist/startDist2)));
           el.w=nw;el.h=Math.round(nw/ratio);
           renderElements();
         };
@@ -1579,6 +1662,12 @@ function renderElements(){
       div.addEventListener('dblclick',ev=>{
         ev.stopPropagation();ev.preventDefault();
         if(el.groupId&&el.groupLocked)return;
+        editLabel(el.id);
+      });
+    }
+    else if(el.type==='sticker'&&!el.sondageId&&!el.nivRefId&&!el.isText){
+      div.addEventListener('dblclick',ev=>{
+        ev.stopPropagation();ev.preventDefault();
         editLabel(el.id);
       });
     }
@@ -1702,8 +1791,9 @@ function deleteElement(id){const el=elements.find(e=>e.id===id);if(el&&el.groupI
 
 function editText(id){const el=elements.find(e=>e.id===id);if(!el)return;selectTool('text');openTextEditorForEdit(id);}
 function editLabel(id){
-  const el=elements.find(e=>e.id===id);if(!el||!el.isText)return;
-  const newText=prompt('Modifier le texte :',el.label);
+  const el=elements.find(e=>e.id===id);if(!el)return;
+  if(el.sondageId||el.nivRefId)return;
+  const newText=prompt('Modifier le texte :',el.label||'');
   if(newText!==null&&newText.trim()){el.label=newText.trim();renderElements();}
 }
 function duplicateElement(id){
@@ -1751,6 +1841,13 @@ function openTextEditorForEdit(id){
   ed.innerHTML=el.html||el.text||'';
   ed.style.left=(el.x*scale+offX)+'px';ed.style.top=(el.y*scale+offY)+'px';
   ed.style.color=el.color||textColor;
+  ed.style.transform='translate(-50%,-50%) scale('+scale+')';
+  if(el.textW){ed.style.width=el.textW+'px';ed.style.maxWidth='none';}else{ed.style.maxWidth='240px';}
+  ed.style.padding='6px 10px';
+  ed.style.borderRadius='8px';
+  ed.style.background='rgba(255,255,255,0.95)';
+  ed.style.textAlign='justify';
+  if(el.bordered){ed.style.border='2px solid '+(el.color||'#1A1A1A');ed.style.borderRadius='4px';}
   document.getElementById('canvas-area').appendChild(ed);
   document.getElementById('ts-bordered').checked=!!el.bordered;
   setTimeout(()=>ed.focus(),50);
@@ -1783,6 +1880,31 @@ function teSetColor(c){const ed=document.getElementById('inline-text-editor');if
 let redoStack=[];
 function undoAction(){if(cleanPaths.length>0&&(drawPaths.length===0||cleanPaths.length>=drawPaths.length)){redoStack.push({type:'clean',data:cleanPaths.pop()});redrawCleanCanvas();}else if(drawPaths.length>0){redoStack.push({type:'path',data:drawPaths.pop()});redrawCanvas();}else if(elements.length>0){redoStack.push({type:'element',data:elements.pop()});selectedId=null;renderElements();}}
 function redoAction(){if(redoStack.length===0)return;const item=redoStack.pop();if(item.type==='path'){drawPaths.push(item.data);redrawCanvas();}else if(item.type==='clean'){cleanPaths.push(item.data);redrawCleanCanvas();}else if(item.type==='element'){elements.push(item.data);renderElements();}}
+
+function duplicateSelected(){
+  if(!selectedId)return;
+  const el=elements.find(e=>e.id===selectedId);
+  if(!el)return;
+  // Ne pas dupliquer les éléments liés (sondages, niveaux de référence)
+  if(el.sondageId||el.nivRefId)return;
+  const off=20/scale;
+  const nid=Date.now();
+  if(el.type==='sticker'){
+    const copy={...el,id:nid,x:el.x+off,y:el.y+off};
+    delete copy.groupId;delete copy.groupLocked;
+    elements.push(copy);
+  }else if(el.type==='text'){
+    elements.push({...el,id:nid,x:el.x+off,y:el.y+off});
+  }else if(el.type==='arrow'){
+    elements.push({...el,id:nid,x:el.x+off,y:el.y+off,x2:el.x2+off,y2:el.y2+off});
+  }else if(el.type==='image'){
+    elements.push({...el,id:nid,x:el.x+off,y:el.y+off});
+  }else{
+    elements.push({...el,id:nid,x:el.x+off,y:el.y+off});
+  }
+  selectedId=nid;
+  renderElements();
+}
 
 // ═══ LÉGENDE ═══
 
@@ -1825,6 +1947,7 @@ function openLegend(){
 function closeLegend(){document.getElementById('legend-modal').classList.remove('open');}
 
 function escXml(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function autoSizeRef(){const el=document.getElementById('project-ref');if(!el)return;el.size=Math.max(10,el.value.length+1);}
 
 function placeLegendOnPlan(){
   const stickers=elements.filter(e=>e.type==='sticker'&&!e.noLegend);
@@ -1892,7 +2015,7 @@ async function createNewStudy(){
     return;
   }
   // Remplir la référence projet
-  document.getElementById('project-ref').value=ref;
+  document.getElementById('project-ref').value=ref;autoSizeRef();
   const fileName='VISIO_'+ref+'.geoter';
   if(window.showSaveFilePicker){
     try{
@@ -1932,8 +2055,8 @@ function buildProjectJSON(){
     planW:planW,
     planH:planH,
     elements:elements.map(el=>{
-      if(el.type==='sticker'){const o={type:'sticker',x:el.x,y:el.y,svgKey:el.svgKey,label:el.label,color:el.color,sScale:el.sScale||1,rotation:el.rotation||0};if(el.isText)o.isText=true;if(el.noBorder)o.noBorder=true;if(el.noLegend)o.noLegend=true;if(el.underline)o.underline=true;if(el.groupId)o.groupId=el.groupId;if(el.groupLocked)o.groupLocked=true;if(el.sondageId)o.sondageId=el.sondageId;if(el.sondageBg)o.sondageBg=true;if(el.nivRefId){o.nivRefId=el.nivRefId;o.nivRefAlt=el.nivRefAlt;}if(el.isShape){o.isShape=true;o.shapeType=el.shapeType;o.filled=!!el.filled;o.shapeW=el.shapeW;o.shapeH=el.shapeH;o.strokeWidth=el.strokeWidth||2;o.opacity=el.opacity!=null?el.opacity:1;if(el.fillColor)o.fillColor=el.fillColor;}return o;}
-      if(el.type==='text'){const o={type:'text',x:el.x,y:el.y,html:el.html||'',text:el.text||'',color:el.color};if(el.bordered)o.bordered=true;return o;}
+      if(el.type==='sticker'){const o={type:'sticker',x:el.x,y:el.y,svgKey:el.svgKey,label:el.label,color:el.color,sScale:el.sScale||1,rotation:el.rotation||0};if(el.isText)o.isText=true;if(el.noBorder)o.noBorder=true;if(el.noLegend)o.noLegend=true;if(el.underline)o.underline=true;if(el.groupId)o.groupId=el.groupId;if(el.groupLocked)o.groupLocked=true;if(el.sondageId)o.sondageId=el.sondageId;if(el.sondageBg)o.sondageBg=true;if(el.nivRefId){o.nivRefId=el.nivRefId;o.nivRefAlt=el.nivRefAlt;if(el.sondageBg===false)o.sondageBg=false;}if(el.labelPos)o.labelPos=el.labelPos;if(el.showLabel)o.showLabel=true;if(el.isShape){o.isShape=true;o.shapeType=el.shapeType;o.filled=!!el.filled;o.shapeW=el.shapeW;o.shapeH=el.shapeH;o.strokeWidth=el.strokeWidth||2;o.opacity=el.opacity!=null?el.opacity:1;if(el.fillColor)o.fillColor=el.fillColor;}return o;}
+      if(el.type==='text'){const o={type:'text',x:el.x,y:el.y,html:el.html||'',text:el.text||'',color:el.color};if(el.bordered)o.bordered=true;if(el.textW)o.textW=el.textW;return o;}
       if(el.type==='arrow')return{type:'arrow',x:el.x,y:el.y,x2:el.x2,y2:el.y2,color:el.color,doubleHead:el.doubleHead||false,lineOnly:el.lineOnly||false,dashed:el.dashed||false,opacity:el.opacity!=null?el.opacity:1,strokeWidth:el.strokeWidth||2};
       if(el.type==='legend')return{type:'legend',x:el.x,y:el.y,imgSrc:el.imgSrc,w:el.w,h:el.h};
       if(el.type==='image')return{type:'image',x:el.x,y:el.y,imgSrc:el.imgSrc,w:el.w,h:el.h,rotation:el.rotation||0};
@@ -2056,7 +2179,7 @@ function importProject(e){
     activateApp();
     savedFileHandle=null; // Pas de handle en lecture, le 1er "Enregistrer" demandera l'emplacement
     // Restore project ref
-    document.getElementById('project-ref').value=project.projectRef||'';
+    document.getElementById('project-ref').value=project.projectRef||'';autoSizeRef();
     // Projet sans plan (nouveau projet vide)
     if(!project.planImgSrc){
       if(window.importScan3DFromProject) window.importScan3DFromProject(project.scan3d||null);
@@ -2071,9 +2194,7 @@ function importProject(e){
     $img.src=planImgSrc;
     $img.onload=function(){
       document.getElementById('empty-state').style.display='none';
-      const $dc=document.getElementById('draw-canvas');
-      $dc.width=$area.clientWidth;$dc.height=$area.clientHeight;
-      resetView();
+      resizeDrawCanvas();
       // Restore elements
       elements=(project.elements||[]).map(el=>{el.id=el.id||Date.now()+Math.random();return el;});
       // Restore draw paths
@@ -2091,6 +2212,9 @@ function importProject(e){
       redrawCanvas();
       redrawCleanCanvas();
       renderElements();
+      resetView();
+      // Recentrer une seconde fois après stabilisation du layout
+      setTimeout(()=>{resizeDrawCanvas();resetView();},100);
     };
   };
   reader.readAsText(file);
@@ -2181,9 +2305,9 @@ function renderPlanToCanvas(cb){
     textEls.forEach(el=>{
       const content=el.html||el.text||'';
       if(!content)return;
-      const maxW=240,padX=10,padY=6;
+      const maxW=el.textW||240,padX=10,padY=6;
       const wrap=document.createElement('div');
-      wrap.style.cssText=`position:absolute;left:-9999px;top:-9999px;font-family:sans-serif;font-size:13px;line-height:1.5;max-width:${maxW}px;padding:${padY}px ${padX}px;word-break:break-word;text-align:center;visibility:hidden`;
+      wrap.style.cssText=`position:absolute;left:-9999px;top:-9999px;font-family:sans-serif;font-size:13px;line-height:1.5;${el.textW?'width:'+maxW+'px':'max-width:'+maxW+'px'};padding:${padY}px ${padX}px;word-break:break-word;text-align:justify;visibility:hidden`;
       wrap.innerHTML=content;
       document.body.appendChild(wrap);
       const boxW=wrap.offsetWidth,boxH=wrap.offsetHeight;
