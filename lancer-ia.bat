@@ -1,4 +1,0 @@
-@echo off
-set ANTHROPIC_API_KEY=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
-python proxy-ia.py
-pause
